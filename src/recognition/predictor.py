@@ -19,7 +19,8 @@ class PiecePredictor:
         self.model = load_model(model_path, num_classes=NUM_CLASSES, device=device)
 
     def predict_cell(self, cell_image: np.ndarray) -> int:
-        pil_image = Image.fromarray(cell_image).convert("RGB")
+        cell_rgb = cell_image[:, :, ::-1]
+        pil_image = Image.fromarray(cell_rgb)
         input_tensor = PREDICT_TRANSFORM(pil_image).unsqueeze(0).to(self.device)
 
         with torch.no_grad():

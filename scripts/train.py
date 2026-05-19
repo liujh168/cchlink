@@ -1,17 +1,34 @@
 import argparse
 import sys
 import os
+import random
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
 from src.recognition.model import build_model, save_model, NUM_CLASSES
 from src.recognition.dataset import PieceDataset, TRAIN_TRANSFORM, VAL_TRANSFORM
+
+
+class _TransformSubset(Dataset):
+    def __init__(self, samples, transform):
+        self.samples = samples
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        img_path, label = self.samples[idx]
+        image = PieceDataset._load_image(img_path)
+        if self.transform:
+            image = self.transform(image)
+        return image, label
 
 
 def train_one_epoch(model, dataloader, criterion, optimizer, device):
@@ -72,11 +89,19 @@ def main():
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
 
-    dataset = PieceDataset(args.data, transform=TRAIN_TRANSFORM)
-    val_size = int(len(dataset) * args.val_split)
-    train_size = len(dataset) - val_size
-    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-    val_dataset.dataset.transform = VAL_TRANSFORM
+    full_dataset = PieceDataset(args.data, transform=None)
+    indices = list(range(len(full_dataset)))
+    random.seed(42)
+    random.shuffle(indices)
+
+    val_size = int(len(full_dataset) * args.val_split)
+    train_size = len(full_dataset) - val_size
+
+    train_samples = [full_dataset.samples[i] for i in indices[:train_size]]
+    val_samples = [full_dataset.samples[i] for i in indices[train_size:]]
+
+    train_dataset = _TransformSubset(train_samples, TRAIN_TRANSFORM)
+    val_dataset = _TransformSubset(val_samples, VAL_TRANSFORM)
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=0)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=0)

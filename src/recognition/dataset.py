@@ -49,9 +49,13 @@ class PieceDataset(Dataset):
 
     def __getitem__(self, idx):
         img_path, label = self.samples[idx]
-        image = Image.open(img_path).convert("RGB")
+        image = self._load_image(img_path)
 
         if self.transform:
             image = self.transform(image)
 
         return image, label
+
+    @staticmethod
+    def _load_image(img_path: str) -> Image.Image:
+        return Image.open(img_path).convert("RGB")
