@@ -142,6 +142,15 @@ def apply_perspective(pil_img: Image.Image) -> np.ndarray:
     return warped
 
 
+def apply_rotation(img: np.ndarray) -> np.ndarray:
+    h, w = img.shape[:2]
+    angle = random.uniform(-15, 15)
+    M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1.0)
+    rotated = cv2.warpAffine(img, M, (w, h), borderMode=cv2.BORDER_CONSTANT,
+                              borderValue=(0, 0, 0))
+    return rotated
+
+
 def apply_lighting(img: np.ndarray) -> np.ndarray:
     if random.random() < 0.6:
         factor = random.uniform(0.6, 1.4)

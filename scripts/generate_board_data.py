@@ -9,9 +9,10 @@ import numpy as np
 from PIL import Image
 
 from generate_board import (
-    render_board, INITIAL_LAYOUT, PIECE_CHARS,
-    ROWS, COLS, CELL, BOARD_W, BOARD_H,
-)
+            render_board, INITIAL_LAYOUT, PIECE_CHARS,
+            ROWS, COLS, CELL, BOARD_W, BOARD_H,
+            apply_perspective, apply_lighting, apply_rotation,
+        )
 from src.recognition.dataset import CLASS_TO_IDX
 
 RED_PIECES = ["红帅", "红仕", "红相", "红俥", "红马", "红炮", "红兵"]
@@ -116,8 +117,10 @@ def main():
 
             board_img = render_board(INITIAL_LAYOUT)
 
-            from generate_board import apply_perspective, apply_lighting
-            warped = Image.fromarray(apply_perspective(board_img))
+            warped = apply_perspective(board_img)
+            if random.random() < 0.4:
+                warped = apply_rotation(warped)
+            warped = Image.fromarray(warped)
             warped = Image.fromarray(apply_lighting(np.array(warped)))
 
             cells = crop_cells(warped)
@@ -144,8 +147,10 @@ def main():
         layout = generate_random_midgame()
         board_img = render_board(layout)
 
-        from generate_board import apply_perspective, apply_lighting
-        warped = Image.fromarray(apply_perspective(board_img))
+        warped = apply_perspective(board_img)
+        if random.random() < 0.4:
+            warped = apply_rotation(warped)
+        warped = Image.fromarray(warped)
         warped = Image.fromarray(apply_lighting(np.array(warped)))
 
         cells = crop_cells(warped)

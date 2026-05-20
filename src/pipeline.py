@@ -8,6 +8,11 @@ from src.fen.fen_builder import build_fen, IDX_TO_NAME
 
 
 class Pipeline:
+    """Pipeline expects image input in RGB format.
+
+    CLI scripts should convert images to RGB before calling run() or run_verbose().
+    """
+
     def __init__(self, model_path: str, device: str = "cpu"):
         self.predictor = PiecePredictor(model_path, device=device)
 

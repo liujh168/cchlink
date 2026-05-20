@@ -10,9 +10,10 @@ from src.segmentation.grid_splitter import split_board_with_positions
 from src.recognition.predictor import PiecePredictor
 
 image_path = r"i:\cchlink\data\raw\initial_00.jpg"
-model_path = r"i:\cchlink\data\models\checkpoint_v2.pth"
+model_path = r"i:\cchlink\data\models\checkpoint_v3.pth"
 
 image = cv2.imread(image_path)
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 print(f"原图尺寸: {image.shape}")
 
 corners = detect_board_corners(image)
@@ -23,7 +24,8 @@ if corners is None:
 
 board = warp_board(image, corners)
 print(f"校正后棋盘尺寸: {board.shape}")
-cv2.imwrite(r"i:\cchlink\data\raw\debug_board.jpg", board)
+cv2.imwrite(r"i:\cchlink\data\raw\debug_board.jpg",
+             cv2.cvtColor(board, cv2.COLOR_RGB2BGR))
 
 cells = split_board_with_positions(board)
 print(f"分割格子数: {len(cells)}")
