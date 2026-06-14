@@ -5,6 +5,11 @@ import random
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VENV_SITE = os.path.join(PROJECT_ROOT, ".venv", "Lib", "site-packages")
+if os.path.exists(VENV_SITE) and VENV_SITE not in sys.path:
+    sys.path.insert(0, VENV_SITE)
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -13,6 +18,7 @@ from tqdm import tqdm
 
 from src.recognition.model import build_model, save_model, NUM_CLASSES
 from src.recognition.dataset import PieceDataset, TRAIN_TRANSFORM, VAL_TRANSFORM
+from src.recognition.split import group_split_indices
 
 
 class _TransformSubset(Dataset):
@@ -82,7 +88,7 @@ def main():
     parser.add_argument("--batch_size", "-b", type=int, default=32, help="批次大小")
     parser.add_argument("--lr", type=float, default=0.001, help="学习率")
     parser.add_argument("--output", "-o", required=True, help="模型输出路径 (*.pth)")
-    parser.add_argument("--device", default="cpu", choices=["cpu", "cuda"], help="训练设备")
+    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu", choices=["cpu", "cuda"], help="训练设备")
     parser.add_argument("--val_split", type=float, default=0.2, help="验证集比例")
     args = parser.parse_args()
 
@@ -90,15 +96,11 @@ def main():
     print(f"使用设备: {device}")
 
     full_dataset = PieceDataset(args.data, transform=None)
-    indices = list(range(len(full_dataset)))
-    random.seed(42)
-    random.shuffle(indices)
-
-    val_size = int(len(full_dataset) * args.val_split)
-    train_size = len(full_dataset) - val_size
-
-    train_samples = [full_dataset.samples[i] for i in indices[:train_size]]
-    val_samples = [full_dataset.samples[i] for i in indices[train_size:]]
+    train_indices, val_indices = group_split_indices(full_dataset.groups, args.val_split)
+    train_samples = [full_dataset.samples[i] for i in train_indices]
+    val_samples = [full_dataset.samples[i] for i in val_indices]
+    train_size = len(train_samples)
+    val_size = len(val_samples)
 
     train_dataset = _TransformSubset(train_samples, TRAIN_TRANSFORM)
     val_dataset = _TransformSubset(val_samples, VAL_TRANSFORM)

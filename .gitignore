@@ -12,3 +12,12 @@ venv/
 *.pth
 .DS_Store
 Thumbs.db
+.vscode/
+.pytest_cache/
+.ruff_cache/
+debug/
+debug_*.png
+data/raw/debug_*
+data/raw/diag_*
+data/raw/eval/
+data/pieces_*/

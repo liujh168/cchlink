@@ -52,29 +52,31 @@ def _load_font(size: int) -> ImageFont.FreeTypeFont | None:
 
 
 def _draw_board_base(draw):
-    for r in range(ROWS + 1):
-        y = r * CELL
-        draw.line([(0, y), (BOARD_W - CELL, y)], fill=LINE_COLOR, width=LINE_WIDTH)
-    draw.line([(0, ROWS * CELL - CELL), (BOARD_W - CELL, ROWS * CELL - CELL)],
-              fill=LINE_COLOR, width=LINE_WIDTH)
+    offset = CELL // 2
+    left_x = offset
+    right_x = offset + (COLS - 1) * CELL
+    top_y = offset
+    bot_y = offset + (ROWS - 1) * CELL
 
-    for c in range(COLS + 1):
-        x = c * CELL
-        top_y = 0
-        bot_y = ROWS * CELL - CELL
-        if c in (0, COLS):
+    for r in range(ROWS):
+        y = offset + r * CELL
+        draw.line([(left_x, y), (right_x, y)], fill=LINE_COLOR, width=LINE_WIDTH)
+
+    for c in range(COLS):
+        x = offset + c * CELL
+        if c in (0, COLS - 1):
             draw.line([(x, top_y), (x, bot_y)], fill=LINE_COLOR, width=LINE_WIDTH)
         else:
-            draw.line([(x, top_y), (x, 4 * CELL)], fill=LINE_COLOR, width=LINE_WIDTH)
-            draw.line([(x, 5 * CELL), (x, bot_y)], fill=LINE_COLOR, width=LINE_WIDTH)
+            draw.line([(x, top_y), (x, offset + 4 * CELL)], fill=LINE_COLOR, width=LINE_WIDTH)
+            draw.line([(x, offset + 5 * CELL), (x, bot_y)], fill=LINE_COLOR, width=LINE_WIDTH)
 
-    for r1, r2 in [(0, 1), (7, 8)]:
-        x1, x2 = 3 * CELL, 5 * CELL
-        y1, y2 = r1 * CELL, r2 * CELL
+    for r1, r2 in [(0, 2), (7, 9)]:
+        x1, x2 = offset + 3 * CELL, offset + 5 * CELL
+        y1, y2 = offset + r1 * CELL, offset + r2 * CELL
         draw.line([(x1, y1), (x2, y2)], fill=LINE_COLOR, width=LINE_WIDTH)
         draw.line([(x2, y1), (x1, y2)], fill=LINE_COLOR, width=LINE_WIDTH)
 
-    river_cy = 4 * CELL + CELL // 2
+    river_cy = offset + 4 * CELL + CELL // 2
     font_river = _load_font(22)
     if font_river:
         draw.text((1 * CELL + 14, river_cy - 18), "楚  河", fill=LINE_COLOR, font=font_river)
@@ -116,11 +118,15 @@ def render_board(layout: list[list[str | None]], font_size=26) -> Image.Image:
         for c in range(COLS):
             piece = layout[r][c]
             if piece:
-                cx = c * CELL + CELL // 2
-                cy = r * CELL + CELL // 2
+                cx = CELL // 2 + c * CELL
+                cy = CELL // 2 + r * CELL
                 _draw_piece(draw, cx, cy, piece, font, size=40)
 
     return img
+
+
+def _random_bg_color() -> tuple:
+    return tuple(random.randint(0, 80) for _ in range(3))
 
 
 def apply_perspective(pil_img: Image.Image) -> np.ndarray:
@@ -128,7 +134,7 @@ def apply_perspective(pil_img: Image.Image) -> np.ndarray:
     h, w = img.shape[:2]
     src_pts = np.float32([[0, 0], [w - 1, 0], [w - 1, h - 1], [0, h - 1]])
 
-    jitter = random.uniform(0.05, 0.15)
+    jitter = random.uniform(0.10, 0.30)
     dst_pts = np.float32([
         [w * random.uniform(0, jitter), h * random.uniform(0, jitter)],
         [w * (1 - random.uniform(0, jitter)), h * random.uniform(0, jitter)],
@@ -136,18 +142,20 @@ def apply_perspective(pil_img: Image.Image) -> np.ndarray:
         [w * random.uniform(0, jitter), h * (1 - random.uniform(0, jitter))],
     ])
 
+    bg = _random_bg_color()
     M = cv2.getPerspectiveTransform(src_pts, dst_pts)
     warped = cv2.warpPerspective(img, M, (w, h), borderMode=cv2.BORDER_CONSTANT,
-                                  borderValue=(0, 0, 0))
+                                  borderValue=bg)
     return warped
 
 
 def apply_rotation(img: np.ndarray) -> np.ndarray:
     h, w = img.shape[:2]
-    angle = random.uniform(-15, 15)
+    angle = random.uniform(-35, 35)
     M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1.0)
+    bg = _random_bg_color()
     rotated = cv2.warpAffine(img, M, (w, h), borderMode=cv2.BORDER_CONSTANT,
-                              borderValue=(0, 0, 0))
+                              borderValue=bg)
     return rotated
 
 

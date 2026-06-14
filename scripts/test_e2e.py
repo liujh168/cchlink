@@ -1,11 +1,14 @@
 import sys
-sys.path.insert(0, r"i:\cchlink")
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
 
 import cv2
 from src.pipeline import Pipeline
 
-image_path = r"i:\cchlink\data\raw\initial_00.jpg"
-model_path = r"i:\cchlink\data\models\checkpoint.pth"
+image_path = str(PROJECT_ROOT / "data" / "raw" / "initial_00.jpg")
+model_path = str(PROJECT_ROOT / "data" / "models" / "checkpoint.pth")
 
 print(f"图片: {image_path}")
 print(f"模型: {model_path}")

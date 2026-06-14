@@ -1,9 +1,8 @@
 import cv2
 import numpy as np
 
+from src.geometry import BOARD_HEIGHT, BOARD_WIDTH
 
-BOARD_WIDTH = 450
-BOARD_HEIGHT = 500
 WARP_PAD = 30
 
 

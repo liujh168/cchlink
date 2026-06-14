@@ -1,77 +1,212 @@
+from dataclasses import dataclass
+
 import cv2
 import numpy as np
 
+from src.geometry import COLS, extract_intersection_patches, ideal_grid_positions
 
-COLS = 9
-ROWS = 10
+
+@dataclass(frozen=True)
+class GridDetection:
+    """校正棋盘中的交点位置及其整体可信度。"""
+
+    row_positions: list[int]
+    col_positions: list[int]
+    confidence: float
 
 
 def split_board(board_image: np.ndarray) -> list[np.ndarray]:
-    gray = cv2.cvtColor(board_image, cv2.COLOR_BGR2GRAY)
-    h_lines, v_lines = _detect_grid_lines(gray, board_image.shape[:2])
-
-    cells = []
-    for row in range(min(ROWS, len(h_lines) - 1)):
-        y1 = max(0, h_lines[row])
-        y2 = min(board_image.shape[0], h_lines[row + 1])
-        for col in range(min(COLS, len(v_lines) - 1)):
-            x1 = max(0, v_lines[col])
-            x2 = min(board_image.shape[1], v_lines[col + 1])
-            cells.append(board_image[y1:y2, x1:x2])
-
-    return cells
+    detection = detect_grid(board_image)
+    return extract_intersection_patches(
+        board_image, detection.row_positions, detection.col_positions
+    )
 
 
 def split_board_with_positions(board_image: np.ndarray) -> list[tuple[int, int, np.ndarray]]:
-    gray = cv2.cvtColor(board_image, cv2.COLOR_BGR2GRAY)
-    h_lines, v_lines = _detect_grid_lines(gray, board_image.shape[:2])
+    cells = split_board(board_image)
+    return [(i // COLS, i % COLS, cell) for i, cell in enumerate(cells)]
 
-    cells = []
-    for row in range(min(ROWS, len(h_lines) - 1)):
-        y1 = max(0, h_lines[row])
-        y2 = min(board_image.shape[0], h_lines[row + 1])
-        for col in range(min(COLS, len(v_lines) - 1)):
-            x1 = max(0, v_lines[col])
-            x2 = min(board_image.shape[1], v_lines[col + 1])
-            cells.append((row, col, board_image[y1:y2, x1:x2]))
 
-    return cells
+def detect_grid(board_image: np.ndarray) -> GridDetection:
+    """定位 10 行、9 列棋盘交点，并返回保守的整体置信度。"""
+    gray = cv2.cvtColor(board_image, cv2.COLOR_RGB2GRAY)
+    h, w = gray.shape
+    ideal_rows, ideal_cols = ideal_grid_positions(w, h)
+    rows, row_score = _snap_intersections(gray, axis="h", ideal=ideal_rows)
+    cols, col_score = _snap_intersections(gray, axis="v", ideal=ideal_cols)
+    return GridDetection(rows, cols, float(min(row_score, col_score)))
 
 
 def _detect_grid_lines(gray: np.ndarray, shape: tuple) -> tuple[list[int], list[int]]:
     h, w = shape
-
-    h_lines = _detect_by_sobel(gray, axis='h', expected=ROWS + 1)
-    v_lines = _detect_by_sobel(gray, axis='v', expected=COLS + 1)
-
-    if len(h_lines) < ROWS + 1 or len(v_lines) < COLS + 1:
-        hh, vv = _detect_by_hough(gray, h, w)
-        if len(hh) >= ROWS + 1:
-            h_lines = hh
-        else:
-            h_lines = _fill_lines(h_lines, ROWS + 1, h)
-        if len(vv) >= COLS + 1:
-            v_lines = vv
-        else:
-            v_lines = _fill_lines(v_lines, COLS + 1, w)
-
-    if len(h_lines) > ROWS + 1:
-        h_lines = _trim_lines(h_lines, ROWS + 1)
-    if len(v_lines) > COLS + 1:
-        v_lines = _trim_lines(v_lines, COLS + 1)
-
+    rows, cols = ideal_grid_positions(w, h)
+    h_lines, _ = _snap_intersections(gray, axis="h", ideal=rows)
+    v_lines, _ = _snap_intersections(gray, axis="v", ideal=cols)
     return h_lines, v_lines
 
 
-def _detect_by_sobel(gray: np.ndarray, axis: str, expected: int) -> list[int]:
-    if axis == 'h':
+def _snap_intersections(gray: np.ndarray, axis: str, ideal: list[int]) -> tuple[list[int], float]:
+    """将理想交点吸附到附近的 Sobel 边缘峰值。
+
+    置信度同时考虑峰值相对背景的强度、整条投影曲线的对比度以及相邻交点间距的
+    规则程度。最终取横纵两个方向的较低值，使任一方向定位不可靠时能够触发拒识。
+    """
+    if axis == "h":
+        edge = np.abs(cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3))
+        profile = edge.mean(axis=1)
+    else:
+        edge = np.abs(cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3))
+        profile = edge.mean(axis=0)
+
+    profile = np.convolve(profile, np.ones(5, dtype=np.float32) / 5, mode="same")
+    spacing = float(np.median(np.diff(ideal)))
+    search_half = max(3, int(round(spacing * 0.22)))
+    positions = []
+    strengths = []
+    baseline = float(np.percentile(profile, 55)) + 1e-6
+
+    for center in ideal:
+        lo = max(0, center - search_half)
+        hi = min(len(profile), center + search_half + 1)
+        window = profile[lo:hi]
+        best = lo + int(np.argmax(window))
+        positions.append(best)
+        strengths.append(float(profile[best]) / baseline)
+
+    for index in range(1, len(positions)):
+        positions[index] = max(positions[index], positions[index - 1] + 1)
+
+    spacing_error = np.std(np.diff(positions)) / max(spacing, 1.0)
+    strength_score = np.clip((np.median(strengths) - 1.0) / 2.5, 0.0, 1.0)
+    p50 = float(np.percentile(profile, 50))
+    p90 = float(np.percentile(profile, 90))
+    contrast_score = np.clip(((p90 / (p50 + 1e-6)) - 1.0) / 3.0, 0.0, 1.0)
+    signal_score = max(strength_score, contrast_score * 0.75)
+    regularity_score = np.clip(1.0 - spacing_error / 0.22, 0.0, 1.0)
+    confidence = signal_score * (0.65 + 0.35 * regularity_score)
+    return positions, float(confidence)
+
+
+def _snap_grid(gray: np.ndarray, axis: str, count: int, size: int) -> list[int]:
+    if axis == "h":
         edge = np.abs(cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3))
         profile = edge.mean(axis=1)
     else:
         edge = np.abs(cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3))
         profile = edge.mean(axis=0)
 
-    profile = np.convolve(profile, np.ones(5) / 5, mode='same')
+    profile = np.convolve(profile, np.ones(5) / 5, mode="same")
+
+    spacing = float(size) / (count - 1)
+    best_offset = 0
+    best_score = -1.0
+    search_range = max(1, int(spacing * 0.3))
+
+    for offset in range(-search_range, search_range + 1):
+        score = 0.0
+        for i in range(count):
+            pos = int(offset + i * spacing)
+            if 0 <= pos < len(profile):
+                score += profile[pos]
+        if score > best_score:
+            best_score = score
+            best_offset = offset
+
+    lines = []
+    for i in range(count):
+        center = int(best_offset + i * spacing)
+        lo = max(0, center - 2)
+        hi = min(len(profile) - 1, center + 2)
+        if lo >= hi:
+            lines.append(center)
+            continue
+        window = profile[lo : hi + 1]
+        best = int(np.argmax(window)) + lo
+        lines.append(best)
+
+    lines = sorted(set(lines))
+    if not lines:
+        return [int(i * spacing) for i in range(count)]
+
+    if lines[0] > max(3, size // 20):
+        lines.insert(0, 0)
+    if lines[-1] < size - max(3, size // 20):
+        lines.append(size - 1)
+
+    while len(lines) < count:
+        max_gap = 0
+        max_idx = 0
+        for i in range(len(lines) - 1):
+            gap = lines[i + 1] - lines[i]
+            if gap > max_gap:
+                max_gap = gap
+                max_idx = i
+        lines.insert(max_idx + 1, (lines[max_idx] + lines[max_idx + 1]) // 2)
+
+    if len(lines) > count:
+        step = (len(lines) - 1) / (count - 1)
+        selected = []
+        for i in range(count):
+            idx = min(len(lines) - 1, int(round(i * step)))
+            selected.append(lines[idx])
+        lines = selected
+
+    return lines[:count]
+
+
+def _detect_expected(gray: np.ndarray, axis: str, expected_count: int, size: int) -> list[int]:
+    if axis == "h":
+        edge = np.abs(cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3))
+        profile = edge.mean(axis=1)
+    else:
+        edge = np.abs(cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3))
+        profile = edge.mean(axis=0)
+
+    profile = np.convolve(profile, np.ones(5) / 5, mode="same")
+
+    spacing = size / (expected_count - 1)
+    search_half = max(2, int(spacing * 0.25))
+
+    lines = []
+    for i in range(expected_count):
+        center = int(i * spacing)
+        lo = max(0, center - search_half)
+        hi = min(len(profile) - 1, center + search_half)
+        if lo >= hi:
+            lines.append(center)
+            continue
+        window = profile[lo : hi + 1]
+        best = int(np.argmax(window)) + lo
+        lines.append(best)
+
+    lines.sort()
+    for i in range(1, len(lines)):
+        if lines[i] <= lines[i - 1]:
+            lines[i] = lines[i - 1] + 1
+
+    return lines
+
+
+def _ensure_boundaries(lines: list[int], size: int) -> list[int]:
+    if not lines:
+        return lines
+    lines = sorted(lines)
+    if lines[0] > max(3, size // 20):
+        lines.insert(0, 0)
+    if lines[-1] < size - max(3, size // 20):
+        lines.append(size - 1)
+    return lines
+
+
+def _detect_by_sobel(gray: np.ndarray, axis: str, expected: int) -> list[int]:
+    if axis == "h":
+        edge = np.abs(cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3))
+        profile = edge.mean(axis=1)
+    else:
+        edge = np.abs(cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3))
+        profile = edge.mean(axis=0)
+
+    profile = np.convolve(profile, np.ones(5) / 5, mode="same")
 
     min_dist = max(5, len(profile) // (expected * 2))
     threshold = np.mean(profile) * 1.2

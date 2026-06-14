@@ -7,14 +7,14 @@
 **传统 CV + 深度学习**，分四个阶段：
 
 1. **棋盘定位与校正** — Canny 边缘检测 → 最大四边形轮廓查找 → 透视变换 → 450×500 标准棋盘
-2. **格子分割** — 9×10 均匀切分，每格取中心 80% 区域
+2. **交点定位** — 检测 9×10 个棋盘交点，以交点为中心截取棋子区域
 3. **棋子识别** — MobileNetV3-Small（15 分类：7 红子 + 7 黑子 + 空）
 4. **FEN 组装** — 按规则拼接成 FEN 字符串
 
 ## 项目结构
 
 ```
-i:\cchlink\
+cchlink/
 ├── data/
 │   ├── raw/                          # 原始棋盘照片
 │   ├── pieces/                       # 棋子训练数据
@@ -63,8 +63,9 @@ i:\cchlink\
 
 ## 环境要求
 
-- Python 3.9+
-- 依赖安装：`pip install -r requirements.txt`
+- Python 3.10+
+- 依赖安装：`pip install -e .`
+- 开发依赖：`pip install -e ".[dev]"`
 
 核心依赖：OpenCV、PyTorch、torchvision、NumPy、Pillow
 
@@ -75,6 +76,14 @@ i:\cchlink\
 ```bash
 # 将训练数据放入 data/pieces/ 后执行
 python scripts/train.py -d data/pieces -o data/models/checkpoint.pth -e 30
+```
+
+推荐使用按整盘分组的数据集，避免同一棋盘泄漏到训练集和验证集：
+
+```bash
+python scripts/generate_grouped_data.py -o data/pieces_grouped -n 500
+python scripts/audit_dataset.py data/pieces_grouped
+python scripts/train_v2.py -d data/pieces_grouped -o data/models/grouped.pth
 ```
 
 参数说明：
@@ -109,6 +118,14 @@ python scripts/test_imports.py
 python scripts/test_fen.py
 ```
 
+### 固定照片分阶段评估
+
+```bash
+python scripts/evaluate_stages.py --model data/models/checkpoint_v8.pth
+```
+
+评估会分别报告棋盘检测通过率、网格通过率、90 格准确率、整盘完全匹配率和延迟。
+
 ## 开发状态
 
 | 模块 | 状态 |
@@ -121,8 +138,10 @@ python scripts/test_fen.py
 | Pipeline 管线 | ✅ |
 | 训练脚本 | ✅ |
 | CLI 推理入口 | ✅ |
-| 单元测试（FEN） | ✅ 通过 |
-| 模型训练 | ⏳ 待准备数据 |
+| pytest + GitHub Actions CI | ✅ |
+| 按棋盘分组训练数据 | ✅ |
+| 固定照片分阶段评估 | ✅ |
+| 批量推理 + 棋规后处理 | ✅ |
 
 ## 许可证
 

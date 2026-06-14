@@ -13,6 +13,7 @@ def main():
     parser.add_argument("image", help="棋盘图片路径")
     parser.add_argument("--model", "-m", required=True, help="训练好的模型权重路径 (*.pth)")
     parser.add_argument("--device", "-d", default="cpu", choices=["cpu", "cuda"], help="推理设备")
+    parser.add_argument("--backbone", default="mobilenet_v3_small", help="模型骨干网络")
     parser.add_argument("--verbose", "-v", action="store_true", help="打印详细信息")
     args = parser.parse_args()
 
@@ -21,19 +22,25 @@ def main():
         print(f"无法读取图片: {args.image}")
         sys.exit(1)
 
-    pipeline = Pipeline(model_path=args.model, device=args.device)
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    pipeline = Pipeline(model_path=args.model, device=args.device, backbone=args.backbone)
 
-    if args.verbose:
-        result = pipeline.run_verbose(image)
-        print("=" * 50)
-        print("FEN:", result["fen"])
-        print("=" * 50)
-        print("棋盘布局:")
-        for row_cells in result["grid"]:
-            print(" | ".join(f"{c:4}" for c in row_cells))
-    else:
-        fen = pipeline.run(image)
-        print(fen)
+    try:
+        if args.verbose:
+            result = pipeline.run_verbose(image_rgb)
+            print("=" * 50)
+            print("FEN:", result["fen"])
+            print(f"棋盘置信度: {result['board_confidence']:.3f}")
+            print(f"网格置信度: {result['grid_confidence']:.3f}")
+            print("=" * 50)
+            print("棋盘布局:")
+            for row_cells in result["grid"]:
+                print(" | ".join(f"{c:4}" for c in row_cells))
+        else:
+            print(pipeline.run(image_rgb))
+    except RuntimeError as error:
+        print(f"拒识: {error}", file=sys.stderr)
+        sys.exit(2)
 
 
 if __name__ == "__main__":
