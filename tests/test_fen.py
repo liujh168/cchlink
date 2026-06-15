@@ -1,67 +1,17 @@
 import pytest
 
 from src.fen.fen_builder import build_fen
+from src.recognition.dataset import CLASS_TO_IDX
+from src.standard_board import STANDARD_INITIAL_FEN, STANDARD_INITIAL_LAYOUT
 
 
 def test_build_initial_position_fen():
     board = [
-        10,
-        11,
-        9,
-        8,
-        7,
-        8,
-        9,
-        11,
-        10,
-        14,
-        12,
-        14,
-        14,
-        14,
-        14,
-        14,
-        12,
-        14,
-        13,
-        14,
-        13,
-        14,
-        13,
-        14,
-        13,
-        14,
-        13,
-        *([14] * 36),
-        6,
-        14,
-        6,
-        14,
-        6,
-        14,
-        6,
-        14,
-        6,
-        14,
-        5,
-        14,
-        14,
-        14,
-        14,
-        14,
-        5,
-        14,
-        3,
-        4,
-        2,
-        1,
-        0,
-        1,
-        2,
-        4,
-        3,
+        CLASS_TO_IDX[piece] if piece else CLASS_TO_IDX["空"]
+        for row in STANDARD_INITIAL_LAYOUT
+        for piece in row
     ]
-    assert build_fen(board) == ("rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR")
+    assert build_fen(board) == STANDARD_INITIAL_FEN
 
 
 def test_build_fen_requires_90_predictions():

@@ -67,6 +67,24 @@ def crop_cells(board_img: Image.Image) -> list[tuple[int, int, str | None, Image
     return cells
 
 
+def crop_cells_with_jitter(board_img: Image.Image, max_offset: int = 5) -> list[tuple[int, int, str | None, Image.Image]]:
+    cells = []
+    bw, bh = board_img.size
+    for r in range(ROWS):
+        for c in range(COLS):
+            cx = c * CELL + CELL // 2
+            cy = r * CELL + CELL // 2
+            dx = random.randint(-max_offset, max_offset)
+            dy = random.randint(-max_offset, max_offset)
+            x = cx + dx - CELL // 2
+            y = cy + dy - CELL // 2
+            x = max(0, min(x, bw - CELL))
+            y = max(0, min(y, bh - CELL))
+            cell = board_img.crop((x, y, x + CELL, y + CELL))
+            cells.append((r, c, None, cell))
+    return cells
+
+
 def augment_cell(cell_img: Image.Image) -> Image.Image:
     from PIL import ImageEnhance, ImageFilter
 
@@ -93,10 +111,10 @@ def augment_cell(cell_img: Image.Image) -> Image.Image:
 
 def main():
     parser = argparse.ArgumentParser(description="从模拟棋盘图片中裁剪格子生成训练数据")
-    parser.add_argument("--output", "-o", default="data/pieces_v2", help="输出目录")
-    parser.add_argument("--num-boards", "-n", type=int, default=300, help="生成的棋盘数量")
+    parser.add_argument("--output", "-o", default="data/pieces_v3", help="输出目录")
+    parser.add_argument("--num-boards", "-n", type=int, default=600, help="生成的棋盘数量")
     parser.add_argument("--include-initial", action="store_true", default=True, help="包含初始布局")
-    parser.add_argument("--num-initial", type=int, default=50, help="初始布局重复次数（配合光照变化）")
+    parser.add_argument("--num-initial", type=int, default=100, help="初始布局重复次数（配合光照变化）")
     args = parser.parse_args()
 
     output_dir = args.output
@@ -107,7 +125,6 @@ def main():
     counters = {name: 0 for name in CLASS_TO_IDX}
     total_boards = 0
 
-    # Generate from initial layout (with lighting/rotation variation via seed)
     if args.include_initial:
         print(f"从初始布局生成 ({args.num_initial} 次模拟)...")
         for i in range(args.num_initial):
@@ -118,12 +135,12 @@ def main():
             board_img = render_board(INITIAL_LAYOUT)
 
             warped = apply_perspective(board_img)
-            if random.random() < 0.4:
+            if random.random() < 0.7:
                 warped = apply_rotation(warped)
             warped = Image.fromarray(warped)
             warped = Image.fromarray(apply_lighting(np.array(warped)))
 
-            cells = crop_cells(warped)
+            cells = crop_cells_with_jitter(warped)
             for r, c, _, cell_img in cells:
                 piece = INITIAL_LAYOUT[r][c]
                 class_name = piece if piece else "空"
@@ -137,7 +154,6 @@ def main():
             if (i + 1) % 10 == 0:
                 print(f"  初始布局: {i + 1}/{args.num_initial}")
 
-    # Generate from random midgame layouts
     print(f"从随机中局布局生成 ({args.num_boards} 盘)...")
     for i in range(args.num_boards):
         seed = random.randint(0, 999999)
@@ -148,12 +164,12 @@ def main():
         board_img = render_board(layout)
 
         warped = apply_perspective(board_img)
-        if random.random() < 0.4:
+        if random.random() < 0.7:
             warped = apply_rotation(warped)
         warped = Image.fromarray(warped)
         warped = Image.fromarray(apply_lighting(np.array(warped)))
 
-        cells = crop_cells(warped)
+        cells = crop_cells_with_jitter(warped)
         for r, c, _, cell_img in cells:
             piece = layout[r][c]
             class_name = piece if piece else "空"

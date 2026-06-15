@@ -1,25 +1,21 @@
 import argparse
-import sys
 import os
 import random
+import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VENV_SITE = os.path.join(PROJECT_ROOT, ".venv", "Lib", "site-packages")
-if os.path.exists(VENV_SITE) and VENV_SITE not in sys.path:
-    sys.path.insert(0, VENV_SITE)
-
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import numpy as np
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
-from src.recognition.model import build_model, save_model, NUM_CLASSES, CLASS_NAMES
-from src.recognition.dataset import PieceDataset
-from src.recognition.split import group_split_indices
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
+
+from src.recognition.dataset import PieceDataset  # noqa: E402
+from src.recognition.model import CLASS_NAMES, NUM_CLASSES, build_model, save_model  # noqa: E402
+from src.recognition.split import group_split_indices  # noqa: E402
 
 
 class FocalLoss(nn.Module):
@@ -133,9 +129,8 @@ def print_class_accuracies(class_correct, class_total, prefix="  "):
     for cls in range(NUM_CLASSES):
         if class_total[cls] > 0:
             acc = class_correct[cls] / class_total[cls]
-            print(
-                f"{prefix}{CLASS_NAMES[cls]:6s}: {class_correct[cls]:.0f}/{class_total[cls]:.0f} ({acc:.1%})"
-            )
+            result = f"{class_correct[cls]:.0f}/{class_total[cls]:.0f} ({acc:.1%})"
+            print(f"{prefix}{CLASS_NAMES[cls]:6s}: {result}")
 
 
 def print_confusion_summary(confusion):
@@ -150,7 +145,7 @@ def main():
     parser = argparse.ArgumentParser(description="训练棋子识别 CNN 模型 (v2)")
     parser.add_argument("--data", "-d", required=True, help="训练数据根目录")
     parser.add_argument("--epochs", "-e", type=int, default=40, help="训练轮数")
-    parser.add_argument("--batch_size", "-b", type=int, default=32, help="批次大小")
+    parser.add_argument("--batch_size", "-b", type=int, default=128, help="批次大小")
     parser.add_argument("--lr", type=float, default=0.001, help="学习率")
     parser.add_argument("--output", "-o", required=True, help="模型输出路径 (*.pth)")
     parser.add_argument(
@@ -160,6 +155,12 @@ def main():
         help="训练设备",
     )
     parser.add_argument("--val_split", type=float, default=0.2, help="验证集比例")
+    parser.add_argument("--seed", type=int, default=42, help="训练与拆分随机种子")
+    parser.add_argument(
+        "--allow-legacy-data",
+        action="store_true",
+        help="允许使用不带标准 provenance manifest 的历史数据",
+    )
     parser.add_argument(
         "--backbone",
         default="resnet18",
@@ -175,13 +176,27 @@ def main():
     parser.add_argument("--focal-gamma", type=float, default=2.0, help="焦点损失的 gamma 参数")
     args = parser.parse_args()
 
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
+
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     print(f"使用设备: {device}")
 
     from src.recognition.dataset import TRAIN_TRANSFORM, VAL_TRANSFORM
 
     full_dataset = PieceDataset(args.data, transform=None)
-    train_indices, val_indices = group_split_indices(full_dataset.groups, args.val_split)
+    if not args.allow_legacy_data:
+        if full_dataset.manifest_path is None:
+            raise ValueError("标准训练要求 manifest.csv；历史目录需显式传入 --allow-legacy-data")
+        sources = {row.get("source") for row in full_dataset.provenance}
+        if sources != {"standard-v2"}:
+            raise ValueError(f"标准训练仅接受 source=standard-v2，当前为: {sorted(sources)}")
+    train_indices, val_indices = group_split_indices(
+        full_dataset.groups, args.val_split, seed=args.seed
+    )
     train_samples = [full_dataset.samples[i] for i in train_indices]
     val_samples = [full_dataset.samples[i] for i in val_indices]
     train_size = len(train_samples)
@@ -238,6 +253,13 @@ def main():
                         "std": [0.229, 0.224, 0.225],
                     },
                     "best_val_accuracy": best_val_acc,
+                    "dataset_manifest_sha256": full_dataset.manifest_sha256,
+                    "dataset_source": sorted(
+                        {row.get("source", "legacy") for row in full_dataset.provenance}
+                    ),
+                    "split_seed": args.seed,
+                    "train_samples": train_size,
+                    "val_samples": val_size,
                 },
             )
             print(f"  -> 保存最佳模型到 {args.output}")

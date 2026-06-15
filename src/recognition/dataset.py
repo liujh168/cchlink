@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import os
 
 from PIL import Image
@@ -56,10 +57,16 @@ class PieceDataset(Dataset):
     def __init__(self, root_dir: str, transform=None):
         self.samples = []
         self.groups = []
+        self.provenance = []
         self.transform = transform
+        self.manifest_path = None
+        self.manifest_sha256 = None
 
         manifest_path = os.path.join(root_dir, "manifest.csv")
         if os.path.exists(manifest_path):
+            self.manifest_path = manifest_path
+            with open(manifest_path, "rb") as handle:
+                self.manifest_sha256 = hashlib.sha256(handle.read()).hexdigest()
             self._load_manifest(root_dir, manifest_path)
             return
 
@@ -74,6 +81,7 @@ class PieceDataset(Dataset):
                 if fname.lower().endswith((".png", ".jpg", ".jpeg", ".bmp")):
                     self.samples.append((os.path.join(class_dir, fname), label))
                     self.groups.append(os.path.join(class_name, fname))
+                    self.provenance.append({})
 
     def _load_manifest(self, root_dir: str, manifest_path: str):
         with open(manifest_path, newline="", encoding="utf-8") as handle:
@@ -86,6 +94,7 @@ class PieceDataset(Dataset):
                     path = os.path.join(root_dir, path)
                 self.samples.append((path, CLASS_TO_IDX[class_name]))
                 self.groups.append(row["group"])
+                self.provenance.append(row)
 
     def __len__(self):
         return len(self.samples)

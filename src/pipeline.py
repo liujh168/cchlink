@@ -1,7 +1,14 @@
 import numpy as np
 
+from src.analysis import AnalysisResult, AnalysisWarning, CellResult
+from src.artifacts import save_debug_artifacts, save_visualizations
 from src.fen.fen_builder import IDX_TO_NAME, build_fen
-from src.fen.rules import legalize_predictions
+from src.fen.rules import (
+    detect_orientation,
+    legalize_predictions_with_corrections,
+    normalize_orientation,
+    validate_position,
+)
 from src.geometry import COLS, extract_intersection_patches
 from src.preprocess.board_detector import detect_board
 from src.preprocess.perspective import WARP_PAD, warp_board
@@ -46,37 +53,92 @@ class Pipeline:
         if grid.confidence < self.min_grid_confidence:
             raise RuntimeError(f"网格定位置信度过低: {grid.confidence:.3f}")
         cells = extract_intersection_patches(board, grid.row_positions, grid.col_positions)
-        return detection, grid, cells
+        return detection, grid, board, cells
+
+    def analyze(self, image: np.ndarray, debug_dir=None, visualize_dir=None) -> AnalysisResult:
+        """返回完整结构化结果，并可选择保存本次识别的调试产物。"""
+        detection, grid, board, cells = self._extract(image)
+        raw_predictions, raw_confidences = self.predictor.predict_batch(cells)
+        orientation = detect_orientation(raw_predictions)
+        predictions, confidences = normalize_orientation(
+            raw_predictions, raw_confidences, orientation
+        )
+        if orientation == "red_top":
+            board = np.rot90(board, 2).copy()
+            cells = list(reversed(cells))
+            row_positions = sorted(board.shape[0] - 1 - y for y in grid.row_positions)
+            col_positions = sorted(board.shape[1] - 1 - x for x in grid.col_positions)
+        else:
+            row_positions = grid.row_positions
+            col_positions = grid.col_positions
+
+        raw_fen = build_fen(predictions)
+        if self.apply_rules:
+            final_predictions, corrections = legalize_predictions_with_corrections(
+                predictions, confidences
+            )
+        else:
+            final_predictions, corrections = predictions, []
+        warnings = validate_position(final_predictions, orientation)
+        low_confidence = [
+            divmod(index, COLS) for index, confidence in enumerate(confidences) if confidence < 0.5
+        ]
+        if low_confidence:
+            warnings.append(
+                AnalysisWarning(
+                    "low_confidence_cells",
+                    "warning",
+                    f"存在 {len(low_confidence)} 个低置信度交点",
+                    low_confidence,
+                )
+            )
+
+        cell_results = [
+            CellResult(
+                row=index // COLS,
+                col=index % COLS,
+                prediction=prediction,
+                name=IDX_TO_NAME[prediction],
+                confidence=float(confidences[index]),
+                raw_prediction=predictions[index],
+            )
+            for index, prediction in enumerate(final_predictions)
+        ]
+        result = AnalysisResult(
+            fen=build_fen(final_predictions),
+            raw_fen=raw_fen,
+            orientation=orientation,
+            board_confidence=detection.confidence,
+            grid_confidence=grid.confidence,
+            cells=cell_results,
+            warnings=warnings,
+            corrections=corrections,
+            corners=detection.corners.tolist(),
+            row_positions=row_positions,
+            col_positions=col_positions,
+        )
+        # 两类输出是独立开关；同时传入时，两处目录都应得到各自约定的产物。
+        if visualize_dir is not None:
+            save_visualizations(visualize_dir, image, board, result)
+        if debug_dir is not None:
+            save_debug_artifacts(debug_dir, image, board, cells, result)
+        return result
 
     def run(self, image: np.ndarray) -> str:
-        _, _, cells = self._extract(image)
-        predictions, confidences = self.predictor.predict_batch(cells)
-        if self.apply_rules:
-            predictions = legalize_predictions(predictions, confidences)
-        fen = build_fen(predictions)
-        return fen
+        return self.analyze(image).fen
 
     def run_verbose(self, image: np.ndarray) -> dict:
-        detection, grid_detection, cells = self._extract(image)
-        cells_with_pos = [(index // COLS, index % COLS, cell) for index, cell in enumerate(cells)]
-        predictions, confidences = self.predictor.predict_batch(cells)
-        if self.apply_rules:
-            predictions = legalize_predictions(predictions, confidences)
-        results = [
-            (row, col, pred, IDX_TO_NAME[pred], confidence)
-            for (row, col, _), pred, confidence in zip(cells_with_pos, predictions, confidences)
-        ]
-        fen = build_fen(predictions)
-
+        result = self.analyze(image)
         grid = [["" for _ in range(9)] for _ in range(10)]
-        for row, col, _, name, _ in results:
-            grid[row][col] = name
-
-        return {
-            "fen": fen,
-            "grid": grid,
-            "details": results,
-            "board_confidence": detection.confidence,
-            "grid_confidence": grid_detection.confidence,
-            "corners": detection.corners.tolist(),
-        }
+        details = []
+        for cell in result.cells:
+            grid[cell.row][cell.col] = cell.name
+            details.append((cell.row, cell.col, cell.prediction, cell.name, cell.confidence))
+        payload = result.to_dict()
+        payload.update(
+            {
+                "grid": grid,
+                "details": details,
+            }
+        )
+        return payload

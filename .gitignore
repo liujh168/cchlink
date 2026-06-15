@@ -21,3 +21,5 @@ data/raw/debug_*
 data/raw/diag_*
 data/raw/eval/
 data/pieces_*/
+evaluation/generated_v2/
+output/

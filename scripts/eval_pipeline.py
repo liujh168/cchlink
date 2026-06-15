@@ -1,5 +1,11 @@
 import sys
-sys.path.insert(0, r"i:\cchlink")
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VENV_SITE = os.path.join(PROJECT_ROOT, ".venv", "Lib", "site-packages")
+if os.path.exists(VENV_SITE) and VENV_SITE not in sys.path:
+    sys.path.insert(0, VENV_SITE)
 
 import random
 import numpy as np
@@ -11,9 +17,7 @@ from scripts.generate_board import (
 from src.pipeline import Pipeline
 from src.fen.fen_builder import IDX_TO_FEN, IDX_TO_NAME
 from src.recognition.dataset import CLASS_TO_IDX
-import os
-
-MODEL_PATH = r"i:\cchlink\data\models\checkpoint_v3.pth"
+MODEL_PATH = os.path.join(PROJECT_ROOT, "data", "models", "checkpoint_v8.pth")
 
 FEN_TO_NAME = {fen_char: IDX_TO_NAME[idx] for idx, fen_char in IDX_TO_FEN.items() if fen_char}
 
@@ -111,7 +115,8 @@ def distort_image(pil_img):
 
 
 def main():
-    os.makedirs(r"i:\cchlink\data\raw\eval", exist_ok=True)
+    eval_dir = os.path.join(PROJECT_ROOT, "data", "raw", "eval")
+    os.makedirs(eval_dir, exist_ok=True)
     random.seed(123)
 
     all_correct = 0
@@ -119,7 +124,10 @@ def main():
     all_per_class = defaultdict(lambda: {"correct": 0, "total": 0})
     total_exact = 0
 
-    pipeline = Pipeline(model_path=MODEL_PATH, device="cpu")
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"使用设备: {device}")
+    pipeline = Pipeline(model_path=MODEL_PATH, device=device)
 
     num_tests = 20
     for i in range(num_tests):
@@ -132,7 +140,7 @@ def main():
         board_pil = render_board(layout)
         distorted = distort_image(board_pil)
 
-        img_path = os.path.join(r"i:\cchlink\data\raw\eval", f"test_{i:03d}.png")
+        img_path = os.path.join(eval_dir, f"test_{i:03d}.png")
         cv2.imwrite(img_path, distorted)
 
         expected_fen = layout_to_fen(layout)

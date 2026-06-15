@@ -1,35 +1,100 @@
 import argparse
 import csv
 import hashlib
+import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
+REQUIRED_V2_FIELDS = {
+    "path",
+    "label",
+    "group",
+    "style",
+    "layout_id",
+    "layout_type",
+    "seed",
+    "orientation",
+    "source",
+    "fen",
+}
 
-def main():
-    parser = argparse.ArgumentParser(description="审计按棋盘分组的数据集清单")
-    parser.add_argument("dataset", help="包含 manifest.csv 的数据集目录")
-    args = parser.parse_args()
-    root = Path(args.dataset)
-    rows = list(csv.DictReader(open(root / "manifest.csv", encoding="utf-8")))
+
+def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
+    manifest = root / "manifest.csv"
+    rows = list(csv.DictReader(open(manifest, encoding="utf-8")))
+    if not rows:
+        raise ValueError("数据集清单为空")
+    missing_fields = REQUIRED_V2_FIELDS - set(rows[0])
+    if missing_fields:
+        raise ValueError(f"清单缺少标准 v2 字段: {sorted(missing_fields)}")
+
     hashes = defaultdict(list)
     labels = Counter()
     groups = Counter()
-
+    styles = Counter()
+    layout_types = Counter()
+    missing_files = []
+    seeds = set()
+    group_metadata = {}
     for row in rows:
         path = root / row["path"]
+        if not path.is_file():
+            missing_files.append(row["path"])
+            continue
         hashes[hashlib.sha256(path.read_bytes()).hexdigest()].append(row)
         labels[row["label"]] += 1
         groups[row["group"]] += 1
+        styles[row["style"]] += 1
+        layout_types[row["layout_type"]] += 1
+        seeds.add(int(row["seed"]))
+        metadata = (
+            row["style"],
+            row["layout_id"],
+            row["layout_type"],
+            row["seed"],
+            row["orientation"],
+            row["fen"],
+        )
+        previous = group_metadata.setdefault(row["group"], metadata)
+        if previous != metadata:
+            raise ValueError(f"分组元数据不一致: {row['group']}")
 
     duplicates = [items for items in hashes.values() if len(items) > 1]
     cross_group = [items for items in duplicates if len({item["group"] for item in items}) > 1]
-    print(f"samples={len(rows)} groups={len(groups)} labels={len(labels)}")
-    print(f"duplicate_hash_groups={len(duplicates)} cross_group_duplicates={len(cross_group)}")
-    print(f"group_size_min={min(groups.values())} group_size_max={max(groups.values())}")
-    for label, count in sorted(labels.items()):
-        print(f"{label}: {count}")
-    if cross_group:
-        raise SystemExit("发现跨棋盘分组的完全重复图片")
+    leaked_seeds = []
+    if against_manifest is not None:
+        against = list(csv.DictReader(open(against_manifest, encoding="utf-8")))
+        eval_seeds = {int(row["seed"]) for row in against if row.get("seed")}
+        leaked_seeds = sorted(seeds & eval_seeds)
+
+    summary = {
+        "samples": len(rows),
+        "groups": len(groups),
+        "labels": dict(sorted(labels.items())),
+        "styles": dict(sorted(styles.items())),
+        "layout_types": dict(sorted(layout_types.items())),
+        "duplicate_hash_groups": len(duplicates),
+        "cross_group_duplicates": len(cross_group),
+        "missing_files": missing_files,
+        "leaked_seeds": leaked_seeds,
+        "group_size_min": min(groups.values()),
+        "group_size_max": max(groups.values()),
+    }
+    if missing_files or cross_group or leaked_seeds:
+        raise ValueError(json.dumps(summary, ensure_ascii=False))
+    return summary
+
+
+def main():
+    parser = argparse.ArgumentParser(description="审计标准 v2 分组数据集清单")
+    parser.add_argument("dataset", help="包含 manifest.csv 的数据集目录")
+    parser.add_argument("--against-manifest", help="检查与评估清单的随机种子泄漏")
+    args = parser.parse_args()
+    summary = audit_dataset(
+        Path(args.dataset),
+        Path(args.against_manifest) if args.against_manifest else None,
+    )
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

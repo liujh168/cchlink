@@ -1,17 +1,22 @@
-import os
-import sys
-import random
 import argparse
+import os
+import random
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import numpy as np
 import cv2
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
+from src.standard_board import (
+    COLS,
+    ROWS,
+    STANDARD_INITIAL_LAYOUT,
+    clone_layout,
+)
+
 CELL = 50
-COLS = 9
-ROWS = 10
 BOARD_W = COLS * CELL
 BOARD_H = ROWS * CELL
 
@@ -19,20 +24,51 @@ BOARD_BG = (235, 205, 150)
 LINE_COLOR = (40, 20, 0)
 LINE_WIDTH = 2
 
-PIECE_CHARS = {
-    "红帅": "帅", "红仕": "仕", "红相": "相", "红俥": "俥", "红马": "馬", "红炮": "炮", "红兵": "兵",
-    "黑将": "将", "黑士": "士", "黑象": "象", "黑车": "車", "黑马": "馬", "黑炮": "砲", "黑卒": "卒",
+BOARD_STYLES = {
+    "classic": {
+        "background": BOARD_BG,
+        "line": LINE_COLOR,
+        "border": (60, 30, 0),
+        "piece_outer": (210, 180, 130),
+        "piece_inner": (245, 220, 175),
+        "piece_outline": (150, 120, 80),
+    },
+    "wood": {
+        "background": (211, 154, 82),
+        "line": (55, 25, 10),
+        "border": (72, 34, 14),
+        "piece_outer": (176, 116, 57),
+        "piece_inner": (229, 183, 112),
+        "piece_outline": (105, 57, 24),
+    },
+    "plastic": {
+        "background": (239, 231, 204),
+        "line": (54, 60, 60),
+        "border": (74, 80, 80),
+        "piece_outer": (224, 220, 204),
+        "piece_inner": (248, 246, 232),
+        "piece_outline": (120, 120, 110),
+    },
 }
 
-INITIAL_LAYOUT = [
-    ["黑车","黑马","黑象","黑士","黑将","黑士","黑象","黑马","黑车"],
-    [None, "黑炮", None, None, None, None, None, "黑炮", None],
-    ["黑卒", None, "黑卒", None, "黑卒", None, "黑卒", None, "黑卒"],
-    [None]*9, [None]*9, [None]*9, [None]*9,
-    ["红兵", None, "红兵", None, "红兵", None, "红兵", None, "红兵"],
-    [None, "红炮", None, None, None, None, None, "红炮", None],
-    ["红俥","红马","红相","红仕","红帅","红仕","红相","红马","红俥"],
-]
+PIECE_CHARS = {
+    "红帅": "帅",
+    "红仕": "仕",
+    "红相": "相",
+    "红俥": "俥",
+    "红马": "馬",
+    "红炮": "炮",
+    "红兵": "兵",
+    "黑将": "将",
+    "黑士": "士",
+    "黑象": "象",
+    "黑车": "車",
+    "黑马": "馬",
+    "黑炮": "砲",
+    "黑卒": "卒",
+}
+
+INITIAL_LAYOUT = STANDARD_INITIAL_LAYOUT
 
 
 def _load_font(size: int) -> ImageFont.FreeTypeFont | None:
@@ -51,52 +87,120 @@ def _load_font(size: int) -> ImageFont.FreeTypeFont | None:
     return None
 
 
-def _draw_board_base(draw):
-    offset = CELL // 2
+def _grid_point(row: int, col: int, scale: int = 1) -> tuple[int, int]:
+    cell = CELL * scale
+    offset = cell // 2
+    return offset + col * cell, offset + row * cell
+
+
+def _draw_position_marker(draw, row: int, col: int, scale: int, color: tuple[int, int, int]):
+    """在炮位和兵卒位交点周围绘制标准直角定位标记。"""
+    x, y = _grid_point(row, col, scale)
+    gap = 6 * scale
+    arm = 5 * scale
+    width = max(1, LINE_WIDTH * scale)
+
+    sides = []
+    if col > 0:
+        sides.append(-1)
+    if col < COLS - 1:
+        sides.append(1)
+
+    for side in sides:
+        inner_x = x + side * gap
+        outer_x = x + side * (gap + arm)
+        draw.line([(inner_x, y - gap), (outer_x, y - gap)], fill=color, width=width)
+        draw.line([(inner_x, y - gap), (inner_x, y - gap - arm)], fill=color, width=width)
+        draw.line([(inner_x, y + gap), (outer_x, y + gap)], fill=color, width=width)
+        draw.line([(inner_x, y + gap), (inner_x, y + gap + arm)], fill=color, width=width)
+
+
+def _draw_board_base(draw, scale: int = 1, style: str = "classic"):
+    palette = BOARD_STYLES[style]
+    cell = CELL * scale
+    offset = cell // 2
     left_x = offset
-    right_x = offset + (COLS - 1) * CELL
+    right_x = offset + (COLS - 1) * cell
     top_y = offset
-    bot_y = offset + (ROWS - 1) * CELL
+    bot_y = offset + (ROWS - 1) * cell
+    line_color = palette["line"]
+    line_width = max(1, LINE_WIDTH * scale)
 
     for r in range(ROWS):
-        y = offset + r * CELL
-        draw.line([(left_x, y), (right_x, y)], fill=LINE_COLOR, width=LINE_WIDTH)
+        y = offset + r * cell
+        draw.line([(left_x, y), (right_x, y)], fill=line_color, width=line_width)
 
     for c in range(COLS):
-        x = offset + c * CELL
+        x = offset + c * cell
         if c in (0, COLS - 1):
-            draw.line([(x, top_y), (x, bot_y)], fill=LINE_COLOR, width=LINE_WIDTH)
+            draw.line([(x, top_y), (x, bot_y)], fill=line_color, width=line_width)
         else:
-            draw.line([(x, top_y), (x, offset + 4 * CELL)], fill=LINE_COLOR, width=LINE_WIDTH)
-            draw.line([(x, offset + 5 * CELL), (x, bot_y)], fill=LINE_COLOR, width=LINE_WIDTH)
+            draw.line([(x, top_y), (x, offset + 4 * cell)], fill=line_color, width=line_width)
+            draw.line([(x, offset + 5 * cell), (x, bot_y)], fill=line_color, width=line_width)
 
     for r1, r2 in [(0, 2), (7, 9)]:
-        x1, x2 = offset + 3 * CELL, offset + 5 * CELL
-        y1, y2 = offset + r1 * CELL, offset + r2 * CELL
-        draw.line([(x1, y1), (x2, y2)], fill=LINE_COLOR, width=LINE_WIDTH)
-        draw.line([(x2, y1), (x1, y2)], fill=LINE_COLOR, width=LINE_WIDTH)
+        x1, x2 = offset + 3 * cell, offset + 5 * cell
+        y1, y2 = offset + r1 * cell, offset + r2 * cell
+        draw.line([(x1, y1), (x2, y2)], fill=line_color, width=line_width)
+        draw.line([(x2, y1), (x1, y2)], fill=line_color, width=line_width)
 
-    river_cy = offset + 4 * CELL + CELL // 2
-    font_river = _load_font(22)
+    for row, col in (
+        (2, 1),
+        (2, 7),
+        (3, 0),
+        (3, 2),
+        (3, 4),
+        (3, 6),
+        (3, 8),
+        (6, 0),
+        (6, 2),
+        (6, 4),
+        (6, 6),
+        (6, 8),
+        (7, 1),
+        (7, 7),
+    ):
+        _draw_position_marker(draw, row, col, scale, line_color)
+
+    river_cy = offset + 4 * cell + cell // 2
+    font_river = _load_font(22 * scale)
     if font_river:
-        draw.text((1 * CELL + 14, river_cy - 18), "楚  河", fill=LINE_COLOR, font=font_river)
-        draw.text((5 * CELL + 14, river_cy - 18), "汉  界", fill=LINE_COLOR, font=font_river)
+        draw.text(
+            (cell + 14 * scale, river_cy - 18 * scale),
+            "楚  河",
+            fill=line_color,
+            font=font_river,
+        )
+        draw.text(
+            (5 * cell + 14 * scale, river_cy - 18 * scale),
+            "汉  界",
+            fill=line_color,
+            font=font_river,
+        )
 
 
-def _draw_piece(draw, cx, cy, piece_name: str, font, size=40):
+def _draw_piece(draw, cx, cy, piece_name: str, font, size=40, style: str = "classic"):
+    palette = BOARD_STYLES[style]
     r = size // 2
     if "红" in piece_name:
         text_color = (180, 30, 30)
     else:
         text_color = (30, 80, 30)
 
-    circle_color = (210, 180, 130)
-    inner_color = (245, 220, 175)
-
-    draw.ellipse([cx - r + 2, cy - r + 2, cx + r - 2, cy + r - 2],
-                 fill=circle_color, outline=(150, 120, 80), width=2)
-    draw.ellipse([cx - r + 7, cy - r + 7, cx + r - 7, cy + r - 7],
-                 fill=inner_color, outline=(150, 120, 80), width=1)
+    edge = max(2, size // 20)
+    inset = max(7, size // 6)
+    draw.ellipse(
+        [cx - r + edge, cy - r + edge, cx + r - edge, cy + r - edge],
+        fill=palette["piece_outer"],
+        outline=palette["piece_outline"],
+        width=max(2, size // 20),
+    )
+    draw.ellipse(
+        [cx - r + inset, cy - r + inset, cx + r - inset, cy + r - inset],
+        fill=palette["piece_inner"],
+        outline=palette["piece_outline"],
+        width=max(1, size // 40),
+    )
 
     char = PIECE_CHARS[piece_name]
     bbox = draw.textbbox((0, 0), char, font=font)
@@ -106,21 +210,45 @@ def _draw_piece(draw, cx, cy, piece_name: str, font, size=40):
     draw.text((tx, ty), char, fill=text_color, font=font)
 
 
-def render_board(layout: list[list[str | None]], font_size=26) -> Image.Image:
-    img = Image.new("RGB", (BOARD_W, BOARD_H), BOARD_BG)
-    draw = ImageDraw.Draw(img)
-    draw.rectangle([0, 0, BOARD_W - 1, BOARD_H - 1],
-                   outline=(60, 30, 0), width=2)
-    _draw_board_base(draw)
+def _add_wood_texture(img: Image.Image, scale: int) -> Image.Image:
+    array = np.asarray(img).astype(np.int16)
+    height, width = array.shape[:2]
+    x = np.arange(width, dtype=np.float32)
+    grain = 6 * np.sin(x / (13 * scale)) + 3 * np.sin(x / (37 * scale))
+    array = np.clip(array + grain[np.newaxis, :, np.newaxis], 0, 255).astype(np.uint8)
+    return Image.fromarray(array)
 
-    font = _load_font(font_size)
+
+def render_board(
+    layout: list[list[str | None]],
+    font_size: int = 26,
+    style: str = "classic",
+    scale: int = 1,
+) -> Image.Image:
+    if style not in BOARD_STYLES:
+        raise ValueError(f"未知棋盘样式: {style}")
+    if scale < 1:
+        raise ValueError("scale 必须大于等于 1")
+
+    palette = BOARD_STYLES[style]
+    img = Image.new("RGB", (BOARD_W * scale, BOARD_H * scale), palette["background"])
+    if style == "wood":
+        img = _add_wood_texture(img, scale)
+    draw = ImageDraw.Draw(img)
+    draw.rectangle(
+        [0, 0, BOARD_W * scale - 1, BOARD_H * scale - 1],
+        outline=palette["border"],
+        width=4 * scale,
+    )
+    _draw_board_base(draw, scale=scale, style=style)
+
+    font = _load_font(font_size * scale)
     for r in range(ROWS):
         for c in range(COLS):
             piece = layout[r][c]
             if piece:
-                cx = CELL // 2 + c * CELL
-                cy = CELL // 2 + r * CELL
-                _draw_piece(draw, cx, cy, piece, font, size=40)
+                cx, cy = _grid_point(r, c, scale)
+                _draw_piece(draw, cx, cy, piece, font, size=40 * scale, style=style)
 
     return img
 
@@ -196,34 +324,30 @@ def generate_test_image(layout, output_path: str, seed: int = None):
 
 
 def generate_random_midgame() -> list[list[str | None]]:
-    pieces = ["红帅","红仕","红相","红俥","红马","红炮","红兵",
-              "黑将","黑士","黑象","黑车","黑马","黑炮","黑卒"]
-    layout = [[None] * COLS for _ in range(ROWS)]
-    placed = set()
-    count = random.randint(8, 20)
+    """从标准初始局面移除并移动棋子，生成静态合法性较高的中局样本。"""
+    layout = clone_layout(STANDARD_INITIAL_LAYOUT)
+    movable = [(row, col) for row in range(ROWS) for col in range(COLS) if layout[row][col]]
+    random.shuffle(movable)
 
-    for _ in range(count):
-        piece = random.choice(pieces)
-        if piece in placed:
+    for row, col in movable[: random.randint(6, 20)]:
+        if layout[row][col] not in ("红帅", "黑将"):
+            layout[row][col] = None
+
+    for row, col in movable[random.randint(10, 20) : random.randint(21, 31)]:
+        piece = layout[row][col]
+        if piece is None or piece in ("红帅", "黑将"):
             continue
-        attempts = 0
-        while attempts < 50:
-            row = random.randint(0, ROWS - 1)
-            col = random.randint(0, COLS - 1)
-            if (piece in ("红帅", "黑将") and (3 <= col <= 5) and
-                    ((piece == "黑将" and 0 <= row <= 2) or (piece == "红帅" and 7 <= row <= 9))):
-                pass
-            elif piece.startswith("红") and row < 5:
-                attempts += 1
-                continue
-            elif piece.startswith("黑") and row > 4:
-                attempts += 1
-                continue
-            if layout[row][col] is None:
-                layout[row][col] = piece
-                placed.add(piece)
-                break
-            attempts += 1
+        candidates = [
+            (new_row, new_col)
+            for new_row in range(ROWS)
+            for new_col in range(COLS)
+            if layout[new_row][new_col] is None
+            and (new_row >= 3 if piece.startswith("红") else new_row <= 6)
+        ]
+        if candidates:
+            new_row, new_col = random.choice(candidates)
+            layout[new_row][new_col] = piece
+            layout[row][col] = None
     return layout
 
 

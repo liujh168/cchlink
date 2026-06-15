@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 from src.preprocess.board_detector import detect_board_corners
-from src.preprocess.perspective import warp_board
+from src.preprocess.perspective import warp_board, WARP_PAD
 from src.segmentation.grid_splitter import split_board_with_positions
 from src.recognition.predictor import PiecePredictor
 
@@ -24,6 +24,8 @@ if corners is None:
 
 board = warp_board(image, corners)
 print(f"校正后棋盘尺寸: {board.shape}")
+board = board[WARP_PAD:board.shape[0] - WARP_PAD, WARP_PAD:board.shape[1] - WARP_PAD]
+print(f"裁剪后棋盘尺寸: {board.shape}")
 cv2.imwrite(r"i:\cchlink\data\raw\debug_board.jpg",
              cv2.cvtColor(board, cv2.COLOR_RGB2BGR))
 

@@ -1,0 +1,63 @@
+{
+  "manifest": "evaluation\\legacy_synthetic_manifest.csv",
+  "model": "data/models/checkpoint_standard_v2.pth",
+  "overall": {
+    "count": 4,
+    "detected": 4,
+    "grid_accepted": 4,
+    "correct_cells": 329,
+    "exact": 2,
+    "cell_accuracy": 0.9138888888888889,
+    "exact_rate": 0.5
+  },
+  "by_style": {
+    "classic": {
+      "count": 4,
+      "detected": 4,
+      "grid_accepted": 4,
+      "correct_cells": 329,
+      "exact": 2,
+      "cell_accuracy": 0.9138888888888889,
+      "exact_rate": 0.5
+    }
+  },
+  "mean_latency_seconds": 0.10633437499973297,
+  "results": [
+    {
+      "path": "data/raw/initial_00.jpg",
+      "status": "OK",
+      "correct_cells": 90,
+      "fen": "rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR",
+      "expected_fen": "rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR",
+      "style": "classic",
+      "layout_type": "initial"
+    },
+    {
+      "path": "data/raw/initial_01.jpg",
+      "status": "NG",
+      "correct_cells": 60,
+      "fen": "rnb6/1n5r1/p8/9/9/9/9/7PC/1NR3P2/7N1",
+      "expected_fen": "rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR",
+      "style": "classic",
+      "layout_type": "initial"
+    },
+    {
+      "path": "data/raw/initial_02.jpg",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "1nbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR",
+      "expected_fen": "rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR",
+      "style": "classic",
+      "layout_type": "initial"
+    },
+    {
+      "path": "data/raw/initial_03.jpg",
+      "status": "OK",
+      "correct_cells": 90,
+      "fen": "rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR",
+      "expected_fen": "rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR",
+      "style": "classic",
+      "layout_type": "initial"
+    }
+  ]
+}

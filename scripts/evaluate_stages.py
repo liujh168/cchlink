@@ -1,7 +1,9 @@
 import argparse
 import csv
+import json
 import sys
 import time
+from collections import defaultdict
 from pathlib import Path
 
 import cv2
@@ -9,14 +11,13 @@ import cv2
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.pipeline import Pipeline
-from src.preprocess.board_detector import detect_board
-from src.preprocess.perspective import WARP_PAD, warp_board
-from src.segmentation.grid_splitter import detect_grid
+from src.pipeline import Pipeline  # noqa: E402
+from src.preprocess.board_detector import detect_board  # noqa: E402
+from src.preprocess.perspective import WARP_PAD, warp_board  # noqa: E402
+from src.segmentation.grid_splitter import detect_grid  # noqa: E402
 
 
 def fen_cells(fen):
-    """将 FEN 展开为固定长度的 90 个交点，便于逐格统计准确率。"""
     cells = []
     for row in fen.split("/"):
         for char in row:
@@ -24,51 +25,102 @@ def fen_cells(fen):
     return cells
 
 
-def main():
-    parser = argparse.ArgumentParser(description="对固定照片回归集执行分阶段评估")
-    parser.add_argument("--model", required=True, help="待评估的模型权重路径")
-    parser.add_argument(
-        "--manifest",
-        default="evaluation/real_manifest.csv",
-        help="固定照片回归集清单",
-    )
-    parser.add_argument("--backbone", default="mobilenet_v3_small", help="模型骨干网络")
-    args = parser.parse_args()
+def _empty_metrics():
+    return {"count": 0, "detected": 0, "grid_accepted": 0, "correct_cells": 0, "exact": 0}
 
-    pipeline = Pipeline(args.model, backbone=args.backbone)
-    rows = list(csv.DictReader(open(args.manifest, encoding="utf-8")))
-    detected = grid_accepted = exact = correct_cells = 0
+
+def evaluate_manifest(
+    model: str,
+    manifest: Path,
+    backbone: str = "mobilenet_v3_small",
+    device: str = "cpu",
+) -> dict:
+    pipeline = Pipeline(model, backbone=backbone, device=device)
+    rows = list(csv.DictReader(open(manifest, encoding="utf-8")))
+    overall = _empty_metrics()
+    by_style = defaultdict(_empty_metrics)
+    results = []
     latencies = []
-
     for item in rows:
-        image = cv2.imread(str(PROJECT_ROOT / item["path"]))
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        metrics = [overall, by_style[item.get("style") or "unspecified"]]
+        for metric in metrics:
+            metric["count"] += 1
+        path = Path(item["path"])
+        if not path.is_absolute():
+            path = PROJECT_ROOT / path
+        image_bgr = cv2.imread(str(path))
+        if image_bgr is None:
+            results.append({"path": item["path"], "status": "READ_ERROR"})
+            continue
+        image = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
         started = time.perf_counter()
         board_detection = detect_board(image, min_confidence=0.22)
         if board_detection is not None:
-            detected += 1
+            for metric in metrics:
+                metric["detected"] += 1
             warped = warp_board(image, board_detection.corners)
             board = warped[WARP_PAD:-WARP_PAD, WARP_PAD:-WARP_PAD]
             if detect_grid(board).confidence >= pipeline.min_grid_confidence:
-                grid_accepted += 1
+                for metric in metrics:
+                    metric["grid_accepted"] += 1
         try:
-            result = pipeline.run_verbose(image)
+            result = pipeline.analyze(image)
             expected = fen_cells(item["expected_fen"])
-            actual = fen_cells(result["fen"])
-            correct_cells += sum(a == b for a, b in zip(expected, actual))
-            exact += result["fen"] == item["expected_fen"]
-            status = "OK" if result["fen"] == item["expected_fen"] else "NG"
+            actual = fen_cells(result.fen)
+            correct = sum(a == b for a, b in zip(expected, actual))
+            exact = result.fen == item["expected_fen"]
+            for metric in metrics:
+                metric["correct_cells"] += correct
+                metric["exact"] += int(exact)
+            status = "OK" if exact else "NG"
+            results.append(
+                {
+                    "path": item["path"],
+                    "status": status,
+                    "correct_cells": correct,
+                    "fen": result.fen,
+                    "expected_fen": item["expected_fen"],
+                    "style": item.get("style", ""),
+                    "layout_type": item.get("layout_type", ""),
+                }
+            )
         except RuntimeError as error:
-            status = f"REJECTED: {error}"
+            results.append({"path": item["path"], "status": "REJECTED", "error": str(error)})
         latencies.append(time.perf_counter() - started)
-        print(f"{item['path']}: {status}")
 
-    count = len(rows)
-    print(f"detection_acceptance={detected}/{count}")
-    print(f"grid_acceptance={grid_accepted}/{count}")
-    print(f"cell_accuracy={correct_cells}/{count * 90}")
-    print(f"exact_boards={exact}/{count}")
-    print(f"mean_latency_seconds={sum(latencies) / max(count, 1):.4f}")
+    def finalize(metric):
+        count = metric["count"]
+        return {
+            **metric,
+            "cell_accuracy": metric["correct_cells"] / max(count * 90, 1),
+            "exact_rate": metric["exact"] / max(count, 1),
+        }
+
+    return {
+        "manifest": str(manifest),
+        "model": model,
+        "overall": finalize(overall),
+        "by_style": {style: finalize(metric) for style, metric in sorted(by_style.items())},
+        "mean_latency_seconds": sum(latencies) / max(len(latencies), 1),
+        "results": results,
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description="对固定清单执行分阶段评估")
+    parser.add_argument("--model", required=True, help="待评估的模型权重路径")
+    parser.add_argument("--manifest", default="evaluation/standard_manifest.csv", help="评估清单")
+    parser.add_argument("--backbone", default="mobilenet_v3_small", help="模型骨干网络")
+    parser.add_argument("--device", default="cpu", choices=["cpu", "cuda"], help="推理设备")
+    parser.add_argument("--json-output", help="保存完整 JSON 报告")
+    args = parser.parse_args()
+    report = evaluate_manifest(args.model, Path(args.manifest), args.backbone, args.device)
+    summary = {key: value for key, value in report.items() if key != "results"}
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    if args.json_output:
+        output = Path(args.json_output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":
