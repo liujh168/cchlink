@@ -86,10 +86,16 @@ python scripts/train.py -d data/pieces -o data/models/checkpoint.pth -e 30
 推荐使用按整盘分组的数据集，避免同一棋盘泄漏到训练集和验证集：
 
 ```bash
-python scripts/generate_grouped_data.py -o data/pieces_grouped -n 500
-python scripts/audit_dataset.py data/pieces_grouped
-python scripts/train_v2.py -d data/pieces_grouped -o data/models/grouped.pth
+python scripts/generate_grouped_data.py -o data/pieces_grouped_v4 -n 3000
+python scripts/audit_dataset.py data/pieces_grouped_v4 --against-manifest evaluation/standard_manifest.csv
+python scripts/train_v2.py -d data/pieces_grouped_v4 -o data/models/checkpoint_standard_v4.pth
 ```
+
+当前标准数据版本为 `standard-v4`。它沿用已确认的真实棋盘模板：正确初始布局、
+红黑九宫 X、楚河汉界，以及距交点 6px、短臂 5px 的紧凑炮兵卒定位标记。v4
+还会将部分完整棋盘先放入透视、光照和噪声场景，再按已知四角矫正回标准棋盘后
+切出训练图块，使训练输入更接近端到端推理。v4 在此基础上修正了 `red_top`
+样本生成：先渲染正常棋盘再整图旋转 180°，让倒拍时棋子文字方向也与评测/真实照片一致。
 
 参数说明：
 - `-d` / `--data`：训练数据根目录（必填）
@@ -159,11 +165,32 @@ python scripts/test_fen.py
 ### 固定照片分阶段评估
 
 ```bash
-python scripts/evaluate_stages.py --model data/models/checkpoint_v8.pth
+python scripts/evaluate_stages.py --model data/models/checkpoint_standard_v4.pth \
+  --manifest evaluation/standard_manifest.csv \
+  --device cuda \
+  --json-output evaluation/standard_v4_report.json
 ```
 
 评估会分别报告棋盘检测通过率、网格通过率、90 格准确率、整盘完全匹配率和延迟。
 `evaluation/real_manifest.csv` 是固定照片回归集，严禁将其中照片或其派生样本用于训练。
+
+如需定位剩余错误，可运行逐格诊断：
+
+```bash
+python scripts/diagnose_eval_errors.py \
+  --model data/models/checkpoint_standard_v4.pth \
+  --manifest evaluation/standard_manifest.csv \
+  --device cuda \
+  --json-output evaluation/standard_v4_diagnosis.json
+```
+
+模型晋级建议同时满足：标准评测格子级准确率不低于 98.5%，整盘完全正确率不低于
+80%，空棋盘/木质初始/塑料倾斜三张人工确认预览全部完全正确，且旧版回归集下降
+不超过 2 个百分点。
+
+`checkpoint_standard_v4.pth` 已通过该标准评测门槛：标准评测 5397/5400 格正确
+（99.94%），58/60 盘完全正确（96.67%）；三张人工确认预览全部完全正确。旧版
+兼容清单格子级准确率为 327/360（90.83%），相对旧基线下降约 0.83 个百分点。
 
 ## 开发状态
 

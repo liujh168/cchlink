@@ -13,12 +13,14 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.generate_board import BOARD_STYLES, generate_random_midgame, render_board  # noqa: E402
 from src.geometry import extract_intersection_patches, ideal_grid_positions  # noqa: E402
+from src.preprocess.perspective import WARP_PAD, warp_board  # noqa: E402
 from src.standard_board import (  # noqa: E402
     STANDARD_INITIAL_LAYOUT,
     empty_layout,
     layout_to_fen,
     rotate_layout,
 )
+from src.synthetic_scene import place_board_in_scene  # noqa: E402
 
 MANIFEST_FIELDS = [
     "path",
@@ -31,8 +33,9 @@ MANIFEST_FIELDS = [
     "orientation",
     "source",
     "fen",
+    "scene_augmented",
 ]
-GENERATOR_VERSION = "standard-v2"
+GENERATOR_VERSION = "standard-v4"
 STYLES = tuple(BOARD_STYLES)
 
 
@@ -65,11 +68,18 @@ def apply_rectified_variation(board: np.ndarray, seed: int) -> np.ndarray:
     return np.clip(varied, 0, 255).astype(np.uint8)
 
 
+def rectify_scene_board(board: np.ndarray, style: str, seed: int) -> np.ndarray:
+    scene, corners = place_board_in_scene(board, style=style, seed=seed, return_corners=True)
+    warped = warp_board(scene, corners)
+    return warped[WARP_PAD:-WARP_PAD, WARP_PAD:-WARP_PAD]
+
+
 def generate_dataset(
     output: Path,
     num_boards: int,
     seed: int,
     empty_keep_prob: float,
+    scene_prob: float = 0.55,
 ) -> dict:
     if output.exists() and any(output.iterdir()):
         raise ValueError(f"输出目录非空，请使用新的目录: {output}")
@@ -84,12 +94,18 @@ def generate_dataset(
         layout, layout_type = choose_layout(board_index, rng)
         orientation = "red_top" if rng.random() < 0.5 else "red_bottom"
         style = STYLES[board_index % len(STYLES)]
-        oriented_layout = rotate_layout(layout) if orientation == "red_top" else layout
-        board = np.asarray(render_board(oriented_layout, style=style))
-        board = apply_rectified_variation(board, board_seed)
+        labels_layout = rotate_layout(layout) if orientation == "red_top" else layout
+        board = np.asarray(render_board(layout, style=style))
+        if orientation == "red_top":
+            board = np.rot90(board, 2).copy()
+        scene_augmented = rng.random() < scene_prob
+        if scene_augmented:
+            board = rectify_scene_board(board, style=style, seed=board_seed)
+        else:
+            board = apply_rectified_variation(board, board_seed)
         rows, cols = ideal_grid_positions(board.shape[1], board.shape[0])
         patches = extract_intersection_patches(board, rows, cols)
-        labels = [piece or "空" for row in oriented_layout for piece in row]
+        labels = [piece or "空" for row in labels_layout for piece in row]
         group = f"board_{board_index:06d}"
         layout_id = f"{layout_type}_{board_index:06d}"
         fen = layout_to_fen(layout)
@@ -122,6 +138,7 @@ def generate_dataset(
                     "orientation": orientation,
                     "source": GENERATOR_VERSION,
                     "fen": fen,
+                    "scene_augmented": str(scene_augmented).lower(),
                 }
             )
 
@@ -137,6 +154,7 @@ def generate_dataset(
         "num_boards": num_boards,
         "seed": seed,
         "empty_keep_prob": empty_keep_prob,
+        "scene_prob": scene_prob,
         "styles": list(STYLES),
         "samples": len(records),
     }
@@ -148,10 +166,11 @@ def generate_dataset(
 
 def main():
     parser = argparse.ArgumentParser(description="生成标准棋盘按完整棋盘分组的训练图块")
-    parser.add_argument("-o", "--output", default="data/pieces_grouped_v2", help="输出目录")
-    parser.add_argument("-n", "--num-boards", type=int, default=2000, help="生成棋盘数量")
+    parser.add_argument("-o", "--output", default="data/pieces_grouped_v4", help="输出目录")
+    parser.add_argument("-n", "--num-boards", type=int, default=3000, help="生成棋盘数量")
     parser.add_argument("--seed", type=int, default=42000, help="训练数据随机种子")
     parser.add_argument("--empty-keep-prob", type=float, default=0.18, help="空交点保留概率")
+    parser.add_argument("--scene-prob", type=float, default=0.55, help="完整场景透视增强比例")
     args = parser.parse_args()
 
     metadata = generate_dataset(
@@ -159,6 +178,7 @@ def main():
         num_boards=args.num_boards,
         seed=args.seed,
         empty_keep_prob=args.empty_keep_prob,
+        scene_prob=args.scene_prob,
     )
     print(json.dumps(metadata, ensure_ascii=False, indent=2))
 

@@ -11,7 +11,8 @@ def place_board_in_scene(
     style: str,
     seed: int,
     output_size: int = 720,
-) -> np.ndarray:
+    return_corners: bool = False,
+) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
     """将完整棋盘放入带轻微透视、光照和噪声的可复现场景。"""
     rng = random.Random(seed)
     np_rng = np.random.default_rng(seed)
@@ -67,4 +68,7 @@ def place_board_in_scene(
     brightness = rng.uniform(0.82, 1.18)
     scene = np.clip(scene.astype(np.float32) * brightness, 0, 255)
     scene += np_rng.normal(0, rng.uniform(0.5, 3.5), scene.shape)
-    return np.clip(scene, 0, 255).astype(np.uint8)
+    scene = np.clip(scene, 0, 255).astype(np.uint8)
+    if return_corners:
+        return scene, destination
+    return scene

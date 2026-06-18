@@ -1,0 +1,1651 @@
+{
+  "manifest": "evaluation\\standard_manifest.csv",
+  "model": "data/models/checkpoint_standard_v3.pth",
+  "total_boards": 60,
+  "evaluated_boards": 60,
+  "read_errors": 0,
+  "rejected": 0,
+  "exact": 32,
+  "exact_rate": 0.5333333333333333,
+  "total_cells": 5400,
+  "error_cells": 133,
+  "cell_accuracy": 0.9753703703703703,
+  "by_style": {
+    "classic": {
+      "boards": 20,
+      "error_cells": 36
+    },
+    "plastic": {
+      "boards": 20,
+      "error_cells": 46
+    },
+    "wood": {
+      "boards": 20,
+      "error_cells": 51
+    }
+  },
+  "by_layout_type": {
+    "empty": {
+      "boards": 6,
+      "error_cells": 0
+    },
+    "initial": {
+      "boards": 9,
+      "error_cells": 24
+    },
+    "midgame": {
+      "boards": 45,
+      "error_cells": 109
+    }
+  },
+  "top_expected": {
+    "黑马": 33,
+    "红马": 33,
+    "黑将": 27,
+    "红兵": 11,
+    "红仕": 8,
+    "红俥": 6,
+    "黑炮": 5,
+    "红相": 4,
+    "红帅": 3,
+    "黑卒": 2,
+    "黑象": 1
+  },
+  "top_actual": {
+    "空": 58,
+    "黑炮": 18,
+    "黑卒": 13,
+    "红俥": 13,
+    "红仕": 11,
+    "黑象": 7,
+    "红兵": 6,
+    "红相": 4,
+    "黑士": 2,
+    "红炮": 1
+  },
+  "top_pairs": {
+    "黑马->空": 20,
+    "红马->空": 17,
+    "黑将->黑炮": 17,
+    "红马->红俥": 13,
+    "黑将->黑卒": 7,
+    "黑马->黑象": 7,
+    "红兵->红仕": 7,
+    "红仕->红兵": 6,
+    "红俥->空": 5,
+    "红兵->空": 4,
+    "黑将->空": 3,
+    "黑马->黑卒": 3,
+    "黑炮->黑卒": 3,
+    "红马->红相": 3,
+    "红相->红仕": 2,
+    "黑马->黑士": 2,
+    "红仕->空": 2,
+    "黑炮->空": 2,
+    "红帅->红仕": 2,
+    "黑卒->空": 2
+  },
+  "top_regions": {
+    "edge": 94,
+    "center": 17,
+    "river": 13,
+    "palace": 9
+  },
+  "top_cells": {
+    "r0_c4": 27,
+    "r0_c7": 13,
+    "r9_c7": 9,
+    "r9_c1": 8,
+    "r0_c1": 6,
+    "r4_c2": 4,
+    "r9_c3": 4,
+    "r4_c8": 4,
+    "r9_c0": 3,
+    "r7_c0": 3,
+    "r9_c4": 3,
+    "r9_c5": 3,
+    "r6_c6": 3,
+    "r6_c8": 2,
+    "r2_c7": 2,
+    "r8_c4": 2,
+    "r6_c3": 2,
+    "r6_c5": 2,
+    "r4_c1": 2,
+    "r5_c8": 2
+  },
+  "board_errors": [
+    {
+      "path": "evaluation/generated_v2/board_001_wood_initial.png",
+      "style": "wood",
+      "layout_type": "initial",
+      "orientation": "red_top",
+      "seed": "90001",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "actual_fen": "r1ba1ab1r/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/R1BAKAB1R",
+      "error_count": 5,
+      "errors": [
+        {
+          "row": 0,
+          "col": 1,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "",
+          "expected_name": "黑将",
+          "actual_name": "空"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_002_plastic_initial.png",
+      "style": "plastic",
+      "layout_type": "initial",
+      "orientation": "red_bottom",
+      "seed": "90002",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "actual_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/B1AAKAB1R",
+      "error_count": 4,
+      "errors": [
+        {
+          "row": 9,
+          "col": 0,
+          "region": "edge",
+          "expected": "R",
+          "actual": "B",
+          "expected_name": "红俥",
+          "actual_name": "红相"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 2,
+          "region": "edge",
+          "expected": "B",
+          "actual": "A",
+          "expected_name": "红相",
+          "actual_name": "红仕"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_005_plastic_midgame.png",
+      "style": "plastic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90005",
+      "expected_fen": "r3k2n1/9/7c1/2p5p/1c1a3C1/4nA1r1/P3B2BP/4C4/1R4P2/3AK3R",
+      "actual_fen": "r3c2p1/9/7c1/2p5p/1c1a3C1/4aA1r1/P3B2B1/4C4/1R4P2/3AK3R",
+      "error_count": 4,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "p",
+          "expected_name": "黑马",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 5,
+          "col": 4,
+          "region": "river",
+          "expected": "n",
+          "actual": "a",
+          "expected_name": "黑马",
+          "actual_name": "黑士"
+        },
+        {
+          "row": 6,
+          "col": 8,
+          "region": "edge",
+          "expected": "P",
+          "actual": "",
+          "expected_name": "红兵",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_007_wood_midgame.png",
+      "style": "wood",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90007",
+      "expected_fen": "r3kabn1/9/1c5n1/2p5p/2P6/8C/P1r3P2/NC7/A8/R1BAK2NR",
+      "actual_fen": "r3pab2/9/1p5b1/2p5p/2A6/8C/P1r3P2/1C7/9/R1BA3BR",
+      "error_count": 9,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "p",
+          "expected_name": "黑将",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "region": "center",
+          "expected": "c",
+          "actual": "p",
+          "expected_name": "黑炮",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 2,
+          "col": 7,
+          "region": "center",
+          "expected": "n",
+          "actual": "b",
+          "expected_name": "黑马",
+          "actual_name": "黑象"
+        },
+        {
+          "row": 4,
+          "col": 2,
+          "region": "river",
+          "expected": "P",
+          "actual": "A",
+          "expected_name": "红兵",
+          "actual_name": "红仕"
+        },
+        {
+          "row": 7,
+          "col": 0,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        },
+        {
+          "row": 8,
+          "col": 0,
+          "region": "edge",
+          "expected": "A",
+          "actual": "",
+          "expected_name": "红仕",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 4,
+          "region": "edge",
+          "expected": "K",
+          "actual": "",
+          "expected_name": "红帅",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "N",
+          "actual": "B",
+          "expected_name": "红马",
+          "actual_name": "红相"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_009_classic_midgame.png",
+      "style": "classic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90009",
+      "expected_fen": "r1baka1n1/9/1c3c3/2p3p1p/7PC/2P6/6P2/3B3C1/9/1N1AK3R",
+      "actual_fen": "r1baca3/9/1c3c3/2p3p1p/7PC/2P6/6P2/3B3C1/9/1R1PK3R",
+      "error_count": 4,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        },
+        {
+          "row": 9,
+          "col": 3,
+          "region": "edge",
+          "expected": "A",
+          "actual": "P",
+          "expected_name": "红仕",
+          "actual_name": "红兵"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_011_plastic_midgame.png",
+      "style": "plastic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90011",
+      "expected_fen": "4k3r/3p5/n8/2p2A1bp/2C1P3P/1p4p1c/1B3R3/3P1P3/4N2B1/4K2N1",
+      "actual_fen": "8r/3p5/c8/2p2A1bp/2C1P3A/1p4p1c/1B3R3/3P1P3/4R2B1/4K4",
+      "error_count": 5,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "",
+          "expected_name": "黑将",
+          "actual_name": "空"
+        },
+        {
+          "row": 2,
+          "col": 0,
+          "region": "edge",
+          "expected": "n",
+          "actual": "c",
+          "expected_name": "黑马",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 4,
+          "col": 8,
+          "region": "edge",
+          "expected": "P",
+          "actual": "A",
+          "expected_name": "红兵",
+          "actual_name": "红仕"
+        },
+        {
+          "row": 8,
+          "col": 4,
+          "region": "palace",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_013_wood_midgame.png",
+      "style": "wood",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90013",
+      "expected_fen": "1p1ak4/2a6/6r2/2p6/C2b2P2/Bp1r5/2pnPcP1P/7C1/9/3AKA1N1",
+      "actual_fen": "1p1ap4/2a6/6r2/2p6/C2b2P2/Bp1r5/2p1P1P1P/7C1/9/3PKA1R1",
+      "error_count": 5,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "p",
+          "expected_name": "黑将",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 6,
+          "col": 3,
+          "region": "center",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 6,
+          "col": 5,
+          "region": "center",
+          "expected": "c",
+          "actual": "",
+          "expected_name": "黑炮",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 3,
+          "region": "edge",
+          "expected": "A",
+          "actual": "P",
+          "expected_name": "红仕",
+          "actual_name": "红兵"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_015_classic_midgame.png",
+      "style": "classic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90015",
+      "expected_fen": "3ak4/7a1/2p6/1Np6/1C3p3/9/9/P8/8C/2P1K2R1",
+      "actual_fen": "3ac4/7a1/2p6/1Rp6/1C3p3/9/9/P8/8C/2P1K2R1",
+      "error_count": 2,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 3,
+          "col": 1,
+          "region": "center",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_017_plastic_midgame.png",
+      "style": "plastic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90017",
+      "expected_fen": "r2bkab1r/9/p8/1AB5p/1P7/3p2B2/c1P4c1/9/6P2/4K4",
+      "actual_fen": "r2bcab1r/9/p8/1AB5p/9/3p2A2/c1P4c1/9/6P2/4K4",
+      "error_count": 3,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 4,
+          "col": 1,
+          "region": "river",
+          "expected": "P",
+          "actual": "",
+          "expected_name": "红兵",
+          "actual_name": "空"
+        },
+        {
+          "row": 5,
+          "col": 6,
+          "region": "river",
+          "expected": "B",
+          "actual": "A",
+          "expected_name": "红相",
+          "actual_name": "红仕"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_019_wood_midgame.png",
+      "style": "wood",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90019",
+      "expected_fen": "1cb1kc3/3p4b/6a2/7n1/apn6/3N1P2R/P2r4r/1C5C1/1NP6/R1B1KAB2",
+      "actual_fen": "1pb1pc3/3p4b/6a2/9/ap7/5P3/P2r4r/1C5C1/1RP6/R1B1KAB2",
+      "error_count": 7,
+      "errors": [
+        {
+          "row": 0,
+          "col": 1,
+          "region": "edge",
+          "expected": "c",
+          "actual": "p",
+          "expected_name": "黑炮",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "p",
+          "expected_name": "黑将",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 3,
+          "col": 7,
+          "region": "center",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 4,
+          "col": 2,
+          "region": "river",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 5,
+          "col": 3,
+          "region": "river",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        },
+        {
+          "row": 5,
+          "col": 8,
+          "region": "edge",
+          "expected": "R",
+          "actual": "",
+          "expected_name": "红俥",
+          "actual_name": "空"
+        },
+        {
+          "row": 8,
+          "col": 1,
+          "region": "center",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_021_classic_initial.png",
+      "style": "classic",
+      "layout_type": "initial",
+      "orientation": "red_top",
+      "seed": "90021",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "actual_fen": "r1bacab1r/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/R1B1KPBRR",
+      "error_count": 7,
+      "errors": [
+        {
+          "row": 0,
+          "col": 1,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 3,
+          "region": "edge",
+          "expected": "A",
+          "actual": "",
+          "expected_name": "红仕",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 5,
+          "region": "edge",
+          "expected": "A",
+          "actual": "P",
+          "expected_name": "红仕",
+          "actual_name": "红兵"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_025_wood_midgame.png",
+      "style": "wood",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90025",
+      "expected_fen": "r1b1ka1n1/9/9/4p4/1N7/9/7A1/6P2/9/RN2K3R",
+      "actual_fen": "r1b1pa1p1/9/9/4p4/1R7/9/7A1/6P2/9/RB2A4",
+      "error_count": 6,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "p",
+          "expected_name": "黑将",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "p",
+          "expected_name": "黑马",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 4,
+          "col": 1,
+          "region": "river",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "N",
+          "actual": "B",
+          "expected_name": "红马",
+          "actual_name": "红相"
+        },
+        {
+          "row": 9,
+          "col": 4,
+          "region": "edge",
+          "expected": "K",
+          "actual": "A",
+          "expected_name": "红帅",
+          "actual_name": "红仕"
+        },
+        {
+          "row": 9,
+          "col": 8,
+          "region": "edge",
+          "expected": "R",
+          "actual": "",
+          "expected_name": "红俥",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_027_classic_midgame.png",
+      "style": "classic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90027",
+      "expected_fen": "1na1kapn1/b7c/9/9/8B/1P7/4p4/1C7/7P1/4KA2A",
+      "actual_fen": "1ba1cap2/b7c/9/9/8B/1P7/4p4/1C7/7P1/4KA2A",
+      "error_count": 3,
+      "errors": [
+        {
+          "row": 0,
+          "col": 1,
+          "region": "edge",
+          "expected": "n",
+          "actual": "b",
+          "expected_name": "黑马",
+          "actual_name": "黑象"
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_029_plastic_midgame.png",
+      "style": "plastic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90029",
+      "expected_fen": "2b1k4/9/1r1a4c/5C2p/9/9/P1P6/3A1B3/9/3AK3R",
+      "actual_fen": "2b1c4/9/1r1a4c/5C2p/9/9/P1P6/3A1B3/9/3AK3R",
+      "error_count": 1,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_031_wood_midgame.png",
+      "style": "wood",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90031",
+      "expected_fen": "4k3r/9/2pa1b3/p5p2/9/2nc2p1N/3A1bP1P/9/1P3BCPC/R1B1KA3",
+      "actual_fen": "4c3r/9/2pa1b3/p5p2/9/2pc2p2/3A1bP1P/9/1P3BCPC/R1B1KA3",
+      "error_count": 3,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 5,
+          "col": 2,
+          "region": "river",
+          "expected": "n",
+          "actual": "p",
+          "expected_name": "黑马",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 5,
+          "col": 8,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_033_classic_midgame.png",
+      "style": "classic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90033",
+      "expected_fen": "2b1ka1n1/an7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3AK2N1",
+      "actual_fen": "2b1ca3/ab7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3PK2B1",
+      "error_count": 5,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "region": "center",
+          "expected": "n",
+          "actual": "b",
+          "expected_name": "黑马",
+          "actual_name": "黑象"
+        },
+        {
+          "row": 9,
+          "col": 3,
+          "region": "edge",
+          "expected": "A",
+          "actual": "P",
+          "expected_name": "红仕",
+          "actual_name": "红兵"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "N",
+          "actual": "B",
+          "expected_name": "红马",
+          "actual_name": "红相"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_035_plastic_midgame.png",
+      "style": "plastic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90035",
+      "expected_fen": "3ak4/9/2p6/C7a/8N/2A6/2p2R3/1C2N4/9/R1B1K4",
+      "actual_fen": "3ac4/9/2p6/C7a/9/2A6/2p2R3/1C2R4/9/2B1K4",
+      "error_count": 4,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 4,
+          "col": 8,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        },
+        {
+          "row": 7,
+          "col": 4,
+          "region": "palace",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        },
+        {
+          "row": 9,
+          "col": 0,
+          "region": "edge",
+          "expected": "R",
+          "actual": "",
+          "expected_name": "红俥",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_037_wood_midgame.png",
+      "style": "wood",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90037",
+      "expected_fen": "1bb1k4/9/1p1n5/B7p/6p2/6Ba1/9/1C7/9/R3K4",
+      "actual_fen": "1bb1p4/9/1p7/B7p/6p2/6Ba1/9/1C7/9/R3K4",
+      "error_count": 2,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "p",
+          "expected_name": "黑将",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 2,
+          "col": 3,
+          "region": "palace",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_039_classic_midgame.png",
+      "style": "classic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90039",
+      "expected_fen": "r1bak4/9/rc5c1/p3p3p/2P6/9/9/N6C1/9/2BAKA2R",
+      "actual_fen": "r1bac4/9/rc7/p3p3p/2A6/9/9/R6C1/9/2BAKP2R",
+      "error_count": 5,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 2,
+          "col": 7,
+          "region": "center",
+          "expected": "c",
+          "actual": "",
+          "expected_name": "黑炮",
+          "actual_name": "空"
+        },
+        {
+          "row": 4,
+          "col": 2,
+          "region": "river",
+          "expected": "P",
+          "actual": "A",
+          "expected_name": "红兵",
+          "actual_name": "红仕"
+        },
+        {
+          "row": 7,
+          "col": 0,
+          "region": "edge",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        },
+        {
+          "row": 9,
+          "col": 5,
+          "region": "edge",
+          "expected": "A",
+          "actual": "P",
+          "expected_name": "红仕",
+          "actual_name": "红兵"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_041_plastic_initial.png",
+      "style": "plastic",
+      "layout_type": "initial",
+      "orientation": "red_top",
+      "seed": "90041",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "actual_fen": "r1bacab1r/9/1c5c1/p3p1p1p/9/9/P1P1P3P/1C5C1/9/RRBAKAB2",
+      "error_count": 8,
+      "errors": [
+        {
+          "row": 0,
+          "col": 1,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 3,
+          "col": 2,
+          "region": "center",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空"
+        },
+        {
+          "row": 6,
+          "col": 6,
+          "region": "center",
+          "expected": "P",
+          "actual": "",
+          "expected_name": "红兵",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 8,
+          "region": "edge",
+          "expected": "R",
+          "actual": "",
+          "expected_name": "红俥",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_045_classic_midgame.png",
+      "style": "classic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90045",
+      "expected_fen": "r1b1ka1n1/9/1c7/2p1p3p/9/5bR1C/P7P/9/9/R1BAKA1N1",
+      "actual_fen": "r1b1ca3/9/1c7/2p1p3p/9/5bR1C/P7P/9/9/R1BAKA3",
+      "error_count": 3,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_047_plastic_midgame.png",
+      "style": "plastic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90047",
+      "expected_fen": "2b1kab2/2p6/9/papr4P/2N1nA2P/6C2/2P1Pn3/R3P4/2N6/2BBK4",
+      "actual_fen": "2b1cab2/2p6/9/papr4P/5A2P/6C2/2P1A4/R8/2R6/2BBK4",
+      "error_count": 7,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 4,
+          "col": 2,
+          "region": "river",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        },
+        {
+          "row": 4,
+          "col": 4,
+          "region": "river",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 6,
+          "col": 4,
+          "region": "center",
+          "expected": "P",
+          "actual": "A",
+          "expected_name": "红兵",
+          "actual_name": "红仕"
+        },
+        {
+          "row": 6,
+          "col": 5,
+          "region": "center",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 7,
+          "col": 4,
+          "region": "palace",
+          "expected": "P",
+          "actual": "",
+          "expected_name": "红兵",
+          "actual_name": "空"
+        },
+        {
+          "row": 8,
+          "col": 2,
+          "region": "center",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_049_wood_midgame.png",
+      "style": "wood",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90049",
+      "expected_fen": "1n2k4/rc7/9/A3P1p2/6P1n/1c6C/2Pb5/3R1B3/4N4/B3K3R",
+      "actual_fen": "1b2p4/rc7/9/A3P1p2/6P1b/1p6C/2P6/9/4R4/B3A3R",
+      "error_count": 9,
+      "errors": [
+        {
+          "row": 0,
+          "col": 1,
+          "region": "edge",
+          "expected": "n",
+          "actual": "b",
+          "expected_name": "黑马",
+          "actual_name": "黑象"
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "p",
+          "expected_name": "黑将",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 4,
+          "col": 8,
+          "region": "edge",
+          "expected": "n",
+          "actual": "b",
+          "expected_name": "黑马",
+          "actual_name": "黑象"
+        },
+        {
+          "row": 5,
+          "col": 1,
+          "region": "river",
+          "expected": "c",
+          "actual": "p",
+          "expected_name": "黑炮",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 6,
+          "col": 3,
+          "region": "center",
+          "expected": "b",
+          "actual": "",
+          "expected_name": "黑象",
+          "actual_name": "空"
+        },
+        {
+          "row": 7,
+          "col": 3,
+          "region": "palace",
+          "expected": "R",
+          "actual": "",
+          "expected_name": "红俥",
+          "actual_name": "空"
+        },
+        {
+          "row": 7,
+          "col": 5,
+          "region": "palace",
+          "expected": "B",
+          "actual": "",
+          "expected_name": "红相",
+          "actual_name": "空"
+        },
+        {
+          "row": 8,
+          "col": 4,
+          "region": "palace",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        },
+        {
+          "row": 9,
+          "col": 4,
+          "region": "edge",
+          "expected": "K",
+          "actual": "A",
+          "expected_name": "红帅",
+          "actual_name": "红仕"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_051_classic_midgame.png",
+      "style": "classic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90051",
+      "expected_fen": "r1b1k2nr/9/1c5c1/2pb4p/9/9/P3PB3/NC3R1C1/7A1/RN2KAB2",
+      "actual_fen": "r1b5r/9/1c5c1/2pb4p/9/9/P3PB3/1C3R1C1/7A1/R3KAB2",
+      "error_count": 4,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "",
+          "expected_name": "黑将",
+          "actual_name": "空"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 7,
+          "col": 0,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_053_plastic_midgame.png",
+      "style": "plastic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90053",
+      "expected_fen": "r3k4/5n1a1/b8/c1APp4/n7B/1C7/1R1P1BP2/8N/9/4K4",
+      "actual_fen": "r3c4/5a1a1/b8/c1APp4/b7C/1C7/1R1P1BA2/9/9/4K4",
+      "error_count": 6,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 1,
+          "col": 5,
+          "region": "palace",
+          "expected": "n",
+          "actual": "a",
+          "expected_name": "黑马",
+          "actual_name": "黑士"
+        },
+        {
+          "row": 4,
+          "col": 0,
+          "region": "edge",
+          "expected": "n",
+          "actual": "b",
+          "expected_name": "黑马",
+          "actual_name": "黑象"
+        },
+        {
+          "row": 4,
+          "col": 8,
+          "region": "edge",
+          "expected": "B",
+          "actual": "C",
+          "expected_name": "红相",
+          "actual_name": "红炮"
+        },
+        {
+          "row": 6,
+          "col": 6,
+          "region": "center",
+          "expected": "P",
+          "actual": "A",
+          "expected_name": "红兵",
+          "actual_name": "红仕"
+        },
+        {
+          "row": 7,
+          "col": 8,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_055_wood_midgame.png",
+      "style": "wood",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90055",
+      "expected_fen": "rc2k4/3pp4/ac7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
+      "actual_fen": "rc2p4/3p5/ac7/p3pR1Pp/3P2bb1/9/2P5r/9/A8/R1A1K1B2",
+      "error_count": 5,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "p",
+          "expected_name": "黑将",
+          "actual_name": "黑卒"
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "region": "palace",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空"
+        },
+        {
+          "row": 4,
+          "col": 6,
+          "region": "river",
+          "expected": "n",
+          "actual": "b",
+          "expected_name": "黑马",
+          "actual_name": "黑象"
+        },
+        {
+          "row": 9,
+          "col": 0,
+          "region": "edge",
+          "expected": "N",
+          "actual": "R",
+          "expected_name": "红马",
+          "actual_name": "红俥"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_057_classic_midgame.png",
+      "style": "classic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90057",
+      "expected_fen": "r1b1k2n1/p8/1c7/2P1p3p/4r4/9/P4a3/1C7/2P2P3/4KA2R",
+      "actual_fen": "r1b1c4/p8/1c7/2P1p3p/4r4/9/P4a3/1C7/2P2P3/4KP2R",
+      "error_count": 3,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 9,
+          "col": 5,
+          "region": "edge",
+          "expected": "A",
+          "actual": "P",
+          "expected_name": "红仕",
+          "actual_name": "红兵"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/generated_v2/board_059_plastic_midgame.png",
+      "style": "plastic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90059",
+      "expected_fen": "r3k2n1/3p5/1c7/9/6a2/9/B1P1P1P1P/9/9/2B1K4",
+      "actual_fen": "r3c4/3p5/1c7/9/6a2/9/B1P1P1A1A/9/9/2B1K4",
+      "error_count": 4,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "c",
+          "expected_name": "黑将",
+          "actual_name": "黑炮"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空"
+        },
+        {
+          "row": 6,
+          "col": 6,
+          "region": "center",
+          "expected": "P",
+          "actual": "A",
+          "expected_name": "红兵",
+          "actual_name": "红仕"
+        },
+        {
+          "row": 6,
+          "col": 8,
+          "region": "edge",
+          "expected": "P",
+          "actual": "A",
+          "expected_name": "红兵",
+          "actual_name": "红仕"
+        }
+      ]
+    }
+  ]
+}

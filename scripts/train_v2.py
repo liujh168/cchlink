@@ -17,6 +17,8 @@ from src.recognition.dataset import PieceDataset  # noqa: E402
 from src.recognition.model import CLASS_NAMES, NUM_CLASSES, build_model, save_model  # noqa: E402
 from src.recognition.split import group_split_indices  # noqa: E402
 
+STANDARD_DATASET_SOURCES = {"standard-v2", "standard-v3", "standard-v4"}
+
 
 class FocalLoss(nn.Module):
     def __init__(self, alpha=None, gamma=2.0, reduction="mean"):
@@ -192,8 +194,11 @@ def main():
         if full_dataset.manifest_path is None:
             raise ValueError("标准训练要求 manifest.csv；历史目录需显式传入 --allow-legacy-data")
         sources = {row.get("source") for row in full_dataset.provenance}
-        if sources != {"standard-v2"}:
-            raise ValueError(f"标准训练仅接受 source=standard-v2，当前为: {sorted(sources)}")
+        if not sources or not sources <= STANDARD_DATASET_SOURCES:
+            raise ValueError(
+                "标准训练仅接受 source=standard-v2/standard-v3/standard-v4，"
+                f"当前为: {sorted(sources)}"
+            )
     train_indices, val_indices = group_split_indices(
         full_dataset.groups, args.val_split, seed=args.seed
     )

@@ -5,7 +5,7 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
-REQUIRED_V2_FIELDS = {
+REQUIRED_STANDARD_FIELDS = {
     "path",
     "label",
     "group",
@@ -17,6 +17,7 @@ REQUIRED_V2_FIELDS = {
     "source",
     "fen",
 }
+STANDARD_DATASET_SOURCES = {"standard-v2", "standard-v3", "standard-v4"}
 
 
 def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
@@ -24,9 +25,10 @@ def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
     rows = list(csv.DictReader(open(manifest, encoding="utf-8")))
     if not rows:
         raise ValueError("数据集清单为空")
-    missing_fields = REQUIRED_V2_FIELDS - set(rows[0])
+    fieldnames = set(rows[0])
+    missing_fields = REQUIRED_STANDARD_FIELDS - fieldnames
     if missing_fields:
-        raise ValueError(f"清单缺少标准 v2 字段: {sorted(missing_fields)}")
+        raise ValueError(f"清单缺少标准字段: {sorted(missing_fields)}")
 
     hashes = defaultdict(list)
     labels = Counter()
@@ -37,6 +39,10 @@ def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
     seeds = set()
     group_metadata = {}
     for row in rows:
+        if row["source"] not in STANDARD_DATASET_SOURCES:
+            raise ValueError(f"未知标准数据源: {row['source']}")
+        if row["source"] in {"standard-v3", "standard-v4"} and "scene_augmented" not in fieldnames:
+            raise ValueError(f"{row['source']} 清单缺少 scene_augmented 字段")
         path = root / row["path"]
         if not path.is_file():
             missing_files.append(row["path"])
@@ -73,6 +79,7 @@ def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
         "labels": dict(sorted(labels.items())),
         "styles": dict(sorted(styles.items())),
         "layout_types": dict(sorted(layout_types.items())),
+        "scene_augmented": sum(row.get("scene_augmented") == "true" for row in rows),
         "duplicate_hash_groups": len(duplicates),
         "cross_group_duplicates": len(cross_group),
         "missing_files": missing_files,
@@ -86,7 +93,7 @@ def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="审计标准 v2 分组数据集清单")
+    parser = argparse.ArgumentParser(description="审计标准分组数据集清单")
     parser.add_argument("dataset", help="包含 manifest.csv 的数据集目录")
     parser.add_argument("--against-manifest", help="检查与评估清单的随机种子泄漏")
     args = parser.parse_args()
