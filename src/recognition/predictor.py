@@ -33,17 +33,25 @@ class PiecePredictor:
         完整棋盘包含 90 个交点，将它们堆叠成批次可以显著减少逐格调用模型产生的
         Python 调度和算子启动开销。
         """
-        if not cells:
+        probabilities = self.predict_batch_probabilities(cells)
+        if probabilities.size == 0:
             return [], []
+        predicted = probabilities.argmax(axis=1)
+        confidence = probabilities.max(axis=1)
+        return predicted.tolist(), confidence.tolist()
+
+    def predict_batch_probabilities(self, cells: list[np.ndarray]) -> np.ndarray:
+        """返回每个图块的完整类别概率，用于多尺度等融合策略。"""
+        if not cells:
+            return np.empty((0, NUM_CLASSES), dtype=np.float32)
         input_tensor = torch.stack([PREDICT_TRANSFORM(Image.fromarray(cell)) for cell in cells]).to(
             self.device
         )
 
         with torch.inference_mode():
             probabilities = torch.softmax(self.model(input_tensor), dim=1)
-            confidence, predicted = torch.max(probabilities, 1)
 
-        return predicted.cpu().tolist(), confidence.cpu().tolist()
+        return probabilities.cpu().numpy()
 
     def predict_grid(self, cells: list[np.ndarray]) -> list[int]:
         predictions, _ = self.predict_batch(cells)

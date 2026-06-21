@@ -1,13 +1,13 @@
 {
   "manifest": "evaluation\\real_manifest.csv",
-  "model": "data\\models\\checkpoint_standard_v4.pth",
+  "model": "data/models/checkpoint_standard_v4.pth",
   "overall": {
     "count": 18,
     "detected": 18,
-    "grid_accepted": 17,
-    "correct_cells": 1210,
+    "grid_accepted": 18,
+    "correct_cells": 1296,
     "exact": 1,
-    "cell_accuracy": 0.7469135802469136,
+    "cell_accuracy": 0.8,
     "exact_rate": 0.05555555555555555
   },
   "by_style": {
@@ -15,60 +15,64 @@
       "count": 3,
       "detected": 3,
       "grid_accepted": 3,
-      "correct_cells": 218,
+      "correct_cells": 223,
       "exact": 1,
-      "cell_accuracy": 0.8074074074074075,
+      "cell_accuracy": 0.825925925925926,
       "exact_rate": 0.3333333333333333
     },
     "screen": {
       "count": 7,
       "detected": 7,
       "grid_accepted": 7,
-      "correct_cells": 540,
+      "correct_cells": 558,
       "exact": 0,
-      "cell_accuracy": 0.8571428571428571,
+      "cell_accuracy": 0.8857142857142857,
       "exact_rate": 0.0
     },
     "unknown": {
       "count": 1,
       "detected": 1,
       "grid_accepted": 1,
-      "correct_cells": 58,
+      "correct_cells": 57,
       "exact": 0,
-      "cell_accuracy": 0.6444444444444445,
+      "cell_accuracy": 0.6333333333333333,
       "exact_rate": 0.0
     },
     "wood": {
       "count": 7,
       "detected": 7,
-      "grid_accepted": 6,
-      "correct_cells": 394,
+      "grid_accepted": 7,
+      "correct_cells": 458,
       "exact": 0,
-      "cell_accuracy": 0.6253968253968254,
+      "cell_accuracy": 0.726984126984127,
       "exact_rate": 0.0
     }
   },
-  "mean_latency_seconds": 0.10100757222224072,
+  "mean_latency_seconds": 0.15130101111117256,
   "results": [
     {
       "path": "evaluation/real_images/real_001_wood_initial_red_bottom.jpg",
       "status": "NG",
-      "correct_cells": 70,
-      "fen": "ap3a3/9/9/p1p1p1p2/9/9/P1P3P1P/1C7/9/2KAK1KPA",
+      "correct_cells": 75,
+      "fen": "3a1a3/9/1p7/p1p1p1p2/9/9/P1P1P1P1P/1C5C1/9/1NKAK2NA",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"
     },
     {
       "path": "evaluation/real_images/real_002_wood_initial_red_top.jpeg",
-      "status": "REJECTED",
-      "error": "网格定位置信度过低: 0.045"
+      "status": "NG",
+      "correct_cells": 53,
+      "fen": "3n5/4b4/2b3p2/2N3N2/2p6/9/R8/2R6/9/9",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "style": "wood",
+      "layout_type": "initial"
     },
     {
       "path": "evaluation/real_images/real_003_plastic_initial_red_top.jpg",
       "status": "NG",
-      "correct_cells": 70,
-      "fen": "pp1a5/9/1a7/p1p1p3p/9/9/P1P1P3A/1C7/9/RNKP1ARP1",
+      "correct_cells": 72,
+      "fen": "pp7/9/9/p1p1p1p2/9/9/P1P1P1P1A/9/9/RN1PKA1NR",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "plastic",
       "layout_type": "initial"
@@ -76,8 +80,8 @@
     {
       "path": "evaluation/real_images/real_004_screen_initial_red_bottom.png",
       "status": "NG",
-      "correct_cells": 54,
-      "fen": "1cc1n1pn1/9/9/9/9/6A2/P8/7N1/R1KAK1C1R/PP1P2PN1",
+      "correct_cells": 59,
+      "fen": "1n4pn1/9/1p7/9/9/6A2/P3P3P/9/R2AK1C1R/1N1P2PN1",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "screen",
       "layout_type": "initial"
@@ -85,8 +89,8 @@
     {
       "path": "evaluation/real_images/real_005_wood_opening_red_bottom.jpg",
       "status": "NG",
-      "correct_cells": 74,
-      "fen": "2paka2N/9/6p2/2p1p2Rp/9/9/P1P3P1P/1C2B1N2/9/R1CAKA3",
+      "correct_cells": 79,
+      "fen": "1npaka3/9/9/2p1p2Rp/6p2/9/P1P1P1P1P/1C2B1N2/9/RNCAKA3",
       "expected_fen": "rnbakabr1/9/1c4nc1/p1p1p2Rp/6p2/9/P1P1P1P1P/1C2C1N2/9/RNBAKAB2",
       "style": "wood",
       "layout_type": "opening"
@@ -94,8 +98,8 @@
     {
       "path": "evaluation/real_images/real_006_wood_endgame_red_bottom.jpg",
       "status": "NG",
-      "correct_cells": 87,
-      "fen": "4k4/9/9/9/9/9/9/4K4/9/4P4",
+      "correct_cells": 86,
+      "fen": "4kp3/9/9/9/9/9/9/4K4/9/4P3A",
       "expected_fen": "4ka3/9/9/9/9/9/9/4N4/9/4K4",
       "style": "wood",
       "layout_type": "endgame"
@@ -103,8 +107,8 @@
     {
       "path": "evaluation/real_images/real_007_wood_initial_red_bottom.jpg",
       "status": "NG",
-      "correct_cells": 61,
-      "fen": "1p3p1p1/9/1p5p1/9/9/9/2P1P1C2/1R5A1/9/3A5",
+      "correct_cells": 62,
+      "fen": "1p5p1/1b7/1p5p1/2p6/9/9/2P1P1P2/1R5A1/9/3A5",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"
@@ -112,8 +116,8 @@
     {
       "path": "evaluation/real_images/real_008_plastic_midgame_red_bottom.jpg",
       "status": "NG",
-      "correct_cells": 58,
-      "fen": "9/9/8K/9/8K/8K/R7R/8K/4P4/1NN6",
+      "correct_cells": 61,
+      "fen": "9/9/9/9/8K/9/R7R/4P4/9/1NN6",
       "expected_fen": "1rbak4/4a4/1cn1b4/p1p1p3p/9/2P3p2/P1N5P/4C1nC1/3RK4/1RBA1rBc1",
       "style": "plastic",
       "layout_type": "midgame"
@@ -122,7 +126,7 @@
       "path": "evaluation/real_images/real_009_wood_initial_red_top.png",
       "status": "NG",
       "correct_cells": 52,
-      "fen": "9/9/9/R8/n2P5/1N5P1/2R6/1N7/A1P6/9",
+      "fen": "9/6P1A/2A4N1/R5R2/1P5N1/5P3/9/9/9/9",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"
@@ -130,8 +134,8 @@
     {
       "path": "evaluation/real_images/real_010_unknown_initial_red_bottom.jpg",
       "status": "NG",
-      "correct_cells": 58,
-      "fen": "n8/9/9/9/9/9/9/9/9/9",
+      "correct_cells": 57,
+      "fen": "n8/9/9/9/3n5/9/9/9/9/9",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "unknown",
       "layout_type": "initial"
@@ -148,8 +152,8 @@
     {
       "path": "evaluation/real_images/real_012_screen_endgame_red_bottom_02.png",
       "status": "NG",
-      "correct_cells": 77,
-      "fen": "9/3ann3/9/5a3/9/9/9/7R1/9/3pb4",
+      "correct_cells": 78,
+      "fen": "4bp3/9/9/9/9/9/9/9/3nnp3/9",
       "expected_fen": "3k1a3/4a4/9/9/9/9/9/3p5/4C4/3KCRR2",
       "style": "screen",
       "layout_type": "endgame"
@@ -157,8 +161,8 @@
     {
       "path": "evaluation/real_images/real_013_screen_endgame_red_bottom_03.png",
       "status": "NG",
-      "correct_cells": 71,
-      "fen": "3C5/1p7/4C4/4p4/P2P5/9/9/9/3N4N/9",
+      "correct_cells": 81,
+      "fen": "4k4/N4N3/9/9/9/8P/4p4/4C4/7p1/5C3",
       "expected_fen": "4k4/C4R3/9/9/9/5R2P/4r4/4B3B/4p2r1/5K3",
       "style": "screen",
       "layout_type": "endgame"
@@ -166,8 +170,8 @@
     {
       "path": "evaluation/real_images/real_014_screen_endgame_red_bottom_04.png",
       "status": "NG",
-      "correct_cells": 87,
-      "fen": "9/4aR3/5a2p/9/9/9/9/9/9/4K4",
+      "correct_cells": 88,
+      "fen": "9/4aR3/3k1a2p/9/9/9/9/9/9/4K4",
       "expected_fen": "9/4aR3/3k1a2b/9/6b2/9/9/9/9/4K4",
       "style": "screen",
       "layout_type": "endgame"
@@ -175,8 +179,8 @@
     {
       "path": "evaluation/real_images/real_015_screen_endgame_red_top_01.png",
       "status": "NG",
-      "correct_cells": 88,
-      "fen": "4k4/5N1C1/5R3/9/9/9/9/9/4r1r2/5R3",
+      "correct_cells": 89,
+      "fen": "4k4/5R1C1/5R3/9/9/9/9/9/4r1r2/5N3",
       "expected_fen": "4k4/5R1C1/5R3/9/9/9/9/9/4r1r2/5K3",
       "style": "screen",
       "layout_type": "endgame"
@@ -185,7 +189,7 @@
       "path": "evaluation/real_images/real_016_screen_endgame_red_top_02.png",
       "status": "NG",
       "correct_cells": 82,
-      "fen": "9/4k4/9/9/4R4/9/8P/5A3/4P4/p3N4",
+      "fen": "9/4k4/9/9/9/4N4/8P/5A3/4P4/p3N4",
       "expected_fen": "4k4/9/9/p8/8p/9/8P/5A3/4A4/r3K4",
       "style": "screen",
       "layout_type": "endgame"
@@ -193,8 +197,8 @@
     {
       "path": "evaluation/real_images/real_017_wood_initial_red_top.jpg",
       "status": "NG",
-      "correct_cells": 50,
-      "fen": "4c4/9/9/9/c2P5/R4P3/9/2N2RP2/4P4/4PN3",
+      "correct_cells": 51,
+      "fen": "4c4/6c2/9/2a6/1R1P5/5P3/9/2N3P2/4P4/4PN3",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"

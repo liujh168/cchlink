@@ -1,23 +1,23 @@
-import os
-import sys
-import random
 import argparse
+import os
+import random
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import cv2
 import numpy as np
+from generate_board import (
+    COLS,
+    ROWS,
+    render_board,
+)
 from PIL import Image
 
-from generate_board import (
-    render_board, INITIAL_LAYOUT, PIECE_CHARS,
-    ROWS, COLS, CELL, BOARD_W, BOARD_H,
-    apply_perspective, apply_rotation, apply_lighting,
-)
 from src.preprocess.board_detector import detect_board_corners
-from src.preprocess.perspective import warp_board, WARP_PAD
-from src.segmentation.grid_splitter import _snap_grid, _detect_grid_lines
+from src.preprocess.perspective import warp_board
 from src.recognition.dataset import CLASS_TO_IDX
+from src.segmentation.grid_splitter import _snap_grid
 
 RED_PIECES = ["红帅", "红仕", "红相", "红俥", "红马", "红炮", "红兵"]
 BLACK_PIECES = ["黑将", "黑士", "黑象", "黑车", "黑马", "黑炮", "黑卒"]
@@ -38,8 +38,11 @@ def generate_random_midgame():
             row = random.randint(0, ROWS - 1)
             col = random.randint(0, COLS - 1)
 
-            if (piece in ("红帅", "黑将") and (3 <= col <= 5) and
-                    ((piece == "黑将" and 0 <= row <= 2) or (piece == "红帅" and 7 <= row <= 9))):
+            if (
+                piece in ("红帅", "黑将")
+                and (3 <= col <= 5)
+                and ((piece == "黑将" and 0 <= row <= 2) or (piece == "红帅" and 7 <= row <= 9))
+            ):
                 if layout[row][col] is None:
                     layout[row][col] = piece
                     placed.add(piece)
@@ -72,23 +75,26 @@ def distort_to_array(pil_img):
     rotated = cv2.warpAffine(img, M, (w, h), borderValue=bg_color)
 
     shift = random.randint(10, 50)
-    src_pts = np.float32([
-        [shift, shift],
-        [w - 1 - shift, random.randint(0, shift)],
-        [w - 1 - random.randint(0, shift), h - 1 - shift],
-        [random.randint(0, shift), h - 1 - random.randint(0, shift)],
-    ])
+    src_pts = np.float32(
+        [
+            [shift, shift],
+            [w - 1 - shift, random.randint(0, shift)],
+            [w - 1 - random.randint(0, shift), h - 1 - shift],
+            [random.randint(0, shift), h - 1 - random.randint(0, shift)],
+        ]
+    )
     dst_size = 600
-    dst_pts = np.float32([
-        [30, 30],
-        [dst_size - 1 - 30, 30],
-        [dst_size - 1 - 30, dst_size - 1 - 30],
-        [30, dst_size - 1 - 30],
-    ])
+    dst_pts = np.float32(
+        [
+            [30, 30],
+            [dst_size - 1 - 30, 30],
+            [dst_size - 1 - 30, dst_size - 1 - 30],
+            [30, dst_size - 1 - 30],
+        ]
+    )
 
     M2 = cv2.getPerspectiveTransform(src_pts, dst_pts)
-    result = cv2.warpPerspective(rotated, M2, (dst_size, dst_size),
-                                  borderValue=bg_color)
+    result = cv2.warpPerspective(rotated, M2, (dst_size, dst_size), borderValue=bg_color)
 
     brightness = random.uniform(0.5, 1.5)
     result = np.clip(result.astype(np.float32) * brightness, 0, 255).astype(np.uint8)
@@ -105,8 +111,8 @@ def extract_cells_from_board(board_img, layout):
     hw, ww = warped.shape[:2]
     gray = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 
-    h_lines = _snap_grid(gray, axis='h', count=ROWS + 1, size=hw)
-    v_lines = _snap_grid(gray, axis='v', count=COLS + 1, size=ww)
+    h_lines = _snap_grid(gray, axis="h", count=ROWS + 1, size=hw)
+    v_lines = _snap_grid(gray, axis="v", count=COLS + 1, size=ww)
 
     cells = []
     for r in range(ROWS):
@@ -151,9 +157,7 @@ def main():
             if cell.size == 0:
                 continue
             idx = counters[label_name]
-            Image.fromarray(cell).save(
-                os.path.join(output_dir, label_name, f"{idx:05d}.png")
-            )
+            Image.fromarray(cell).save(os.path.join(output_dir, label_name, f"{idx:05d}.png"))
             counters[label_name] += 1
 
         total_boards += 1

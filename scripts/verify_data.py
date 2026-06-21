@@ -1,4 +1,5 @@
 import os
+
 from PIL import Image
 
 base = r"i:\cchlink\data\pieces"
@@ -12,9 +13,12 @@ red_img = Image.open(os.path.join(red_dir, "00000.png"))
 black_img = Image.open(os.path.join(black_dir, "00000.png"))
 empty_img = Image.open(os.path.join(empty_dir, "00000.png"))
 
-print(f"红帅: size={red_img.size}, mode={red_img.mode}, center_pixel={red_img.getpixel((20, 20))}")
-print(f"黑将: size={black_img.size}, mode={black_img.mode}, center_pixel={black_img.getpixel((20, 20))}")
-print(f"空:   size={empty_img.size}, mode={empty_img.mode}, center_pixel={empty_img.getpixel((20, 20))}")
+red_center = red_img.getpixel((20, 20))
+black_center = black_img.getpixel((20, 20))
+empty_center = empty_img.getpixel((20, 20))
+print(f"红帅: size={red_img.size}, mode={red_img.mode}, center_pixel={red_center}")
+print(f"黑将: size={black_img.size}, mode={black_img.mode}, center_pixel={black_center}")
+print(f"空:   size={empty_img.size}, mode={empty_img.mode}, center_pixel={empty_center}")
 
 # 验证同一类的多样性
 pixels = []

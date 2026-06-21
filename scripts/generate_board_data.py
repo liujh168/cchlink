@@ -1,18 +1,23 @@
-import os
-import sys
-import random
 import argparse
+import os
+import random
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
+from generate_board import (
+    CELL,
+    COLS,
+    INITIAL_LAYOUT,
+    ROWS,
+    apply_lighting,
+    apply_perspective,
+    apply_rotation,
+    render_board,
+)
 from PIL import Image
 
-from generate_board import (
-            render_board, INITIAL_LAYOUT, PIECE_CHARS,
-            ROWS, COLS, CELL, BOARD_W, BOARD_H,
-            apply_perspective, apply_lighting, apply_rotation,
-        )
 from src.recognition.dataset import CLASS_TO_IDX
 
 RED_PIECES = ["红帅", "红仕", "红相", "红俥", "红马", "红炮", "红兵"]
@@ -34,8 +39,11 @@ def generate_random_midgame() -> list[list[str | None]]:
             row = random.randint(0, ROWS - 1)
             col = random.randint(0, COLS - 1)
 
-            if (piece in ("红帅", "黑将") and (3 <= col <= 5) and
-                    ((piece == "黑将" and 0 <= row <= 2) or (piece == "红帅" and 7 <= row <= 9))):
+            if (
+                piece in ("红帅", "黑将")
+                and (3 <= col <= 5)
+                and ((piece == "黑将" and 0 <= row <= 2) or (piece == "红帅" and 7 <= row <= 9))
+            ):
                 if layout[row][col] is None:
                     layout[row][col] = piece
                     placed.add(piece)
@@ -67,7 +75,9 @@ def crop_cells(board_img: Image.Image) -> list[tuple[int, int, str | None, Image
     return cells
 
 
-def crop_cells_with_jitter(board_img: Image.Image, max_offset: int = 5) -> list[tuple[int, int, str | None, Image.Image]]:
+def crop_cells_with_jitter(
+    board_img: Image.Image, max_offset: int = 5
+) -> list[tuple[int, int, str | None, Image.Image]]:
     cells = []
     bw, bh = board_img.size
     for r in range(ROWS):
@@ -114,7 +124,9 @@ def main():
     parser.add_argument("--output", "-o", default="data/pieces_v3", help="输出目录")
     parser.add_argument("--num-boards", "-n", type=int, default=600, help="生成的棋盘数量")
     parser.add_argument("--include-initial", action="store_true", default=True, help="包含初始布局")
-    parser.add_argument("--num-initial", type=int, default=100, help="初始布局重复次数（配合光照变化）")
+    parser.add_argument(
+        "--num-initial", type=int, default=100, help="初始布局重复次数（配合光照变化）"
+    )
     args = parser.parse_args()
 
     output_dir = args.output

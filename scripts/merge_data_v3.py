@@ -1,6 +1,6 @@
 import os
-import shutil
 import random
+import shutil
 
 random.seed(42)
 
@@ -13,8 +13,21 @@ src_dirs = [
 dst = r"i:\cchlink\data\pieces_combined_v3"
 
 classes = [
-    "红帅", "红仕", "红相", "红俥", "红马", "红炮", "红兵",
-    "黑将", "黑士", "黑象", "黑车", "黑马", "黑炮", "黑卒", "空",
+    "红帅",
+    "红仕",
+    "红相",
+    "红俥",
+    "红马",
+    "红炮",
+    "红兵",
+    "黑将",
+    "黑士",
+    "黑象",
+    "黑车",
+    "黑马",
+    "黑炮",
+    "黑卒",
+    "空",
 ]
 
 MAX_EMPTY = 4000

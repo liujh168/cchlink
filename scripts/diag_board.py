@@ -1,9 +1,11 @@
 import sys
+
 sys.path.insert(0, r"i:\cchlink")
 
 import cv2
 import numpy as np
-from src.preprocess.board_detector import _detect_by_contour, _detect_by_hough_lines, _order_corners
+
+from src.preprocess.board_detector import _detect_by_contour, _detect_by_hough_lines
 
 test_paths = [
     r"i:\cchlink\data\raw\eval\test_001.png",

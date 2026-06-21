@@ -5,6 +5,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import cv2
+
 from src.pipeline import Pipeline
 
 image_path = str(PROJECT_ROOT / "data" / "raw" / "initial_00.jpg")
@@ -34,4 +35,5 @@ try:
 except Exception as e:
     print(f"错误: {e}")
     import traceback
+
     traceback.print_exc()

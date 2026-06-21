@@ -263,17 +263,18 @@ def apply_perspective(pil_img: Image.Image) -> np.ndarray:
     src_pts = np.float32([[0, 0], [w - 1, 0], [w - 1, h - 1], [0, h - 1]])
 
     jitter = random.uniform(0.10, 0.30)
-    dst_pts = np.float32([
-        [w * random.uniform(0, jitter), h * random.uniform(0, jitter)],
-        [w * (1 - random.uniform(0, jitter)), h * random.uniform(0, jitter)],
-        [w * (1 - random.uniform(0, jitter)), h * (1 - random.uniform(0, jitter))],
-        [w * random.uniform(0, jitter), h * (1 - random.uniform(0, jitter))],
-    ])
+    dst_pts = np.float32(
+        [
+            [w * random.uniform(0, jitter), h * random.uniform(0, jitter)],
+            [w * (1 - random.uniform(0, jitter)), h * random.uniform(0, jitter)],
+            [w * (1 - random.uniform(0, jitter)), h * (1 - random.uniform(0, jitter))],
+            [w * random.uniform(0, jitter), h * (1 - random.uniform(0, jitter))],
+        ]
+    )
 
     bg = _random_bg_color()
     M = cv2.getPerspectiveTransform(src_pts, dst_pts)
-    warped = cv2.warpPerspective(img, M, (w, h), borderMode=cv2.BORDER_CONSTANT,
-                                  borderValue=bg)
+    warped = cv2.warpPerspective(img, M, (w, h), borderMode=cv2.BORDER_CONSTANT, borderValue=bg)
     return warped
 
 
@@ -282,8 +283,7 @@ def apply_rotation(img: np.ndarray) -> np.ndarray:
     angle = random.uniform(-35, 35)
     M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1.0)
     bg = _random_bg_color()
-    rotated = cv2.warpAffine(img, M, (w, h), borderMode=cv2.BORDER_CONSTANT,
-                              borderValue=bg)
+    rotated = cv2.warpAffine(img, M, (w, h), borderMode=cv2.BORDER_CONSTANT, borderValue=bg)
     return rotated
 
 
@@ -298,7 +298,7 @@ def apply_lighting(img: np.ndarray) -> np.ndarray:
         y0 = random.randint(0, h // 2)
         xx, yy = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
         dist = np.sqrt((xx - x0) ** 2 + (yy - y0) ** 2)
-        max_dist = np.sqrt(w ** 2 + h ** 2)
+        max_dist = np.sqrt(w**2 + h**2)
         vignette = 1 - 0.4 * (dist / max_dist)
         vignette = np.clip(vignette, 0.4, 1.0)
         img = np.clip(img.astype(np.float32) * vignette[:, :, np.newaxis], 0, 255).astype(np.uint8)
@@ -358,10 +358,12 @@ def main():
     parser.add_argument("--midgame", action="store_true", help="生成随机中局布局")
     args = parser.parse_args()
 
-    output_dir = os.path.abspath(os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        args.output,
-    ))
+    output_dir = os.path.abspath(
+        os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            args.output,
+        )
+    )
     os.makedirs(output_dir, exist_ok=True)
 
     for i in range(args.num):

@@ -1,14 +1,16 @@
 import sys
+
 sys.path.insert(0, r"i:\cchlink")
 
 import random
-import numpy as np
 from collections import defaultdict
-from scripts.generate_board import INITIAL_LAYOUT, render_board, generate_random_midgame
-from scripts.eval_pipeline import distort_image, layout_to_fen, fen_to_layout, eval_layout, FEN_TO_NAME
+
+from scripts.eval_pipeline import (
+    distort_image,
+    fen_to_layout,
+)
+from scripts.generate_board import INITIAL_LAYOUT, generate_random_midgame, render_board
 from src.pipeline import Pipeline
-from src.recognition.dataset import CLASS_TO_IDX, IDX_TO_CLASS
-from src.fen.fen_builder import IDX_TO_FEN
 
 MODEL_PATH = r"i:\cchlink\data\models\checkpoint_v3.pth"
 

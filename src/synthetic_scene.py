@@ -28,9 +28,7 @@ def place_board_in_scene(
     scene = np.clip(background, 0, 255).astype(np.uint8)
 
     board_h, board_w = board_rgb.shape[:2]
-    source = np.float32(
-        [[0, 0], [board_w - 1, 0], [board_w - 1, board_h - 1], [0, board_h - 1]]
-    )
+    source = np.float32([[0, 0], [board_w - 1, 0], [board_w - 1, board_h - 1], [0, board_h - 1]])
     left = rng.randint(80, 125)
     right = rng.randint(80, 125)
     top = rng.randint(40, 85)

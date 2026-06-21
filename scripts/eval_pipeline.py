@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -8,15 +9,22 @@ if os.path.exists(VENV_SITE) and VENV_SITE not in sys.path:
     sys.path.insert(0, VENV_SITE)
 
 import random
-import numpy as np
-import cv2
 from collections import defaultdict
+
+import cv2
+import numpy as np
+
 from scripts.generate_board import (
-    INITIAL_LAYOUT, render_board, COLS, ROWS, generate_random_midgame,
+    COLS,
+    INITIAL_LAYOUT,
+    ROWS,
+    generate_random_midgame,
+    render_board,
 )
-from src.pipeline import Pipeline
 from src.fen.fen_builder import IDX_TO_FEN, IDX_TO_NAME
+from src.pipeline import Pipeline
 from src.recognition.dataset import CLASS_TO_IDX
+
 MODEL_PATH = os.path.join(PROJECT_ROOT, "data", "models", "checkpoint_v8.pth")
 
 FEN_TO_NAME = {fen_char: IDX_TO_NAME[idx] for idx, fen_char in IDX_TO_FEN.items() if fen_char}
@@ -93,19 +101,23 @@ def distort_image(pil_img):
     rotated = cv2.warpAffine(img, M, (w, h), borderValue=bg_color)
 
     shift = random.randint(10, 50)
-    src_pts = np.float32([
-        [shift, shift],
-        [w - 1 - shift, random.randint(0, shift)],
-        [w - 1 - random.randint(0, shift), h - 1 - shift],
-        [random.randint(0, shift), h - 1 - random.randint(0, shift)],
-    ])
+    src_pts = np.float32(
+        [
+            [shift, shift],
+            [w - 1 - shift, random.randint(0, shift)],
+            [w - 1 - random.randint(0, shift), h - 1 - shift],
+            [random.randint(0, shift), h - 1 - random.randint(0, shift)],
+        ]
+    )
     dst_size = 600
-    dst_pts = np.float32([
-        [30, 30],
-        [dst_size - 31, 30],
-        [dst_size - 31, dst_size - 31],
-        [30, dst_size - 31],
-    ])
+    dst_pts = np.float32(
+        [
+            [30, 30],
+            [dst_size - 31, 30],
+            [dst_size - 31, dst_size - 31],
+            [30, dst_size - 31],
+        ]
+    )
     M = cv2.getPerspectiveTransform(src_pts, dst_pts)
     warped = cv2.warpPerspective(rotated, M, (dst_size, dst_size), borderValue=bg_color)
 
@@ -125,6 +137,7 @@ def main():
     total_exact = 0
 
     import torch
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"使用设备: {device}")
     pipeline = Pipeline(model_path=MODEL_PATH, device=device)
@@ -166,16 +179,16 @@ def main():
             total_exact += 1
 
         status = "OK" if exact else "NG"
-        print(f"[{status}] test_{i:03d} accuracy={correct}/{total} "
-              f"expected={expected_fen} got={fen}")
+        print(
+            f"[{status}] test_{i:03d} accuracy={correct}/{total} expected={expected_fen} got={fen}"
+        )
 
     print(f"\n=== 总体评估 ({num_tests} 张) ===")
     print(f"完全匹配: {total_exact}/{num_tests}")
     print(f"总准确率: {all_correct}/{all_total} = {100 * all_correct / all_total:.1f}%")
 
-    print(f"\n各分类准确率:")
-    for cls in sorted(all_per_class.keys(),
-                      key=lambda x: (x != "空", x)):
+    print("\n各分类准确率:")
+    for cls in sorted(all_per_class.keys(), key=lambda x: (x != "空", x)):
         v = all_per_class[cls]
         acc = 100 * v["correct"] / v["total"] if v["total"] > 0 else 0
         print(f"  {cls}: {v['correct']}/{v['total']} ({acc:.1f}%)")

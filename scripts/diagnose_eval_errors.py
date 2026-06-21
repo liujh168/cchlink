@@ -113,9 +113,7 @@ def diagnose_manifest_errors(
         except RuntimeError as error:
             rejected += 1
             error_cells += 90
-            board_errors.append(
-                {"path": item["path"], "status": "REJECTED", "error": str(error)}
-            )
+            board_errors.append({"path": item["path"], "status": "REJECTED", "error": str(error)})
             continue
 
         errors = compare_fens(item["expected_fen"], result.fen)

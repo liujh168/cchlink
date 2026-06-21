@@ -1,13 +1,28 @@
 import os
-import shutil
 import random
+import shutil
 
 src1 = r"i:\cchlink\data\pieces"
 src2 = r"i:\cchlink\data\pieces_board"
 dst = r"i:\cchlink\data\pieces_combined"
 
-classes = ["红帅","红仕","红相","红俥","红马","红炮","红兵",
-           "黑将","黑士","黑象","黑车","黑马","黑炮","黑卒","空"]
+classes = [
+    "红帅",
+    "红仕",
+    "红相",
+    "红俥",
+    "红马",
+    "红炮",
+    "红兵",
+    "黑将",
+    "黑士",
+    "黑象",
+    "黑车",
+    "黑马",
+    "黑炮",
+    "黑卒",
+    "空",
+]
 
 os.makedirs(dst, exist_ok=True)
 for c in classes:
@@ -22,8 +37,9 @@ for c in classes:
     if os.path.exists(src_dir):
         for f in sorted(os.listdir(src_dir)):
             if f.endswith(".png"):
-                shutil.copy2(os.path.join(src_dir, f),
-                            os.path.join(dst, c, f"{counters[c]:05d}.png"))
+                shutil.copy2(
+                    os.path.join(src_dir, f), os.path.join(dst, c, f"{counters[c]:05d}.png")
+                )
                 counters[c] += 1
 
     # board data (limit empty cells)
@@ -34,8 +50,7 @@ for c in classes:
             random.Random(42).shuffle(files)
             files = files[:2000]
         for f in files:
-            shutil.copy2(os.path.join(src_dir, f),
-                        os.path.join(dst, c, f"{counters[c]:05d}.png"))
+            shutil.copy2(os.path.join(src_dir, f), os.path.join(dst, c, f"{counters[c]:05d}.png"))
             counters[c] += 1
 
 print("classes count:")

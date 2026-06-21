@@ -9,11 +9,13 @@ from src.fen.rules import (
     normalize_orientation,
     validate_position,
 )
-from src.geometry import COLS, extract_intersection_patches
+from src.geometry import COLS, PATCH_SCALE, extract_intersection_patches
 from src.preprocess.board_detector import detect_board
 from src.preprocess.perspective import WARP_PAD, warp_board
 from src.recognition.predictor import PiecePredictor
 from src.segmentation.grid_splitter import detect_grid
+
+DEFAULT_PATCH_SCALES = (PATCH_SCALE, 0.90, 0.98)
 
 
 def _crop_board(warped: np.ndarray) -> np.ndarray:
@@ -35,13 +37,17 @@ class Pipeline:
         device: str = "cpu",
         backbone: str = "mobilenet_v3_small",
         min_board_confidence: float = 0.22,
-        min_grid_confidence: float = 0.05,
+        min_grid_confidence: float = 0.04,
         apply_rules: bool = True,
+        patch_scales: tuple[float, ...] | None = None,
     ):
         self.predictor = PiecePredictor(model_path, device=device, backbone=backbone)
         self.min_board_confidence = min_board_confidence
         self.min_grid_confidence = min_grid_confidence
         self.apply_rules = apply_rules
+        self.patch_scales = patch_scales or DEFAULT_PATCH_SCALES
+        if not self.patch_scales:
+            raise ValueError("patch_scales 至少需要包含一个尺度")
 
     def _extract(self, image: np.ndarray):
         """检测并校正棋盘，完成网格质量校验后提取 90 个交点图块。"""
@@ -55,10 +61,31 @@ class Pipeline:
         cells = extract_intersection_patches(board, grid.row_positions, grid.col_positions)
         return detection, grid, board, cells
 
+    def _predict_cells(self, board: np.ndarray, grid, base_cells: list[np.ndarray]):
+        """对同一组交点做多尺度概率平均，降低真实照片中棋子大小差异的影响。"""
+        patch_scales = getattr(self, "patch_scales", (PATCH_SCALE,))
+        if len(patch_scales) == 1:
+            return self.predictor.predict_batch(base_cells)
+
+        probabilities = []
+        for scale in patch_scales:
+            if abs(scale - PATCH_SCALE) < 1e-6:
+                cells = base_cells
+            else:
+                cells = extract_intersection_patches(
+                    board, grid.row_positions, grid.col_positions, scale=scale
+                )
+            probabilities.append(self.predictor.predict_batch_probabilities(cells))
+
+        averaged = np.mean(probabilities, axis=0)
+        predictions = averaged.argmax(axis=1)
+        confidences = averaged.max(axis=1)
+        return predictions.tolist(), confidences.tolist()
+
     def analyze(self, image: np.ndarray, debug_dir=None, visualize_dir=None) -> AnalysisResult:
         """返回完整结构化结果，并可选择保存本次识别的调试产物。"""
         detection, grid, board, cells = self._extract(image)
-        raw_predictions, raw_confidences = self.predictor.predict_batch(cells)
+        raw_predictions, raw_confidences = self._predict_cells(board, grid, cells)
         orientation = detect_orientation(raw_predictions)
         predictions, confidences = normalize_orientation(
             raw_predictions, raw_confidences, orientation

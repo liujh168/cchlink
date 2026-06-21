@@ -1,7 +1,6 @@
 import argparse
-import sys
 import os
-import random
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -16,8 +15,8 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
-from src.recognition.model import build_model, save_model, NUM_CLASSES
-from src.recognition.dataset import PieceDataset, TRAIN_TRANSFORM, VAL_TRANSFORM
+from src.recognition.dataset import TRAIN_TRANSFORM, VAL_TRANSFORM, PieceDataset
+from src.recognition.model import NUM_CLASSES, build_model, save_model
 from src.recognition.split import group_split_indices
 
 
@@ -88,7 +87,12 @@ def main():
     parser.add_argument("--batch_size", "-b", type=int, default=32, help="批次大小")
     parser.add_argument("--lr", type=float, default=0.001, help="学习率")
     parser.add_argument("--output", "-o", required=True, help="模型输出路径 (*.pth)")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu", choices=["cpu", "cuda"], help="训练设备")
+    parser.add_argument(
+        "--device",
+        default="cuda" if torch.cuda.is_available() else "cpu",
+        choices=["cpu", "cuda"],
+        help="训练设备",
+    )
     parser.add_argument("--val_split", type=float, default=0.2, help="验证集比例")
     args = parser.parse_args()
 
@@ -105,7 +109,9 @@ def main():
     train_dataset = _TransformSubset(train_samples, TRAIN_TRANSFORM)
     val_dataset = _TransformSubset(val_samples, VAL_TRANSFORM)
 
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=0)
+    train_loader = DataLoader(
+        train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=0
+    )
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=0)
 
     print(f"训练集: {train_size} 样本, 验证集: {val_size} 样本")

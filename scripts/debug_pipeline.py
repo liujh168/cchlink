@@ -1,13 +1,13 @@
 import sys
+
 sys.path.insert(0, r"i:\cchlink")
 
 import cv2
-import numpy as np
 
 from src.preprocess.board_detector import detect_board_corners
-from src.preprocess.perspective import warp_board, WARP_PAD
-from src.segmentation.grid_splitter import split_board_with_positions
+from src.preprocess.perspective import WARP_PAD, warp_board
 from src.recognition.predictor import PiecePredictor
+from src.segmentation.grid_splitter import split_board_with_positions
 
 image_path = r"i:\cchlink\data\raw\initial_00.jpg"
 model_path = r"i:\cchlink\data\models\checkpoint_v3.pth"
@@ -24,10 +24,9 @@ if corners is None:
 
 board = warp_board(image, corners)
 print(f"校正后棋盘尺寸: {board.shape}")
-board = board[WARP_PAD:board.shape[0] - WARP_PAD, WARP_PAD:board.shape[1] - WARP_PAD]
+board = board[WARP_PAD : board.shape[0] - WARP_PAD, WARP_PAD : board.shape[1] - WARP_PAD]
 print(f"裁剪后棋盘尺寸: {board.shape}")
-cv2.imwrite(r"i:\cchlink\data\raw\debug_board.jpg",
-             cv2.cvtColor(board, cv2.COLOR_RGB2BGR))
+cv2.imwrite(r"i:\cchlink\data\raw\debug_board.jpg", cv2.cvtColor(board, cv2.COLOR_RGB2BGR))
 
 cells = split_board_with_positions(board)
 print(f"分割格子数: {len(cells)}")
@@ -35,7 +34,7 @@ print(f"分割格子数: {len(cells)}")
 predictor = PiecePredictor(model_path=model_path, device="cpu")
 
 all_preds = predictor.predict_grid([c for _, _, c in cells])
-from src.fen.fen_builder import build_fen, IDX_TO_NAME
+from src.fen.fen_builder import IDX_TO_NAME, build_fen
 
 for row in range(10):
     line = []
@@ -55,6 +54,8 @@ print(f"匹配: {fen == expected}")
 for row in range(10):
     for col in range(9):
         _, _, cell_img = cells[row * 9 + col]
-        cv2.imwrite(rf"i:\cchlink\data\raw\debug_cell_r{row}_c{col}.jpg",
-                     cv2.cvtColor(cell_img, cv2.COLOR_RGB2BGR))
+        cv2.imwrite(
+            rf"i:\cchlink\data\raw\debug_cell_r{row}_c{col}.jpg",
+            cv2.cvtColor(cell_img, cv2.COLOR_RGB2BGR),
+        )
 print("已保存调试格子到 data/raw/debug_cell_*.jpg")

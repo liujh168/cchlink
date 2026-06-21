@@ -1,6 +1,6 @@
 {
   "manifest": "evaluation\\standard_manifest.csv",
-  "model": "data\\models\\checkpoint_standard_v4.pth",
+  "model": "data/models/checkpoint_standard_v4.pth",
   "total_boards": 60,
   "evaluated_boards": 60,
   "read_errors": 0,
@@ -8,8 +8,8 @@
   "exact": 58,
   "exact_rate": 0.9666666666666667,
   "total_cells": 5400,
-  "error_cells": 4,
-  "cell_accuracy": 0.9992592592592593,
+  "error_cells": 2,
+  "cell_accuracy": 0.9996296296296296,
   "by_style": {
     "classic": {
       "boards": 20,
@@ -17,7 +17,7 @@
     },
     "plastic": {
       "boards": 20,
-      "error_cells": 4
+      "error_cells": 2
     },
     "wood": {
       "boards": 20,
@@ -31,7 +31,7 @@
     },
     "initial": {
       "boards": 9,
-      "error_cells": 3
+      "error_cells": 1
     },
     "midgame": {
       "boards": 45,
@@ -39,30 +39,24 @@
     }
   },
   "top_expected": {
-    "红马": 1,
     "红相": 1,
-    "红仕": 1,
     "红兵": 1
   },
   "top_actual": {
-    "空": 2,
-    "红仕": 2
+    "空": 1,
+    "红仕": 1
   },
   "top_pairs": {
-    "红马->空": 1,
-    "红相->红仕": 1,
-    "红仕->空": 1,
+    "红相->空": 1,
     "红兵->红仕": 1
   },
   "top_regions": {
-    "edge": 3,
+    "edge": 1,
     "center": 1
   },
   "top_cells": {
-    "r9_c1": 1,
     "r9_c2": 1,
-    "r9_c3": 1,
-    "r6_c4": 1
+    "r8_c6": 1
   },
   "board_errors": [
     {
@@ -72,51 +66,33 @@
       "orientation": "red_bottom",
       "seed": "90002",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
-      "actual_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/R1A1KABNR",
-      "error_count": 3,
+      "actual_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RN1AKABNR",
+      "error_count": 1,
       "errors": [
-        {
-          "row": 9,
-          "col": 1,
-          "region": "edge",
-          "expected": "N",
-          "actual": "",
-          "expected_name": "红马",
-          "actual_name": "空"
-        },
         {
           "row": 9,
           "col": 2,
           "region": "edge",
           "expected": "B",
-          "actual": "A",
-          "expected_name": "红相",
-          "actual_name": "红仕"
-        },
-        {
-          "row": 9,
-          "col": 3,
-          "region": "edge",
-          "expected": "A",
           "actual": "",
-          "expected_name": "红仕",
+          "expected_name": "红相",
           "actual_name": "空"
         }
       ]
     },
     {
-      "path": "evaluation/generated_v2/board_047_plastic_midgame.png",
+      "path": "evaluation/generated_v2/board_017_plastic_midgame.png",
       "style": "plastic",
       "layout_type": "midgame",
       "orientation": "red_top",
-      "seed": "90047",
-      "expected_fen": "2b1kab2/2p6/9/papr4P/2N1nA2P/6C2/2P1Pn3/R3P4/2N6/2BBK4",
-      "actual_fen": "2b1kab2/2p6/9/papr4P/2N1nA2P/6C2/2P1An3/R3P4/2N6/2BBK4",
+      "seed": "90017",
+      "expected_fen": "r2bkab1r/9/p8/1AB5p/1P7/3p2B2/c1P4c1/9/6P2/4K4",
+      "actual_fen": "r2bkab1r/9/p8/1AB5p/1P7/3p2B2/c1P4c1/9/6A2/4K4",
       "error_count": 1,
       "errors": [
         {
-          "row": 6,
-          "col": 4,
+          "row": 8,
+          "col": 6,
           "region": "center",
           "expected": "P",
           "actual": "A",

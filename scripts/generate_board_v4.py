@@ -1,8 +1,9 @@
 """生成与eval一致风格的训练数据，使用已知棋盘布局提取带标签的棋子格子。"""
-import os
-import sys
-import random
+
 import argparse
+import os
+import random
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -11,8 +12,11 @@ import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter
 
 from scripts.generate_board import (
-    render_board, INITIAL_LAYOUT, PIECE_CHARS,
-    ROWS, COLS, CELL, BOARD_W, BOARD_H,
+    CELL,
+    COLS,
+    INITIAL_LAYOUT,
+    ROWS,
+    render_board,
 )
 from src.recognition.dataset import CLASS_TO_IDX
 
@@ -33,8 +37,11 @@ def generate_random_midgame():
         while attempts < 100:
             row = random.randint(0, ROWS - 1)
             col = random.randint(0, COLS - 1)
-            if (piece in ("红帅", "黑将") and (3 <= col <= 5) and
-                    ((piece == "黑将" and 0 <= row <= 2) or (piece == "红帅" and 7 <= row <= 9))):
+            if (
+                piece in ("红帅", "黑将")
+                and (3 <= col <= 5)
+                and ((piece == "黑将" and 0 <= row <= 2) or (piece == "红帅" and 7 <= row <= 9))
+            ):
                 if layout[row][col] is None:
                     layout[row][col] = piece
                     placed.add(piece)
@@ -68,19 +75,23 @@ def distort_eval_style(pil_img):
     rotated = cv2.warpAffine(img, M, (w, h), borderValue=bg_color)
 
     shift = random.randint(10, 50)
-    src_pts = np.float32([
-        [shift, shift],
-        [w - 1 - shift, random.randint(0, shift)],
-        [w - 1 - random.randint(0, shift), h - 1 - shift],
-        [random.randint(0, shift), h - 1 - random.randint(0, shift)],
-    ])
+    src_pts = np.float32(
+        [
+            [shift, shift],
+            [w - 1 - shift, random.randint(0, shift)],
+            [w - 1 - random.randint(0, shift), h - 1 - shift],
+            [random.randint(0, shift), h - 1 - random.randint(0, shift)],
+        ]
+    )
     dst_size = 600
-    dst_pts = np.float32([
-        [30, 30],
-        [dst_size - 31, 30],
-        [dst_size - 31, dst_size - 31],
-        [30, dst_size - 31],
-    ])
+    dst_pts = np.float32(
+        [
+            [30, 30],
+            [dst_size - 31, 30],
+            [dst_size - 31, dst_size - 31],
+            [30, dst_size - 31],
+        ]
+    )
     M = cv2.getPerspectiveTransform(src_pts, dst_pts)
     warped = cv2.warpPerspective(rotated, M, (dst_size, dst_size), borderValue=bg_color)
 

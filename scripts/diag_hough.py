@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(0, r"i:\cchlink")
 
 import cv2
@@ -44,6 +45,7 @@ if lines is not None:
         print(f"V rhos: {v_rhos[:10]}...{v_rhos[-3:]}")
 
         from src.preprocess.board_detector import _cluster_rhos
+
         h_clusters = _cluster_rhos(h_rhos)
         v_clusters = _cluster_rhos(v_rhos)
         print(f"H clusters: {h_clusters}")
