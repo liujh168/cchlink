@@ -17,7 +17,7 @@ from src.recognition.dataset import PieceDataset  # noqa: E402
 from src.recognition.model import CLASS_NAMES, NUM_CLASSES, build_model, save_model  # noqa: E402
 from src.recognition.split import group_split_indices  # noqa: E402
 
-STANDARD_DATASET_SOURCES = {"standard-v2", "standard-v3", "standard-v4"}
+STANDARD_DATASET_SOURCES = {"standard-v2", "standard-v3", "standard-v4", "standard-v5"}
 
 
 class FocalLoss(nn.Module):
@@ -165,7 +165,7 @@ def main():
     )
     parser.add_argument(
         "--backbone",
-        default="resnet18",
+        default="mobilenet_v3_small",
         choices=[
             "mobilenet_v3_small",
             "mobilenet_v3_large",
@@ -196,7 +196,7 @@ def main():
         sources = {row.get("source") for row in full_dataset.provenance}
         if not sources or not sources <= STANDARD_DATASET_SOURCES:
             raise ValueError(
-                "标准训练仅接受 source=standard-v2/standard-v3/standard-v4，"
+                "标准训练仅接受 source=standard-v2/standard-v3/standard-v4/standard-v5，"
                 f"当前为: {sorted(sources)}"
             )
     train_indices, val_indices = group_split_indices(

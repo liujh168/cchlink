@@ -10,10 +10,31 @@ import cv2
 from src.pipeline import Pipeline  # noqa: E402
 
 
+def build_model_config(primary_model: str, ensemble_models: list[str], weights: list[float] | None):
+    models = [primary_model, *ensemble_models]
+    if not weights:
+        return models, None
+    if len(weights) != len(models):
+        raise ValueError("--ensemble-weight 数量必须等于主模型 + ensemble 模型总数")
+    return models, weights
+
+
 def main():
     parser = argparse.ArgumentParser(description="中国象棋棋盘 FEN 识别")
     parser.add_argument("image", help="棋盘图片路径")
     parser.add_argument("--model", "-m", required=True, help="训练好的模型权重路径 (*.pth)")
+    parser.add_argument(
+        "--ensemble-model",
+        action="append",
+        default=[],
+        help="额外参与概率平均的模型权重路径，可重复传入",
+    )
+    parser.add_argument(
+        "--ensemble-weight",
+        action="append",
+        type=float,
+        help="模型融合权重；数量需等于主模型加 ensemble 模型总数",
+    )
     parser.add_argument("--device", "-d", default="cpu", choices=["cpu", "cuda"], help="推理设备")
     parser.add_argument("--backbone", default="mobilenet_v3_small", help="模型骨干网络")
     parser.add_argument("--verbose", "-v", action="store_true", help="打印详细信息")
@@ -27,7 +48,19 @@ def main():
         sys.exit(1)
 
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    pipeline = Pipeline(model_path=args.model, device=args.device, backbone=args.backbone)
+    try:
+        model_paths, model_weights = build_model_config(
+            args.model, args.ensemble_model, args.ensemble_weight
+        )
+        pipeline = Pipeline(
+            model_path=model_paths,
+            device=args.device,
+            backbone=args.backbone,
+            model_weights=model_weights,
+        )
+    except ValueError as error:
+        print(f"参数错误: {error}", file=sys.stderr)
+        sys.exit(1)
 
     try:
         artifact_name = Path(args.image).stem

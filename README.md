@@ -90,22 +90,27 @@ cchlink/
 
 ### 训练模型
 
-推荐训练路径是先生成按整盘分组的数据集，再用 `train_v2.py` 训练，避免同一棋盘泄漏到训练集和验证集：
+推荐训练路径是先生成按整盘分组的数据集，再用 `train_v2.py` 训练，避免同一棋盘泄漏到训练集和验证集。当前已通过晋级门槛的权重仍为
+`checkpoint_standard_v4.pth`；下一轮真实照片鲁棒性候选数据版本为 `standard-v5`：
 
 ```bash
-python scripts/generate_grouped_data.py -o data/pieces_grouped_v4 -n 3000
-python scripts/audit_dataset.py data/pieces_grouped_v4 --against-manifest evaluation/standard_manifest.csv
-python scripts/train_v2.py -d data/pieces_grouped_v4 -o data/models/checkpoint_standard_v4.pth
+python scripts/generate_grouped_data.py -o data/pieces_grouped_v5 -n 3000
+python scripts/audit_dataset.py data/pieces_grouped_v5 --against-manifest evaluation/standard_manifest.csv
+python scripts/train_v2.py -d data/pieces_grouped_v5 -o data/models/checkpoint_standard_v5.pth
 ```
 
 `data/pieces/` 是保留的基础棋子训练图块；`data/pieces_grouped_v4/` 和 `data/models/`
 是本地派生输出，不纳入 Git。
 
-当前标准数据版本为 `standard-v4`。它沿用已确认的真实棋盘模板：正确初始布局、
+当前已晋级模型的数据版本为 `standard-v4`。它沿用已确认的真实棋盘模板：正确初始布局、
 红黑九宫 X、楚河汉界，以及距交点 6px、短臂 5px 的紧凑炮兵卒定位标记。v4
 还会将部分完整棋盘先放入透视、光照和噪声场景，再按已知四角矫正回标准棋盘后
 切出训练图块，使训练输入更接近端到端推理。v4 在此基础上修正了 `red_top`
 样本生成：先渲染正常棋盘再整图旋转 180°，让倒拍时棋子文字方向也与评测/真实照片一致。
+
+`standard-v5` 在 v4 基础上增加真实照片风格增强（色偏、不均匀光照、轻微虚焦、
+降采样和 JPEG 压缩），并针对边缘有子交点记录并生成多裁剪尺度、轻微外向偏移的
+训练图块，用于补强真实照片中外圈棋子容易被判空的问题。
 
 参数说明：
 - `-d` / `--data`：训练数据根目录（必填）
@@ -121,6 +126,9 @@ python scripts/train_v2.py -d data/pieces_grouped_v4 -o data/models/checkpoint_s
 python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth -v
 python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth --visualize-dir output/visual
 python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth --debug-dir output/debug
+python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth \
+  --ensemble-model data/models/checkpoint_standard_v5.pth \
+  --ensemble-weight 0.9 --ensemble-weight 0.1
 ```
 
 参数说明：
@@ -130,6 +138,8 @@ python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth --
 - `-v` / `--verbose`：打印详细识别结果
 - `--visualize-dir`：保存原图棋盘四角和规范方向棋盘识别叠加图
 - `--debug-dir`：显式保存候选棋盘、校正棋盘、网格、90 格接触表和完整分析 JSON
+- `--ensemble-model` / `--ensemble-weight`：可选模型概率融合；权重数量需等于主模型加
+  ensemble 模型总数
 
 默认识别流程不会写入磁盘。最终 FEN 始终规范化为黑方在上、红方在下；异常静态棋局仍会返回结果，并在结构化警告中说明问题。
 
@@ -148,6 +158,15 @@ print(result.warnings)
 print(result.corrections)
 ```
 
+如需使用当前 v5 候选融合，可传入多个模型和权重：
+
+```python
+pipeline = Pipeline(
+    ["data/models/checkpoint_standard_v4.pth", "data/models/checkpoint_standard_v5.pth"],
+    model_weights=[0.9, 0.1],
+)
+```
+
 `AnalysisResult` 还包含棋盘与网格置信度、90 个交点的类别/名称/置信度、棋盘角点和网格交点坐标。`Pipeline.run()` 继续只返回最终 FEN，`Pipeline.run_verbose()` 继续返回字典并包含新增分析字段。
 
 ### 批量识别
@@ -156,6 +175,10 @@ print(result.corrections)
 python scripts/batch.py photos --model data/models/checkpoint_standard_v4.pth --output results.csv
 python scripts/batch.py photos --model data/models/checkpoint_standard_v4.pth --output results.csv \
   --visualize-dir output/visual --debug-dir output/debug
+python scripts/batch.py photos --model data/models/checkpoint_standard_v4.pth \
+  --ensemble-model data/models/checkpoint_standard_v5.pth \
+  --ensemble-weight 0.9 --ensemble-weight 0.1 \
+  --output results.csv
 ```
 
 批处理会递归扫描常见图片格式，单张读取或识别失败不会终止任务。CSV 包含相对路径、状态、最终/原始 FEN、方向、棋盘/网格置信度、警告代码、错误信息和处理耗时。
@@ -194,6 +217,10 @@ python scripts/diagnose_eval_errors.py \
 
 `checkpoint_standard_v4.pth` 已通过该标准评测门槛：标准评测 5398/5400 格正确
 （99.96%），58/60 盘完全正确（96.67%）；三张人工确认预览全部完全正确。
+
+当前 v5 候选融合模式（v4 权重 0.9 + v5 权重 0.1）在固定清单上达到：标准评测
+5400/5400 格正确、60/60 盘完全正确；真实照片回归集 1299/1620 格正确（80.19%）、
+整盘 1/18。
 
 ## 开发状态
 

@@ -27,6 +27,15 @@ CSV_FIELDS = [
 ]
 
 
+def build_model_config(primary_model: str, ensemble_models: list[str], weights: list[float] | None):
+    models = [primary_model, *ensemble_models]
+    if not weights:
+        return models, None
+    if len(weights) != len(models):
+        raise ValueError("--ensemble-weight 数量必须等于主模型 + ensemble 模型总数")
+    return models, weights
+
+
 def iter_images(input_dir: Path):
     """递归列出支持的图片文件，并保持稳定排序。"""
     return sorted(
@@ -107,6 +116,18 @@ def main():
     parser = argparse.ArgumentParser(description="递归批量识别目录中的中国象棋棋盘图片")
     parser.add_argument("input_dir", help="待扫描的图片目录")
     parser.add_argument("--model", required=True, help="模型权重路径")
+    parser.add_argument(
+        "--ensemble-model",
+        action="append",
+        default=[],
+        help="额外参与概率平均的模型权重路径，可重复传入",
+    )
+    parser.add_argument(
+        "--ensemble-weight",
+        action="append",
+        type=float,
+        help="模型融合权重；数量需等于主模型加 ensemble 模型总数",
+    )
     parser.add_argument("--output", required=True, help="CSV 汇总输出路径")
     parser.add_argument("--device", default="cpu", choices=["cpu", "cuda"], help="推理设备")
     parser.add_argument("--backbone", default="mobilenet_v3_small", help="模型骨干网络")
@@ -114,7 +135,12 @@ def main():
     parser.add_argument("--debug-dir", help="保存每张图片完整调试产物的根目录")
     args = parser.parse_args()
 
-    pipeline = Pipeline(args.model, device=args.device, backbone=args.backbone)
+    model_paths, model_weights = build_model_config(
+        args.model, args.ensemble_model, args.ensemble_weight
+    )
+    pipeline = Pipeline(
+        model_paths, device=args.device, backbone=args.backbone, model_weights=model_weights
+    )
     rows = run_batch(
         args.input_dir,
         args.output,

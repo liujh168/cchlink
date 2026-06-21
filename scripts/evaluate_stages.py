@@ -17,6 +17,15 @@ from src.preprocess.perspective import WARP_PAD, warp_board  # noqa: E402
 from src.segmentation.grid_splitter import detect_grid  # noqa: E402
 
 
+def build_model_config(primary_model: str, ensemble_models: list[str], weights: list[float] | None):
+    models = [primary_model, *ensemble_models]
+    if not weights:
+        return models, None
+    if len(weights) != len(models):
+        raise ValueError("--ensemble-weight 数量必须等于主模型 + ensemble 模型总数")
+    return models, weights
+
+
 def fen_cells(fen):
     cells = []
     for row in fen.split("/"):
@@ -34,8 +43,11 @@ def evaluate_manifest(
     manifest: Path,
     backbone: str = "mobilenet_v3_small",
     device: str = "cpu",
+    ensemble_models: list[str] | None = None,
+    model_weights: list[float] | None = None,
 ) -> dict:
-    pipeline = Pipeline(model, backbone=backbone, device=device)
+    model_paths, weights = build_model_config(model, ensemble_models or [], model_weights)
+    pipeline = Pipeline(model_paths, backbone=backbone, device=device, model_weights=weights)
     rows = list(csv.DictReader(open(manifest, encoding="utf-8-sig")))
     overall = _empty_metrics()
     by_style = defaultdict(_empty_metrics)
@@ -99,6 +111,8 @@ def evaluate_manifest(
     return {
         "manifest": str(manifest),
         "model": model,
+        "model_paths": model_paths,
+        "model_weights": weights,
         "overall": finalize(overall),
         "by_style": {style: finalize(metric) for style, metric in sorted(by_style.items())},
         "mean_latency_seconds": sum(latencies) / max(len(latencies), 1),
@@ -109,12 +123,31 @@ def evaluate_manifest(
 def main():
     parser = argparse.ArgumentParser(description="对固定清单执行分阶段评估")
     parser.add_argument("--model", required=True, help="待评估的模型权重路径")
+    parser.add_argument(
+        "--ensemble-model",
+        action="append",
+        default=[],
+        help="额外参与概率平均的模型权重路径，可重复传入",
+    )
+    parser.add_argument(
+        "--ensemble-weight",
+        action="append",
+        type=float,
+        help="模型融合权重；数量需等于主模型加 ensemble 模型总数",
+    )
     parser.add_argument("--manifest", default="evaluation/standard_manifest.csv", help="评估清单")
     parser.add_argument("--backbone", default="mobilenet_v3_small", help="模型骨干网络")
     parser.add_argument("--device", default="cpu", choices=["cpu", "cuda"], help="推理设备")
     parser.add_argument("--json-output", help="保存完整 JSON 报告")
     args = parser.parse_args()
-    report = evaluate_manifest(args.model, Path(args.manifest), args.backbone, args.device)
+    report = evaluate_manifest(
+        args.model,
+        Path(args.manifest),
+        args.backbone,
+        args.device,
+        ensemble_models=args.ensemble_model,
+        model_weights=args.ensemble_weight,
+    )
     summary = {key: value for key, value in report.items() if key != "results"}
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     if args.json_output:

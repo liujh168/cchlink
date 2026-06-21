@@ -17,7 +17,7 @@ REQUIRED_STANDARD_FIELDS = {
     "source",
     "fen",
 }
-STANDARD_DATASET_SOURCES = {"standard-v2", "standard-v3", "standard-v4"}
+STANDARD_DATASET_SOURCES = {"standard-v2", "standard-v3", "standard-v4", "standard-v5"}
 
 
 def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
@@ -35,14 +35,23 @@ def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
     groups = Counter()
     styles = Counter()
     layout_types = Counter()
+    patch_scales = Counter()
     missing_files = []
     seeds = set()
     group_metadata = {}
     for row in rows:
         if row["source"] not in STANDARD_DATASET_SOURCES:
             raise ValueError(f"未知标准数据源: {row['source']}")
-        if row["source"] in {"standard-v3", "standard-v4"} and "scene_augmented" not in fieldnames:
+        if (
+            row["source"] in {"standard-v3", "standard-v4", "standard-v5"}
+            and "scene_augmented" not in fieldnames
+        ):
             raise ValueError(f"{row['source']} 清单缺少 scene_augmented 字段")
+        if row["source"] == "standard-v5":
+            v5_fields = {"patch_scale", "patch_shift_y", "patch_shift_x", "edge_augmented"}
+            missing_v5_fields = v5_fields - fieldnames
+            if missing_v5_fields:
+                raise ValueError(f"standard-v5 清单缺少字段: {sorted(missing_v5_fields)}")
         path = root / row["path"]
         if not path.is_file():
             missing_files.append(row["path"])
@@ -52,6 +61,8 @@ def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
         groups[row["group"]] += 1
         styles[row["style"]] += 1
         layout_types[row["layout_type"]] += 1
+        if row.get("patch_scale"):
+            patch_scales[row["patch_scale"]] += 1
         seeds.add(int(row["seed"]))
         metadata = (
             row["style"],
@@ -80,6 +91,8 @@ def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
         "styles": dict(sorted(styles.items())),
         "layout_types": dict(sorted(layout_types.items())),
         "scene_augmented": sum(row.get("scene_augmented") == "true" for row in rows),
+        "edge_augmented": sum(row.get("edge_augmented") == "true" for row in rows),
+        "patch_scales": dict(sorted(patch_scales.items())),
         "duplicate_hash_groups": len(duplicates),
         "cross_group_duplicates": len(cross_group),
         "missing_files": missing_files,

@@ -33,15 +33,18 @@ class Pipeline:
 
     def __init__(
         self,
-        model_path: str,
+        model_path: str | list[str],
         device: str = "cpu",
         backbone: str = "mobilenet_v3_small",
         min_board_confidence: float = 0.22,
         min_grid_confidence: float = 0.04,
         apply_rules: bool = True,
         patch_scales: tuple[float, ...] | None = None,
+        model_weights: list[float] | None = None,
     ):
-        self.predictor = PiecePredictor(model_path, device=device, backbone=backbone)
+        self.predictor = PiecePredictor(
+            model_path, device=device, backbone=backbone, model_weights=model_weights
+        )
         self.min_board_confidence = min_board_confidence
         self.min_grid_confidence = min_grid_confidence
         self.apply_rules = apply_rules

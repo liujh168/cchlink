@@ -17,11 +17,34 @@ PREDICT_TRANSFORM = transforms.Compose(
 class PiecePredictor:
     """棋子分类推理封装，支持单格兼容接口和整盘批量推理。"""
 
-    def __init__(self, model_path: str, device: str = "cpu", backbone: str = "mobilenet_v3_small"):
+    def __init__(
+        self,
+        model_path: str | list[str],
+        device: str = "cpu",
+        backbone: str = "mobilenet_v3_small",
+        model_weights: list[float] | None = None,
+    ):
         self.device = device
-        self.model = load_model(
-            model_path, num_classes=NUM_CLASSES, backbone=backbone, device=device
-        )
+        model_paths = [model_path] if isinstance(model_path, str) else list(model_path)
+        if not model_paths:
+            raise ValueError("至少需要提供一个模型权重路径")
+        if model_weights is None:
+            weights = [1.0 / len(model_paths)] * len(model_paths)
+        else:
+            weights = [float(weight) for weight in model_weights]
+            if len(weights) != len(model_paths):
+                raise ValueError("模型权重数量必须与模型数量一致")
+            if any(weight < 0 for weight in weights) or sum(weights) <= 0:
+                raise ValueError("模型权重必须为非负数且总和大于 0")
+            total = sum(weights)
+            weights = [weight / total for weight in weights]
+
+        self.models = [
+            load_model(path, num_classes=NUM_CLASSES, backbone=backbone, device=device)
+            for path in model_paths
+        ]
+        self.model_weights = weights
+        self.model = self.models[0]
 
     def predict_cell(self, cell_image: np.ndarray) -> int:
         predictions, _ = self.predict_batch([cell_image])
@@ -48,8 +71,14 @@ class PiecePredictor:
             self.device
         )
 
+        models = getattr(self, "models", [self.model])
+        weights = getattr(self, "model_weights", [1.0])
         with torch.inference_mode():
-            probabilities = torch.softmax(self.model(input_tensor), dim=1)
+            probabilities = None
+            for model, weight in zip(models, weights):
+                model_probabilities = torch.softmax(model(input_tensor), dim=1)
+                weighted = model_probabilities * float(weight)
+                probabilities = weighted if probabilities is None else probabilities + weighted
 
         return probabilities.cpu().numpy()
 
