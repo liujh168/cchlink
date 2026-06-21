@@ -34,7 +34,23 @@ def detect_grid(board_image: np.ndarray) -> GridDetection:
     ideal_rows, ideal_cols = ideal_grid_positions(w, h)
     rows, row_score = _snap_intersections(gray, axis="h", ideal=ideal_rows)
     cols, col_score = _snap_intersections(gray, axis="v", ideal=ideal_cols)
+    rows = _regularize_intersections(rows, ideal_rows)
+    cols = _regularize_intersections(cols, ideal_cols)
     return GridDetection(rows, cols, float(min(row_score, col_score)))
+
+
+def _regularize_intersections(positions: list[int], ideal: list[int]) -> list[int]:
+    """用全局中位偏移约束 9x10 交点，避免局部棋子边缘抢走网格峰值。
+
+    真实照片中外圈棋子常贴近校正棋盘边缘，Sobel 投影的局部最大值容易落在棋子
+    外沿而不是棋盘线。透视校正后的棋盘仍应接近等距网格，因此保留整体平移量，
+    再使用理想等距位置，可以降低外圈裁剪偏移。
+    """
+    if len(positions) != len(ideal):
+        return positions
+    offsets = np.asarray(positions, dtype=np.float32) - np.asarray(ideal, dtype=np.float32)
+    offset = float(np.median(offsets))
+    return [int(round(value + offset)) for value in ideal]
 
 
 def _detect_grid_lines(gray: np.ndarray, shape: tuple) -> tuple[list[int], list[int]]:

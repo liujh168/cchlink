@@ -13,20 +13,20 @@
     "count": 60,
     "detected": 60,
     "grid_accepted": 60,
-    "correct_cells": 5400,
-    "exact": 60,
-    "cell_accuracy": 1.0,
-    "exact_rate": 1.0
+    "correct_cells": 5398,
+    "exact": 58,
+    "cell_accuracy": 0.9996296296296296,
+    "exact_rate": 0.9666666666666667
   },
   "by_style": {
     "classic": {
       "count": 20,
       "detected": 20,
       "grid_accepted": 20,
-      "correct_cells": 1800,
-      "exact": 20,
-      "cell_accuracy": 1.0,
-      "exact_rate": 1.0
+      "correct_cells": 1799,
+      "exact": 19,
+      "cell_accuracy": 0.9994444444444445,
+      "exact_rate": 0.95
     },
     "plastic": {
       "count": 20,
@@ -41,13 +41,13 @@
       "count": 20,
       "detected": 20,
       "grid_accepted": 20,
-      "correct_cells": 1800,
-      "exact": 20,
-      "cell_accuracy": 1.0,
-      "exact_rate": 1.0
+      "correct_cells": 1799,
+      "exact": 19,
+      "cell_accuracy": 0.9994444444444445,
+      "exact_rate": 0.95
     }
   },
-  "mean_latency_seconds": 0.07326865166666417,
+  "mean_latency_seconds": 0.0766573883334786,
   "results": [
     {
       "path": "evaluation/generated_v2/board_000_classic_initial.png",
@@ -348,9 +348,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_033_classic_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "2b1ka1n1/an7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3AK2N1",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "2b1ka1n1/pn7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3AK2N1",
       "expected_fen": "2b1ka1n1/an7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3AK2N1",
       "style": "classic",
       "layout_type": "midgame"
@@ -546,9 +546,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_055_wood_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "rc2k4/3pp4/ac7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "rc2k4/3pp4/1c7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
       "expected_fen": "rc2k4/3pp4/ac7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
       "style": "wood",
       "layout_type": "midgame"

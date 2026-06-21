@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 from src.geometry import COLS, ROWS, extract_intersection_patches, ideal_grid_positions
-from src.segmentation.grid_splitter import detect_grid, split_board
+from src.segmentation.grid_splitter import _regularize_intersections, detect_grid, split_board
 
 
 def _synthetic_grid(width=450, height=500):
@@ -38,3 +38,12 @@ def test_edge_intersections_are_padded():
 def test_blank_image_has_low_grid_confidence():
     blank = np.full((500, 450, 3), 128, dtype=np.uint8)
     assert detect_grid(blank).confidence < 0.01
+
+
+def test_intersection_regularization_ignores_local_outliers():
+    ideal = [25, 75, 125, 175, 225]
+    snapped = [36, 78, 127, 176, 236]
+
+    regularized = _regularize_intersections(snapped, ideal)
+
+    assert regularized == [28, 78, 128, 178, 228]

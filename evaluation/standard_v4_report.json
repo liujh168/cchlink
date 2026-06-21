@@ -1,6 +1,10 @@
 {
   "manifest": "evaluation\\standard_manifest.csv",
-  "model": "data/models/checkpoint_standard_v4.pth",
+  "model": "data\\models\\checkpoint_standard_v4.pth",
+  "model_paths": [
+    "data\\models\\checkpoint_standard_v4.pth"
+  ],
+  "model_weights": null,
   "overall": {
     "count": 60,
     "detected": 60,
@@ -15,31 +19,31 @@
       "count": 20,
       "detected": 20,
       "grid_accepted": 20,
-      "correct_cells": 1800,
-      "exact": 20,
-      "cell_accuracy": 1.0,
-      "exact_rate": 1.0
+      "correct_cells": 1799,
+      "exact": 19,
+      "cell_accuracy": 0.9994444444444445,
+      "exact_rate": 0.95
     },
     "plastic": {
       "count": 20,
       "detected": 20,
       "grid_accepted": 20,
-      "correct_cells": 1798,
-      "exact": 18,
-      "cell_accuracy": 0.9988888888888889,
-      "exact_rate": 0.9
+      "correct_cells": 1800,
+      "exact": 20,
+      "cell_accuracy": 1.0,
+      "exact_rate": 1.0
     },
     "wood": {
       "count": 20,
       "detected": 20,
       "grid_accepted": 20,
-      "correct_cells": 1800,
-      "exact": 20,
-      "cell_accuracy": 1.0,
-      "exact_rate": 1.0
+      "correct_cells": 1799,
+      "exact": 19,
+      "cell_accuracy": 0.9994444444444445,
+      "exact_rate": 0.95
     }
   },
-  "mean_latency_seconds": 0.11982919666669052,
+  "mean_latency_seconds": 0.06667384333310716,
   "results": [
     {
       "path": "evaluation/generated_v2/board_000_classic_initial.png",
@@ -61,9 +65,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_002_plastic_initial.png",
-      "status": "NG",
-      "correct_cells": 89,
-      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RN1AKABNR",
+      "status": "OK",
+      "correct_cells": 90,
+      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "plastic",
       "layout_type": "initial"
@@ -196,9 +200,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_017_plastic_midgame.png",
-      "status": "NG",
-      "correct_cells": 89,
-      "fen": "r2bkab1r/9/p8/1AB5p/1P7/3p2B2/c1P4c1/9/6A2/4K4",
+      "status": "OK",
+      "correct_cells": 90,
+      "fen": "r2bkab1r/9/p8/1AB5p/1P7/3p2B2/c1P4c1/9/6P2/4K4",
       "expected_fen": "r2bkab1r/9/p8/1AB5p/1P7/3p2B2/c1P4c1/9/6P2/4K4",
       "style": "plastic",
       "layout_type": "midgame"
@@ -340,9 +344,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_033_classic_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "2b1ka1n1/an7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3AK2N1",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "2b1ka1n1/pn7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3AK2N1",
       "expected_fen": "2b1ka1n1/an7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3AK2N1",
       "style": "classic",
       "layout_type": "midgame"
@@ -538,9 +542,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_055_wood_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "rc2k4/3pp4/ac7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "rc2k4/3pp4/1c7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
       "expected_fen": "rc2k4/3pp4/ac7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
       "style": "wood",
       "layout_type": "midgame"
