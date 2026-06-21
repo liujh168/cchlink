@@ -1,13 +1,13 @@
 {
   "manifest": "evaluation\\standard_manifest.csv",
-  "model": "data/models/checkpoint_standard_v4.pth",
+  "model": "data\\models\\checkpoint_standard_v4.pth",
   "overall": {
     "count": 60,
     "detected": 60,
     "grid_accepted": 60,
-    "correct_cells": 5397,
+    "correct_cells": 5396,
     "exact": 58,
-    "cell_accuracy": 0.9994444444444445,
+    "cell_accuracy": 0.9992592592592593,
     "exact_rate": 0.9666666666666667
   },
   "by_style": {
@@ -24,9 +24,9 @@
       "count": 20,
       "detected": 20,
       "grid_accepted": 20,
-      "correct_cells": 1797,
+      "correct_cells": 1796,
       "exact": 18,
-      "cell_accuracy": 0.9983333333333333,
+      "cell_accuracy": 0.9977777777777778,
       "exact_rate": 0.9
     },
     "wood": {
@@ -39,7 +39,7 @@
       "exact_rate": 1.0
     }
   },
-  "mean_latency_seconds": 0.043423864999961856,
+  "mean_latency_seconds": 0.06413655333331007,
   "results": [
     {
       "path": "evaluation/generated_v2/board_000_classic_initial.png",
@@ -62,8 +62,8 @@
     {
       "path": "evaluation/generated_v2/board_002_plastic_initial.png",
       "status": "NG",
-      "correct_cells": 88,
-      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/R2AKABNR",
+      "correct_cells": 87,
+      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/R1A1KABNR",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "plastic",
       "layout_type": "initial"

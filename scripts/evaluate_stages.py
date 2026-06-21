@@ -36,7 +36,7 @@ def evaluate_manifest(
     device: str = "cpu",
 ) -> dict:
     pipeline = Pipeline(model, backbone=backbone, device=device)
-    rows = list(csv.DictReader(open(manifest, encoding="utf-8")))
+    rows = list(csv.DictReader(open(manifest, encoding="utf-8-sig")))
     overall = _empty_metrics()
     by_style = defaultdict(_empty_metrics)
     results = []

@@ -79,7 +79,7 @@ def diagnose_manifest_errors(
     top: int = 20,
 ) -> dict:
     pipeline = Pipeline(model, backbone=backbone, device=device)
-    rows = list(csv.DictReader(open(manifest, encoding="utf-8")))
+    rows = list(csv.DictReader(open(manifest, encoding="utf-8-sig")))
 
     by_style = defaultdict(Counter)
     by_layout_type = defaultdict(Counter)

@@ -1,6 +1,6 @@
 {
   "manifest": "evaluation\\standard_manifest.csv",
-  "model": "data/models/checkpoint_standard_v4.pth",
+  "model": "data\\models\\checkpoint_standard_v4.pth",
   "total_boards": 60,
   "evaluated_boards": 60,
   "read_errors": 0,
@@ -8,8 +8,8 @@
   "exact": 58,
   "exact_rate": 0.9666666666666667,
   "total_cells": 5400,
-  "error_cells": 3,
-  "cell_accuracy": 0.9994444444444445,
+  "error_cells": 4,
+  "cell_accuracy": 0.9992592592592593,
   "by_style": {
     "classic": {
       "boards": 20,
@@ -17,7 +17,7 @@
     },
     "plastic": {
       "boards": 20,
-      "error_cells": 3
+      "error_cells": 4
     },
     "wood": {
       "boards": 20,
@@ -31,7 +31,7 @@
     },
     "initial": {
       "boards": 9,
-      "error_cells": 2
+      "error_cells": 3
     },
     "midgame": {
       "boards": 45,
@@ -41,24 +41,27 @@
   "top_expected": {
     "红马": 1,
     "红相": 1,
+    "红仕": 1,
     "红兵": 1
   },
   "top_actual": {
     "空": 2,
-    "红仕": 1
+    "红仕": 2
   },
   "top_pairs": {
     "红马->空": 1,
-    "红相->空": 1,
+    "红相->红仕": 1,
+    "红仕->空": 1,
     "红兵->红仕": 1
   },
   "top_regions": {
-    "edge": 2,
+    "edge": 3,
     "center": 1
   },
   "top_cells": {
     "r9_c1": 1,
     "r9_c2": 1,
+    "r9_c3": 1,
     "r6_c4": 1
   },
   "board_errors": [
@@ -69,8 +72,8 @@
       "orientation": "red_bottom",
       "seed": "90002",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
-      "actual_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/R2AKABNR",
-      "error_count": 2,
+      "actual_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/R1A1KABNR",
+      "error_count": 3,
       "errors": [
         {
           "row": 9,
@@ -86,8 +89,17 @@
           "col": 2,
           "region": "edge",
           "expected": "B",
-          "actual": "",
+          "actual": "A",
           "expected_name": "红相",
+          "actual_name": "红仕"
+        },
+        {
+          "row": 9,
+          "col": 3,
+          "region": "edge",
+          "expected": "A",
+          "actual": "",
+          "expected_name": "红仕",
           "actual_name": "空"
         }
       ]
