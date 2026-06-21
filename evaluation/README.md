@@ -44,8 +44,8 @@ python scripts/diagnose_eval_errors.py \
 - 整盘完全正确率：58/60（96.67%）
 - 分风格：classic 20/20，wood 20/20，plastic 18/20
 
-早期 `data/raw` 生成图不符合当前标准棋盘要求，相关 legacy 兼容清单和报告已退役；
-后续固定评估以 `standard_manifest.csv` 和 `real_manifest.csv` 为准。
+本目录只保留当前 `standard-v4` 标准评估和 `real-v4` 真实照片回归结果。历史实验报告
+已删除；后续固定评估以 `standard_manifest.csv` 和 `real_manifest.csv` 为准。
 
 `real_manifest.csv` 真实照片回归集当前结果为：检测 18/18、网格接受 18/18、
 格子级准确率 1296/1620（80.00%）、整盘完全正确 1/18。主要剩余错误仍集中在

@@ -17,11 +17,19 @@
 ```
 cchlink/
 ├── data/
-│   ├── pieces/                       # 棋子训练数据
+│   ├── pieces/                       # 基础棋子训练图块
 │   │   ├── red/                      #   红方：帅仕相俥马炮兵
 │   │   └── black/                    #   黑方：将士象车马炮卒
-│   ├── generated/                    # 数据增强样本
-│   └── models/                       # 训练好的模型权重
+│   └── models/                       # 本地模型权重（不纳入 Git）
+│
+├── evaluation/
+│   ├── real_images/                  # 真实照片/截图回归集
+│   ├── standard_manifest.csv         # 标准合成评估清单
+│   ├── real_manifest.csv             # 真实照片固定回归清单
+│   ├── standard_v4_report.json       # 当前标准评估结果
+│   ├── standard_v4_diagnosis.json    # 当前标准逐格诊断
+│   ├── real_v4_report.json           # 当前真实回归结果
+│   └── real_v4_diagnosis.json        # 当前真实逐格诊断
 │
 ├── src/
 │   ├── preprocess/
@@ -41,11 +49,16 @@ cchlink/
 │   └── pipeline.py                   #   总管线
 │
 ├── scripts/
-│   ├── train.py                      # 训练脚本
+│   ├── generate_grouped_data.py      # 生成按整盘分组的 v4 训练数据
+│   ├── generate_standard_eval.py     # 生成标准评估集
+│   ├── train_v2.py                   # 当前训练入口
+│   ├── evaluate_stages.py            # 分阶段评估
+│   ├── diagnose_eval_errors.py       # 逐格错误诊断
 │   ├── predict.py                    # CLI 单张推理
 │   ├── batch.py                      # CLI 递归批量推理
-│   ├── test_fen.py                   # FEN 组装单元测试
-│   └── test_imports.py               # 模块导入验证
+│   ├── audit_dataset.py              # 训练集泄漏审计
+│   ├── generate_realistic_previews.py # 人工确认预览
+│   └── generate_board.py             # 标准棋盘渲染工具（测试使用）
 │
 ├── requirements.txt
 ├── .gitignore
@@ -77,18 +90,16 @@ cchlink/
 
 ### 训练模型
 
-```bash
-# 将训练数据放入 data/pieces/ 后执行
-python scripts/train.py -d data/pieces -o data/models/checkpoint.pth -e 30
-```
-
-推荐使用按整盘分组的数据集，避免同一棋盘泄漏到训练集和验证集：
+推荐训练路径是先生成按整盘分组的数据集，再用 `train_v2.py` 训练，避免同一棋盘泄漏到训练集和验证集：
 
 ```bash
 python scripts/generate_grouped_data.py -o data/pieces_grouped_v4 -n 3000
 python scripts/audit_dataset.py data/pieces_grouped_v4 --against-manifest evaluation/standard_manifest.csv
 python scripts/train_v2.py -d data/pieces_grouped_v4 -o data/models/checkpoint_standard_v4.pth
 ```
+
+`data/pieces/` 是保留的基础棋子训练图块；`data/pieces_grouped_v4/` 和 `data/models/`
+是本地派生输出，不纳入 Git。
 
 当前标准数据版本为 `standard-v4`。它沿用已确认的真实棋盘模板：正确初始布局、
 红黑九宫 X、楚河汉界，以及距交点 6px、短臂 5px 的紧凑炮兵卒定位标记。v4
@@ -107,9 +118,9 @@ python scripts/train_v2.py -d data/pieces_grouped_v4 -o data/models/checkpoint_s
 ### 识别棋盘
 
 ```bash
-python scripts/predict.py photo.jpg -m data/models/checkpoint.pth -v
-python scripts/predict.py photo.jpg -m data/models/checkpoint.pth --visualize-dir output/visual
-python scripts/predict.py photo.jpg -m data/models/checkpoint.pth --debug-dir output/debug
+python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth -v
+python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth --visualize-dir output/visual
+python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth --debug-dir output/debug
 ```
 
 参数说明：
@@ -127,7 +138,7 @@ python scripts/predict.py photo.jpg -m data/models/checkpoint.pth --debug-dir ou
 ```python
 from src.pipeline import Pipeline
 
-pipeline = Pipeline("data/models/checkpoint.pth")
+pipeline = Pipeline("data/models/checkpoint_standard_v4.pth")
 result = pipeline.analyze(image_rgb, debug_dir="output/debug/example")
 
 print(result.fen)          # 规则修正后的规范方向 FEN
@@ -142,23 +153,18 @@ print(result.corrections)
 ### 批量识别
 
 ```bash
-python scripts/batch.py photos --model data/models/checkpoint.pth --output results.csv
-python scripts/batch.py photos --model data/models/checkpoint.pth --output results.csv \
+python scripts/batch.py photos --model data/models/checkpoint_standard_v4.pth --output results.csv
+python scripts/batch.py photos --model data/models/checkpoint_standard_v4.pth --output results.csv \
   --visualize-dir output/visual --debug-dir output/debug
 ```
 
 批处理会递归扫描常见图片格式，单张读取或识别失败不会终止任务。CSV 包含相对路径、状态、最终/原始 FEN、方向、棋盘/网格置信度、警告代码、错误信息和处理耗时。
 
-### 验证导入
+### 运行测试
 
 ```bash
-python scripts/test_imports.py
-```
-
-### 测试 FEN
-
-```bash
-python scripts/test_fen.py
+python -m pytest
+ruff check .
 ```
 
 ### 固定照片分阶段评估
