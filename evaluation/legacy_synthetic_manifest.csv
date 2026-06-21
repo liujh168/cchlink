@@ -1,5 +1,0 @@
-path,expected_fen,source,style,layout_type,seed,orientation
-data/raw/initial_00.jpg,rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR,legacy-invalid-template,classic,initial,100,red_bottom
-data/raw/initial_01.jpg,rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR,legacy-invalid-template,classic,initial,101,red_bottom
-data/raw/initial_02.jpg,rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR,legacy-invalid-template,classic,initial,102,red_bottom
-data/raw/initial_03.jpg,rnbakabnr/1c5c1/p1p1p1p1p/9/9/9/9/P1P1P1P1P/1C5C1/RNBAKABNR,legacy-invalid-template,classic,initial,103,red_bottom

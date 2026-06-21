@@ -17,9 +17,7 @@ Thumbs.db
 .ruff_cache/
 debug/
 debug_*.png
-data/raw/debug_*
-data/raw/diag_*
-data/raw/eval/
+data/raw/
 data/pieces_*/
 evaluation/generated_v2/
 output/

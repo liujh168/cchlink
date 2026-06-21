@@ -353,7 +353,7 @@ def generate_random_midgame() -> list[list[str | None]]:
 
 def main():
     parser = argparse.ArgumentParser(description="生成模拟中国象棋棋盘图片")
-    parser.add_argument("--output", "-o", default="data/raw", help="输出目录")
+    parser.add_argument("--output", "-o", default="output/generated_boards", help="输出目录")
     parser.add_argument("--num", "-n", type=int, default=8, help="生成图片数量")
     parser.add_argument("--midgame", action="store_true", help="生成随机中局布局")
     args = parser.parse_args()
