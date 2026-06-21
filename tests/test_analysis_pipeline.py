@@ -82,3 +82,29 @@ def test_analyze_writes_visualization_and_debug_independently(monkeypatch):
     )
 
     assert calls == ["visual", "debug"]
+
+
+def test_empty_calibration_rolls_back_low_margin_piece_predictions():
+    pipeline = Pipeline.__new__(Pipeline)
+    predictions = [14] * 90
+    confidences = [0.99] * 90
+    probabilities = np.zeros((90, 15), dtype=np.float32)
+    probabilities[:, 14] = 0.99
+    predictions[10] = 4
+    confidences[10] = 0.45
+    probabilities[10, 4] = 0.45
+    probabilities[10, 14] = 0.30
+    predictions[11] = 3
+    confidences[11] = 0.80
+    probabilities[11, 3] = 0.80
+    probabilities[11, 14] = 0.15
+
+    calibrated, calibrated_confidences, corrections = pipeline._calibrate_empty_predictions(
+        predictions, confidences, probabilities
+    )
+
+    assert calibrated[10] == 14
+    assert calibrated_confidences[10] == probabilities[10, 14]
+    assert calibrated[11] == 3
+    assert len(corrections) == 1
+    assert corrections[0].reason == "低边际空位误报回退"

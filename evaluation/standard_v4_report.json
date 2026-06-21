@@ -43,7 +43,7 @@
       "exact_rate": 0.95
     }
   },
-  "mean_latency_seconds": 0.06667384333310716,
+  "mean_latency_seconds": 0.08078790166679634,
   "results": [
     {
       "path": "evaluation/generated_v2/board_000_classic_initial.png",

@@ -1,8 +1,8 @@
 import numpy as np
 
-from src.analysis import AnalysisResult, AnalysisWarning, CellResult
+from src.analysis import AnalysisResult, AnalysisWarning, CellResult, Correction
 from src.artifacts import save_debug_artifacts, save_visualizations
-from src.fen.fen_builder import IDX_TO_NAME, build_fen
+from src.fen.fen_builder import EMPTY_IDX, IDX_TO_NAME, build_fen
 from src.fen.rules import (
     detect_orientation,
     legalize_predictions_with_corrections,
@@ -16,6 +16,9 @@ from src.recognition.predictor import PiecePredictor
 from src.segmentation.grid_splitter import detect_grid
 
 DEFAULT_PATCH_SCALES = (PATCH_SCALE, 0.90, 0.98)
+EMPTY_CALIBRATION_MIN_EMPTY_PROB = 0.25
+EMPTY_CALIBRATION_MAX_PIECE_PROB = 0.50
+EMPTY_CALIBRATION_MAX_GAP = 0.20
 
 
 def _crop_board(warped: np.ndarray) -> np.ndarray:
@@ -68,7 +71,13 @@ class Pipeline:
         """对同一组交点做多尺度概率平均，降低真实照片中棋子大小差异的影响。"""
         patch_scales = getattr(self, "patch_scales", (PATCH_SCALE,))
         if len(patch_scales) == 1:
-            return self.predictor.predict_batch(base_cells)
+            if hasattr(self.predictor, "predict_batch_probabilities"):
+                probabilities = self.predictor.predict_batch_probabilities(base_cells)
+                predictions = probabilities.argmax(axis=1)
+                confidences = probabilities.max(axis=1)
+                return predictions.tolist(), confidences.tolist(), probabilities
+            predictions, confidences = self.predictor.predict_batch(base_cells)
+            return predictions, confidences, None
 
         probabilities = []
         for scale in patch_scales:
@@ -83,16 +92,56 @@ class Pipeline:
         averaged = np.mean(probabilities, axis=0)
         predictions = averaged.argmax(axis=1)
         confidences = averaged.max(axis=1)
-        return predictions.tolist(), confidences.tolist()
+        return predictions.tolist(), confidences.tolist(), averaged
+
+    def _calibrate_empty_predictions(
+        self,
+        predictions: list[int],
+        confidences: list[float],
+        probabilities: np.ndarray | None,
+    ) -> tuple[list[int], list[float], list[Correction]]:
+        """保守回退低边际的空位误报，避免把棋盘纹理识别成棋子。"""
+        if probabilities is None:
+            return predictions, confidences, []
+
+        calibrated = predictions.copy()
+        calibrated_confidences = confidences.copy()
+        corrections = []
+        for index, prediction in enumerate(predictions):
+            if prediction == EMPTY_IDX:
+                continue
+            empty_probability = float(probabilities[index, EMPTY_IDX])
+            piece_probability = float(probabilities[index, prediction])
+            if (
+                empty_probability >= EMPTY_CALIBRATION_MIN_EMPTY_PROB
+                and piece_probability <= EMPTY_CALIBRATION_MAX_PIECE_PROB
+                and piece_probability - empty_probability <= EMPTY_CALIBRATION_MAX_GAP
+            ):
+                row, col = divmod(index, COLS)
+                calibrated[index] = EMPTY_IDX
+                calibrated_confidences[index] = empty_probability
+                corrections.append(
+                    Correction(row, col, prediction, EMPTY_IDX, "低边际空位误报回退")
+                )
+        return calibrated, calibrated_confidences, corrections
 
     def analyze(self, image: np.ndarray, debug_dir=None, visualize_dir=None) -> AnalysisResult:
         """返回完整结构化结果，并可选择保存本次识别的调试产物。"""
         detection, grid, board, cells = self._extract(image)
-        raw_predictions, raw_confidences = self._predict_cells(board, grid, cells)
+        raw_predictions, raw_confidences, raw_probabilities = self._predict_cells(
+            board, grid, cells
+        )
         orientation = detect_orientation(raw_predictions)
-        predictions, confidences = normalize_orientation(
+        model_predictions, model_confidences = normalize_orientation(
             raw_predictions, raw_confidences, orientation
         )
+        probabilities = None
+        if raw_probabilities is not None:
+            probabilities = (
+                raw_probabilities[::-1].copy()
+                if orientation == "red_top"
+                else raw_probabilities
+            )
         if orientation == "red_top":
             board = np.rot90(board, 2).copy()
             cells = list(reversed(cells))
@@ -102,13 +151,17 @@ class Pipeline:
             row_positions = grid.row_positions
             col_positions = grid.col_positions
 
-        raw_fen = build_fen(predictions)
+        raw_fen = build_fen(model_predictions)
+        predictions, confidences, calibration_corrections = self._calibrate_empty_predictions(
+            model_predictions, model_confidences, probabilities
+        )
         if self.apply_rules:
-            final_predictions, corrections = legalize_predictions_with_corrections(
+            final_predictions, rule_corrections = legalize_predictions_with_corrections(
                 predictions, confidences
             )
+            corrections = calibration_corrections + rule_corrections
         else:
-            final_predictions, corrections = predictions, []
+            final_predictions, corrections = predictions, calibration_corrections
         warnings = validate_position(final_predictions, orientation)
         low_confidence = [
             divmod(index, COLS) for index, confidence in enumerate(confidences) if confidence < 0.5
@@ -130,7 +183,7 @@ class Pipeline:
                 prediction=prediction,
                 name=IDX_TO_NAME[prediction],
                 confidence=float(confidences[index]),
-                raw_prediction=predictions[index],
+                raw_prediction=model_predictions[index],
             )
             for index, prediction in enumerate(final_predictions)
         ]

@@ -13,9 +13,9 @@
     "count": 18,
     "detected": 18,
     "grid_accepted": 18,
-    "correct_cells": 1306,
+    "correct_cells": 1308,
     "exact": 1,
-    "cell_accuracy": 0.8061728395061728,
+    "cell_accuracy": 0.8074074074074075,
     "exact_rate": 0.05555555555555555
   },
   "by_style": {
@@ -50,13 +50,13 @@
       "count": 7,
       "detected": 7,
       "grid_accepted": 7,
-      "correct_cells": 460,
+      "correct_cells": 462,
       "exact": 0,
-      "cell_accuracy": 0.7301587301587301,
+      "cell_accuracy": 0.7333333333333333,
       "exact_rate": 0.0
     }
   },
-  "mean_latency_seconds": 0.11121813333354819,
+  "mean_latency_seconds": 0.13499509444429553,
   "results": [
     {
       "path": "evaluation/real_images/real_001_wood_initial_red_bottom.jpg",
@@ -70,8 +70,8 @@
     {
       "path": "evaluation/real_images/real_002_wood_initial_red_top.jpeg",
       "status": "NG",
-      "correct_cells": 52,
-      "fen": "9/5n3/9/3bN3b/9/5N3/9/2RR5/8n/9",
+      "correct_cells": 53,
+      "fen": "9/5n3/9/3b4b/9/5N3/9/3R5/8n/4N4",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"
@@ -106,8 +106,8 @@
     {
       "path": "evaluation/real_images/real_006_wood_endgame_red_bottom.jpg",
       "status": "NG",
-      "correct_cells": 86,
-      "fen": "4kp3/9/9/9/9/9/9/4K4/9/4P3A",
+      "correct_cells": 87,
+      "fen": "4kp3/9/9/9/9/9/9/4K4/9/4P4",
       "expected_fen": "4ka3/9/9/9/9/9/9/4N4/9/4K4",
       "style": "wood",
       "layout_type": "endgame"
@@ -116,7 +116,7 @@
       "path": "evaluation/real_images/real_007_wood_initial_red_bottom.jpg",
       "status": "NG",
       "correct_cells": 67,
-      "fen": "1p1aka1p1/9/9/9/9/9/P3P1P1P/1B7/9/4KA1PA",
+      "fen": "1p1aka3/9/9/9/9/9/P3P1P1P/1B7/9/4KA1PA",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"
@@ -170,7 +170,7 @@
       "path": "evaluation/real_images/real_013_screen_endgame_red_bottom_03.png",
       "status": "NG",
       "correct_cells": 81,
-      "fen": "n3k4/P4N3/9/9/9/5R2P/4p4/4C4/4a2p1/5C3",
+      "fen": "n3k4/P4N3/9/9/9/5R2P/4p4/4C4/7p1/5C3",
       "expected_fen": "4k4/C4R3/9/9/9/5R2P/4r4/4B3B/4p2r1/5K3",
       "style": "screen",
       "layout_type": "endgame"
@@ -179,7 +179,7 @@
       "path": "evaluation/real_images/real_014_screen_endgame_red_bottom_04.png",
       "status": "NG",
       "correct_cells": 86,
-      "fen": "9/4pR3/3k1p2p/9/6p2/9/9/9/9/4K4",
+      "fen": "9/4pR3/3k4p/9/9/9/9/9/9/4K4",
       "expected_fen": "9/4aR3/3k1a2b/9/6b2/9/9/9/9/4K4",
       "style": "screen",
       "layout_type": "endgame"
