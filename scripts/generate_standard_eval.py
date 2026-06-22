@@ -11,7 +11,7 @@ import numpy as np
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.generate_board import BOARD_STYLES, generate_random_midgame, render_board  # noqa: E402
+from scripts.generate_board import generate_random_midgame, render_board  # noqa: E402
 from src.standard_board import (  # noqa: E402
     STANDARD_INITIAL_LAYOUT,
     empty_layout,
@@ -21,6 +21,7 @@ from src.synthetic_scene import place_board_in_scene  # noqa: E402
 
 FIELDS = ["path", "expected_fen", "source", "style", "layout_type", "seed", "orientation"]
 SOURCE = "standard-eval-v2"
+EVAL_STYLES = ("classic", "wood", "plastic")
 
 
 def _layout_for_index(index: int, rng: random.Random):
@@ -45,7 +46,7 @@ def generate_eval_set(output: Path, manifest: Path, count: int = 60, seed: int =
     output.mkdir(parents=True, exist_ok=True)
     manifest.parent.mkdir(parents=True, exist_ok=True)
     rng = random.Random(seed)
-    styles = tuple(BOARD_STYLES)
+    styles = EVAL_STYLES
     rows = []
     for index in range(count):
         item_seed = seed + index

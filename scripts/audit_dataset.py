@@ -17,7 +17,14 @@ REQUIRED_STANDARD_FIELDS = {
     "source",
     "fen",
 }
-STANDARD_DATASET_SOURCES = {"standard-v2", "standard-v3", "standard-v4", "standard-v5"}
+STANDARD_DATASET_SOURCES = {
+    "standard-v2",
+    "standard-v3",
+    "standard-v4",
+    "standard-v5",
+    "standard-v6",
+    "standard-v7",
+}
 
 
 def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
@@ -43,15 +50,18 @@ def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
         if row["source"] not in STANDARD_DATASET_SOURCES:
             raise ValueError(f"未知标准数据源: {row['source']}")
         if (
-            row["source"] in {"standard-v3", "standard-v4", "standard-v5"}
+            row["source"]
+            in {"standard-v3", "standard-v4", "standard-v5", "standard-v6", "standard-v7"}
             and "scene_augmented" not in fieldnames
         ):
             raise ValueError(f"{row['source']} 清单缺少 scene_augmented 字段")
-        if row["source"] == "standard-v5":
-            v5_fields = {"patch_scale", "patch_shift_y", "patch_shift_x", "edge_augmented"}
-            missing_v5_fields = v5_fields - fieldnames
-            if missing_v5_fields:
-                raise ValueError(f"standard-v5 清单缺少字段: {sorted(missing_v5_fields)}")
+        if row["source"] in {"standard-v5", "standard-v6", "standard-v7"}:
+            patch_fields = {"patch_scale", "patch_shift_y", "patch_shift_x", "edge_augmented"}
+            missing_patch_fields = patch_fields - fieldnames
+            if missing_patch_fields:
+                raise ValueError(
+                    f"{row['source']} 清单缺少字段: {sorted(missing_patch_fields)}"
+                )
         path = root / row["path"]
         if not path.is_file():
             missing_files.append(row["path"])

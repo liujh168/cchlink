@@ -23,5 +23,22 @@ def test_compare_fens_reports_position_and_piece_names():
             "actual": "",
             "expected_name": "黑车",
             "actual_name": "空",
+            "kind": "piece_to_empty",
         }
     ]
+
+
+def test_compare_fens_classifies_error_kinds():
+    errors = compare_fens(
+        "9/9/9/9/9/9/9/9/9/9",
+        "N8/9/9/9/9/9/9/9/9/9",
+    )
+
+    assert errors[0]["kind"] == "empty_to_piece"
+
+    errors = compare_fens(
+        "N8/9/9/9/9/9/9/9/9/9",
+        "n8/9/9/9/9/9/9/9/9/9",
+    )
+
+    assert errors[0]["kind"] == "color_confusion"

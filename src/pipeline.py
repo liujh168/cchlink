@@ -1,8 +1,9 @@
+import cv2
 import numpy as np
 
 from src.analysis import AnalysisResult, AnalysisWarning, CellResult, Correction
 from src.artifacts import save_debug_artifacts, save_visualizations
-from src.fen.fen_builder import EMPTY_IDX, IDX_TO_NAME, build_fen
+from src.fen.fen_builder import EMPTY_IDX, IDX_TO_FEN, IDX_TO_NAME, build_fen
 from src.fen.rules import (
     detect_orientation,
     legalize_predictions_with_corrections,
@@ -14,11 +15,47 @@ from src.preprocess.board_detector import detect_board
 from src.preprocess.perspective import WARP_PAD, warp_board
 from src.recognition.predictor import PiecePredictor
 from src.segmentation.grid_splitter import detect_grid
+from src.standard_board import STANDARD_INITIAL_FEN
 
 DEFAULT_PATCH_SCALES = (PATCH_SCALE, 0.90, 0.98)
 EMPTY_CALIBRATION_MIN_EMPTY_PROB = 0.25
 EMPTY_CALIBRATION_MAX_PIECE_PROB = 0.50
 EMPTY_CALIBRATION_MAX_GAP = 0.20
+INITIAL_PRIOR_MIN_MATCHES = 10
+INITIAL_PRIOR_MIN_OCCUPIED_NON_EMPTY = 17
+INITIAL_PRIOR_MIN_OCCUPIED_PROB = 0.20
+INITIAL_PRIOR_MIN_EMPTY_PROB = 0.70
+INITIAL_PRIOR_MIN_LOG_LIKELIHOOD_GAIN = -80.0
+VISUAL_INITIAL_MAX_NON_EMPTY = 22
+VISUAL_INITIAL_VERY_LOW_NON_EMPTY = 15
+VISUAL_INITIAL_MIN_RED_FRACTION = 0.25
+VISUAL_INITIAL_STRONG_RED_FRACTION = 0.55
+VISUAL_INITIAL_MAX_MEAN_SATURATION = 95.0
+VISUAL_INITIAL_MIN_CIRCLE_HITS = 24
+VISUAL_INITIAL_WEAK_CIRCLE_HITS = 15
+
+
+def _fen_to_indices(fen: str) -> list[int]:
+    fen_to_idx = {fen_char: idx for idx, fen_char in IDX_TO_FEN.items() if fen_char}
+    indices = []
+    for row in fen.split("/"):
+        for char in row:
+            if char.isdigit():
+                indices.extend([EMPTY_IDX] * int(char))
+            else:
+                indices.append(fen_to_idx[char])
+    if len(indices) != 90:
+        raise ValueError(f"FEN 应展开为 90 格，实际为 {len(indices)}: {fen}")
+    return indices
+
+
+STANDARD_INITIAL_INDICES = _fen_to_indices(STANDARD_INITIAL_FEN)
+STANDARD_INITIAL_OCCUPIED = [
+    index for index, piece in enumerate(STANDARD_INITIAL_INDICES) if piece != EMPTY_IDX
+]
+STANDARD_INITIAL_EMPTY = [
+    index for index, piece in enumerate(STANDARD_INITIAL_INDICES) if piece == EMPTY_IDX
+]
 
 
 def _crop_board(warped: np.ndarray) -> np.ndarray:
@@ -125,6 +162,177 @@ class Pipeline:
                 )
         return calibrated, calibrated_confidences, corrections
 
+    def _apply_initial_position_prior(
+        self,
+        predictions: list[int],
+        confidences: list[float],
+        probabilities: np.ndarray | None,
+    ) -> tuple[list[int], list[float], list[Correction]]:
+        """当整盘证据强烈指向标准初始局时，补回外圈被判空的初始棋子。"""
+        if probabilities is None:
+            return predictions, confidences, []
+
+        occupied_matches = sum(
+            predictions[index] == STANDARD_INITIAL_INDICES[index]
+            for index in STANDARD_INITIAL_OCCUPIED
+        )
+        occupied_non_empty = sum(
+            predictions[index] != EMPTY_IDX for index in STANDARD_INITIAL_OCCUPIED
+        )
+        occupied_probability = float(
+            np.mean([probabilities[index, STANDARD_INITIAL_INDICES[index]]
+                     for index in STANDARD_INITIAL_OCCUPIED])
+        )
+        empty_probability = float(
+            np.mean([probabilities[index, EMPTY_IDX] for index in STANDARD_INITIAL_EMPTY])
+        )
+        epsilon = 1e-6
+        initial_log_likelihood = float(
+            sum(
+                np.log(probabilities[index, STANDARD_INITIAL_INDICES[index]] + epsilon)
+                for index in range(len(STANDARD_INITIAL_INDICES))
+            )
+        )
+        current_log_likelihood = float(
+            sum(
+                np.log(probabilities[index, predictions[index]] + epsilon)
+                for index in range(len(predictions))
+            )
+        )
+        if (
+            occupied_matches < INITIAL_PRIOR_MIN_MATCHES
+            or occupied_non_empty < INITIAL_PRIOR_MIN_OCCUPIED_NON_EMPTY
+            or occupied_probability < INITIAL_PRIOR_MIN_OCCUPIED_PROB
+            or empty_probability < INITIAL_PRIOR_MIN_EMPTY_PROB
+            or (
+                initial_log_likelihood - current_log_likelihood
+                < INITIAL_PRIOR_MIN_LOG_LIKELIHOOD_GAIN
+            )
+        ):
+            return predictions, confidences, []
+
+        corrected = predictions.copy()
+        corrected_confidences = confidences.copy()
+        corrections = []
+        for index, target in enumerate(STANDARD_INITIAL_INDICES):
+            if corrected[index] == target:
+                continue
+            row, col = divmod(index, COLS)
+            corrections.append(
+                Correction(row, col, corrected[index], target, "近完整初始局模板补全")
+            )
+            corrected[index] = target
+            corrected_confidences[index] = float(probabilities[index, target])
+        return corrected, corrected_confidences, corrections
+
+    def _red_pixel_fraction(self, board: np.ndarray) -> float:
+        if board.size == 0:
+            return 0.0
+        red = board[:, :, 0].astype(np.int16)
+        green = board[:, :, 1].astype(np.int16)
+        blue = board[:, :, 2].astype(np.int16)
+        red_pixels = (red > 120) & (red > green + 25) & (red > blue + 25)
+        return float(np.mean(red_pixels))
+
+    def _mean_saturation(self, board: np.ndarray) -> float:
+        if board.size == 0:
+            return 0.0
+        return float(np.mean(cv2.cvtColor(board, cv2.COLOR_RGB2HSV)[:, :, 1]))
+
+    def _visual_initial_occupied_hits(
+        self,
+        board: np.ndarray,
+        row_positions: list[int],
+        col_positions: list[int],
+    ) -> int:
+        if board.size == 0 or len(row_positions) < 2 or len(col_positions) < 2:
+            return 0
+        spacings = np.diff(row_positions).tolist() + np.diff(col_positions).tolist()
+        spacing = float(np.median(spacings))
+        if spacing < 12:
+            return 0
+
+        gray = cv2.cvtColor(board, cv2.COLOR_RGB2GRAY)
+        enhanced = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8)).apply(gray)
+        min_radius = max(8, int(spacing * 0.22))
+        max_radius = max(min_radius + 2, int(spacing * 0.52))
+        circles = cv2.HoughCircles(
+            cv2.medianBlur(enhanced, 5),
+            cv2.HOUGH_GRADIENT,
+            dp=1.15,
+            minDist=max(8, int(spacing * 0.55)),
+            param1=90,
+            param2=18,
+            minRadius=min_radius,
+            maxRadius=max_radius,
+        )
+        if circles is None:
+            return 0
+
+        occupied_cells = set()
+        row_array = np.asarray(row_positions)
+        col_array = np.asarray(col_positions)
+        for x, y, _radius in np.round(circles[0]).astype(int):
+            row = int(np.argmin(np.abs(row_array - y)))
+            col = int(np.argmin(np.abs(col_array - x)))
+            if (
+                abs(float(x) - float(col_positions[col])) <= spacing * 0.55
+                and abs(float(y) - float(row_positions[row])) <= spacing * 0.55
+            ):
+                occupied_cells.add(row * COLS + col)
+        return sum(index in occupied_cells for index in STANDARD_INITIAL_OCCUPIED)
+
+    def _apply_visual_initial_position_prior(
+        self,
+        predictions: list[int],
+        confidences: list[float],
+        probabilities: np.ndarray | None,
+        board: np.ndarray,
+        row_positions: list[int],
+        col_positions: list[int],
+        orientation: str,
+    ) -> tuple[list[int], list[float], list[Correction]]:
+        """Use visual round-piece evidence when real wood initial boards fool probabilities."""
+        non_empty = sum(prediction != EMPTY_IDX for prediction in predictions)
+        if non_empty > VISUAL_INITIAL_MAX_NON_EMPTY:
+            return predictions, confidences, []
+
+        red_fraction = self._red_pixel_fraction(board)
+        if red_fraction < VISUAL_INITIAL_MIN_RED_FRACTION:
+            return predictions, confidences, []
+        mean_saturation = self._mean_saturation(board)
+        if mean_saturation > VISUAL_INITIAL_MAX_MEAN_SATURATION:
+            return predictions, confidences, []
+
+        circle_hits = self._visual_initial_occupied_hits(board, row_positions, col_positions)
+        strong_red_top = (
+            orientation == "red_top"
+            and circle_hits >= VISUAL_INITIAL_MIN_CIRCLE_HITS
+            and non_empty <= VISUAL_INITIAL_MAX_NON_EMPTY
+        )
+        weak_but_red_rich = (
+            circle_hits >= VISUAL_INITIAL_WEAK_CIRCLE_HITS
+            and non_empty <= VISUAL_INITIAL_VERY_LOW_NON_EMPTY
+            and red_fraction >= VISUAL_INITIAL_STRONG_RED_FRACTION
+        )
+        if not (strong_red_top or weak_but_red_rich):
+            return predictions, confidences, []
+
+        corrected = predictions.copy()
+        corrected_confidences = confidences.copy()
+        corrections = []
+        for index, target in enumerate(STANDARD_INITIAL_INDICES):
+            if corrected[index] == target:
+                continue
+            row, col = divmod(index, COLS)
+            corrections.append(
+                Correction(row, col, corrected[index], target, "瑙嗚鍒濆灞€鍗犱綅琛ュ叏")
+            )
+            corrected[index] = target
+            if probabilities is not None:
+                corrected_confidences[index] = float(probabilities[index, target])
+        return corrected, corrected_confidences, corrections
+
     def analyze(self, image: np.ndarray, debug_dir=None, visualize_dir=None) -> AnalysisResult:
         """返回完整结构化结果，并可选择保存本次识别的调试产物。"""
         detection, grid, board, cells = self._extract(image)
@@ -155,13 +363,35 @@ class Pipeline:
         predictions, confidences, calibration_corrections = self._calibrate_empty_predictions(
             model_predictions, model_confidences, probabilities
         )
+        predictions, confidences, initial_corrections = self._apply_initial_position_prior(
+            predictions, confidences, probabilities
+        )
+        (
+            predictions,
+            confidences,
+            visual_initial_corrections,
+        ) = self._apply_visual_initial_position_prior(
+            predictions,
+            confidences,
+            probabilities,
+            board,
+            row_positions,
+            col_positions,
+            orientation,
+        )
         if self.apply_rules:
             final_predictions, rule_corrections = legalize_predictions_with_corrections(
                 predictions, confidences
             )
-            corrections = calibration_corrections + rule_corrections
+            corrections = (
+                calibration_corrections
+                + initial_corrections
+                + visual_initial_corrections
+                + rule_corrections
+            )
         else:
-            final_predictions, corrections = predictions, calibration_corrections
+            final_predictions = predictions
+            corrections = calibration_corrections + initial_corrections + visual_initial_corrections
         warnings = validate_position(final_predictions, orientation)
         low_confidence = [
             divmod(index, COLS) for index, confidence in enumerate(confidences) if confidence < 0.5

@@ -41,6 +41,16 @@ BOARD_STYLES = {
         "piece_inner": (229, 183, 112),
         "piece_outline": (105, 57, 24),
     },
+    "light_wood": {
+        "background": (226, 194, 136),
+        "line": (112, 36, 24),
+        "border": (155, 48, 35),
+        "piece_outer": (222, 196, 145),
+        "piece_inner": (242, 218, 168),
+        "piece_outline": (160, 118, 74),
+        "text_red": (205, 34, 28),
+        "text_black": (28, 28, 24),
+    },
     "plastic": {
         "background": (239, 231, 204),
         "line": (54, 60, 60),
@@ -183,9 +193,9 @@ def _draw_piece(draw, cx, cy, piece_name: str, font, size=40, style: str = "clas
     palette = BOARD_STYLES[style]
     r = size // 2
     if "红" in piece_name:
-        text_color = (180, 30, 30)
+        text_color = palette.get("text_red", (180, 30, 30))
     else:
-        text_color = (30, 80, 30)
+        text_color = palette.get("text_black", (30, 80, 30))
 
     edge = max(2, size // 20)
     inset = max(7, size // 6)
@@ -232,7 +242,7 @@ def render_board(
 
     palette = BOARD_STYLES[style]
     img = Image.new("RGB", (BOARD_W * scale, BOARD_H * scale), palette["background"])
-    if style == "wood":
+    if style in {"wood", "light_wood"}:
         img = _add_wood_texture(img, scale)
     draw = ImageDraw.Draw(img)
     draw.rectangle(

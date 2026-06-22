@@ -1,6 +1,10 @@
 {
   "manifest": "evaluation\\standard_manifest.csv",
-  "model": "data/models/checkpoint_standard_v4.pth",
+  "model": "data\\models\\checkpoint_standard_v4.pth",
+  "model_paths": [
+    "data\\models\\checkpoint_standard_v4.pth"
+  ],
+  "model_weights": null,
   "total_boards": 60,
   "evaluated_boards": 60,
   "read_errors": 0,
@@ -13,91 +17,111 @@
   "by_style": {
     "classic": {
       "boards": 20,
-      "error_cells": 0
+      "cells": 1800,
+      "error_cells": 1,
+      "cell_accuracy": 0.9994444444444445
     },
     "plastic": {
       "boards": 20,
-      "error_cells": 2
+      "cells": 1800,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
     },
     "wood": {
       "boards": 20,
-      "error_cells": 0
+      "cells": 1800,
+      "error_cells": 1,
+      "cell_accuracy": 0.9994444444444445
     }
   },
   "by_layout_type": {
     "empty": {
       "boards": 6,
-      "error_cells": 0
+      "cells": 540,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
     },
     "initial": {
       "boards": 9,
-      "error_cells": 1
+      "cells": 810,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
     },
     "midgame": {
       "boards": 45,
-      "error_cells": 1
+      "cells": 4050,
+      "error_cells": 2,
+      "cell_accuracy": 0.9995061728395062
     }
   },
   "top_expected": {
-    "红相": 1,
-    "红兵": 1
+    "黑士": 2
   },
   "top_actual": {
-    "空": 1,
-    "红仕": 1
+    "黑卒": 1,
+    "空": 1
   },
   "top_pairs": {
-    "红相->空": 1,
-    "红兵->红仕": 1
+    "黑士->黑卒": 1,
+    "黑士->空": 1
+  },
+  "top_kinds": {
+    "piece_confusion": 1,
+    "piece_to_empty": 1
   },
   "top_regions": {
-    "edge": 1,
-    "center": 1
+    "edge": 2
+  },
+  "top_region_kinds": {
+    "edge:piece_confusion": 1,
+    "edge:piece_to_empty": 1
   },
   "top_cells": {
-    "r9_c2": 1,
-    "r8_c6": 1
+    "r1_c0": 1,
+    "r2_c0": 1
   },
   "board_errors": [
     {
-      "path": "evaluation/generated_v2/board_002_plastic_initial.png",
-      "style": "plastic",
-      "layout_type": "initial",
-      "orientation": "red_bottom",
-      "seed": "90002",
-      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
-      "actual_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RN1AKABNR",
+      "path": "evaluation/generated_v2/board_033_classic_midgame.png",
+      "style": "classic",
+      "layout_type": "midgame",
+      "orientation": "red_top",
+      "seed": "90033",
+      "expected_fen": "2b1ka1n1/an7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3AK2N1",
+      "actual_fen": "2b1ka1n1/pn7/9/4pp3/2r3p2/9/2c1r4/7C1/3C2PP1/3AK2N1",
       "error_count": 1,
       "errors": [
         {
-          "row": 9,
-          "col": 2,
+          "row": 1,
+          "col": 0,
           "region": "edge",
-          "expected": "B",
-          "actual": "",
-          "expected_name": "红相",
-          "actual_name": "空"
+          "expected": "a",
+          "actual": "p",
+          "expected_name": "黑士",
+          "actual_name": "黑卒",
+          "kind": "piece_confusion"
         }
       ]
     },
     {
-      "path": "evaluation/generated_v2/board_017_plastic_midgame.png",
-      "style": "plastic",
+      "path": "evaluation/generated_v2/board_055_wood_midgame.png",
+      "style": "wood",
       "layout_type": "midgame",
       "orientation": "red_top",
-      "seed": "90017",
-      "expected_fen": "r2bkab1r/9/p8/1AB5p/1P7/3p2B2/c1P4c1/9/6P2/4K4",
-      "actual_fen": "r2bkab1r/9/p8/1AB5p/1P7/3p2B2/c1P4c1/9/6A2/4K4",
+      "seed": "90055",
+      "expected_fen": "rc2k4/3pp4/ac7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
+      "actual_fen": "rc2k4/3pp4/1c7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
       "error_count": 1,
       "errors": [
         {
-          "row": 8,
-          "col": 6,
-          "region": "center",
-          "expected": "P",
-          "actual": "A",
-          "expected_name": "红兵",
-          "actual_name": "红仕"
+          "row": 2,
+          "col": 0,
+          "region": "edge",
+          "expected": "a",
+          "actual": "",
+          "expected_name": "黑士",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
         }
       ]
     }

@@ -45,6 +45,20 @@ def cell_region(row: int, col: int) -> str:
     return "center"
 
 
+def error_kind(expected: str, actual: str) -> str:
+    if expected and not actual:
+        return "piece_to_empty"
+    if not expected and actual:
+        return "empty_to_piece"
+    if not expected and not actual:
+        return "none"
+    if expected.isupper() != actual.isupper():
+        return "color_confusion"
+    if expected.lower() == actual.lower():
+        return "same_piece_color_confusion"
+    return "piece_confusion"
+
+
 def compare_fens(expected_fen: str, actual_fen: str) -> list[dict]:
     expected = fen_cells(expected_fen)
     actual = fen_cells(actual_fen)
@@ -62,6 +76,7 @@ def compare_fens(expected_fen: str, actual_fen: str) -> list[dict]:
                 "actual": got,
                 "expected_name": fen_name(want),
                 "actual_name": fen_name(got),
+                "kind": error_kind(want, got),
             }
         )
     return errors
@@ -71,14 +86,26 @@ def _top(counter: Counter, limit: int) -> dict:
     return {key: value for key, value in counter.most_common(limit)}
 
 
+def build_model_config(primary_model: str, ensemble_models: list[str], weights: list[float] | None):
+    models = [primary_model, *ensemble_models]
+    if not weights:
+        return models, None
+    if len(weights) != len(models):
+        raise ValueError("--ensemble-weight 数量必须等于主模型 + ensemble 模型总数")
+    return models, weights
+
+
 def diagnose_manifest_errors(
     model: str,
     manifest: Path,
     backbone: str = "mobilenet_v3_small",
     device: str = "cpu",
     top: int = 20,
+    ensemble_models: list[str] | None = None,
+    model_weights: list[float] | None = None,
 ) -> dict:
-    pipeline = Pipeline(model, backbone=backbone, device=device)
+    model_paths, weights = build_model_config(model, ensemble_models or [], model_weights)
+    pipeline = Pipeline(model_paths, backbone=backbone, device=device, model_weights=weights)
     rows = list(csv.DictReader(open(manifest, encoding="utf-8-sig")))
 
     by_style = defaultdict(Counter)
@@ -87,6 +114,8 @@ def diagnose_manifest_errors(
     by_actual = Counter()
     by_pair = Counter()
     by_region = Counter()
+    by_kind = Counter()
+    by_region_kind = Counter()
     by_cell = Counter()
     board_errors = []
 
@@ -122,8 +151,10 @@ def diagnose_manifest_errors(
         style = item.get("style") or "unspecified"
         layout_type = item.get("layout_type") or "unspecified"
         by_style[style]["boards"] += 1
+        by_style[style]["cells"] += 90
         by_style[style]["error_cells"] += len(errors)
         by_layout_type[layout_type]["boards"] += 1
+        by_layout_type[layout_type]["cells"] += 90
         by_layout_type[layout_type]["error_cells"] += len(errors)
 
         for error in errors:
@@ -133,6 +164,8 @@ def diagnose_manifest_errors(
             by_actual[actual_name] += 1
             by_pair[f"{expected_name}->{actual_name}"] += 1
             by_region[error["region"]] += 1
+            by_kind[error["kind"]] += 1
+            by_region_kind[f"{error['region']}:{error['kind']}"] += 1
             by_cell[f"r{error['row']}_c{error['col']}"] += 1
 
         if errors:
@@ -155,6 +188,8 @@ def diagnose_manifest_errors(
     return {
         "manifest": str(manifest),
         "model": model,
+        "model_paths": model_paths,
+        "model_weights": weights,
         "total_boards": total_boards,
         "evaluated_boards": evaluated_boards,
         "read_errors": read_errors,
@@ -164,20 +199,46 @@ def diagnose_manifest_errors(
         "total_cells": total_cells,
         "error_cells": error_cells,
         "cell_accuracy": 1 - error_cells / max(total_cells, 1),
-        "by_style": {key: dict(value) for key, value in sorted(by_style.items())},
-        "by_layout_type": {key: dict(value) for key, value in sorted(by_layout_type.items())},
+        "by_style": _finalize_groups(by_style),
+        "by_layout_type": _finalize_groups(by_layout_type),
         "top_expected": _top(by_expected, top),
         "top_actual": _top(by_actual, top),
         "top_pairs": _top(by_pair, top),
+        "top_kinds": _top(by_kind, top),
         "top_regions": _top(by_region, top),
+        "top_region_kinds": _top(by_region_kind, top),
         "top_cells": _top(by_cell, top),
         "board_errors": board_errors,
     }
 
 
+def _finalize_groups(groups: defaultdict[Counter]) -> dict:
+    finalized = {}
+    for key, value in sorted(groups.items()):
+        cells = value.get("cells", value.get("boards", 0) * 90)
+        error_cells = value.get("error_cells", 0)
+        finalized[key] = {
+            **dict(value),
+            "cell_accuracy": 1 - error_cells / max(cells, 1),
+        }
+    return finalized
+
+
 def main():
     parser = argparse.ArgumentParser(description="逐格诊断固定评估清单中的 FEN 识别错误")
     parser.add_argument("--model", required=True, help="待诊断模型权重")
+    parser.add_argument(
+        "--ensemble-model",
+        action="append",
+        default=[],
+        help="额外参与概率平均的模型权重路径，可重复传入",
+    )
+    parser.add_argument(
+        "--ensemble-weight",
+        action="append",
+        type=float,
+        help="模型融合权重；数量需等于主模型加 ensemble 模型总数",
+    )
     parser.add_argument("--manifest", default="evaluation/standard_manifest.csv", help="评估清单")
     parser.add_argument("--backbone", default="mobilenet_v3_small", help="模型骨干网络")
     parser.add_argument("--device", default="cpu", choices=["cpu", "cuda"], help="推理设备")
@@ -191,6 +252,8 @@ def main():
         backbone=args.backbone,
         device=args.device,
         top=args.top,
+        ensemble_models=args.ensemble_model,
+        model_weights=args.ensemble_weight,
     )
     summary = {key: value for key, value in report.items() if key != "board_errors"}
     print(json.dumps(summary, ensure_ascii=False, indent=2))

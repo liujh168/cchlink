@@ -2,7 +2,8 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from src.pipeline import Pipeline
+from src.fen.fen_builder import EMPTY_IDX
+from src.pipeline import STANDARD_INITIAL_INDICES, Pipeline
 
 
 class _Predictor:
@@ -108,3 +109,111 @@ def test_empty_calibration_rolls_back_low_margin_piece_predictions():
     assert calibrated[11] == 3
     assert len(corrections) == 1
     assert corrections[0].reason == "低边际空位误报回退"
+
+
+def test_initial_position_prior_fills_near_complete_initial_board():
+    pipeline = Pipeline.__new__(Pipeline)
+    predictions = STANDARD_INITIAL_INDICES.copy()
+    confidences = [0.80] * 90
+    missing_index = 0
+    predictions[missing_index] = EMPTY_IDX
+    confidences[missing_index] = 0.60
+    probabilities = np.full((90, 15), 0.001, dtype=np.float32)
+    for index, target in enumerate(STANDARD_INITIAL_INDICES):
+        probabilities[index, target] = 0.99
+    probabilities[missing_index, EMPTY_IDX] = 0.60
+    probabilities[missing_index, STANDARD_INITIAL_INDICES[missing_index]] = 0.50
+
+    corrected, corrected_confidences, corrections = pipeline._apply_initial_position_prior(
+        predictions, confidences, probabilities
+    )
+
+    assert corrected == STANDARD_INITIAL_INDICES
+    assert corrected_confidences[missing_index] == probabilities[
+        missing_index, STANDARD_INITIAL_INDICES[missing_index]
+    ]
+    assert len(corrections) == 1
+    assert corrections[0].reason == "近完整初始局模板补全"
+
+
+def test_initial_position_prior_rejects_when_current_board_is_much_more_likely():
+    pipeline = Pipeline.__new__(Pipeline)
+    predictions = STANDARD_INITIAL_INDICES.copy()
+    confidences = [0.80] * 90
+    occupied_indices = [
+        index for index, target in enumerate(STANDARD_INITIAL_INDICES) if target != EMPTY_IDX
+    ]
+    empty_indices = [
+        index for index, target in enumerate(STANDARD_INITIAL_INDICES) if target == EMPTY_IDX
+    ]
+    wrong_occupied_indices = occupied_indices[:22]
+    false_positive_indices = empty_indices[:58]
+    for index in wrong_occupied_indices:
+        predictions[index] = 4
+    for index in false_positive_indices:
+        predictions[index] = 4
+    probabilities = np.full((90, 15), 0.001, dtype=np.float32)
+    for index, target in enumerate(STANDARD_INITIAL_INDICES):
+        probabilities[index, target] = 0.99
+    for index in wrong_occupied_indices:
+        probabilities[index, STANDARD_INITIAL_INDICES[index]] = 0.05
+        probabilities[index, predictions[index]] = 0.99
+    for index in false_positive_indices:
+        probabilities[index, EMPTY_IDX] = 0.71
+        probabilities[index, predictions[index]] = 0.99
+
+    corrected, corrected_confidences, corrections = pipeline._apply_initial_position_prior(
+        predictions, confidences, probabilities
+    )
+
+    assert corrected == predictions
+    assert corrected_confidences == confidences
+    assert corrections == []
+
+
+def test_visual_initial_position_prior_fills_red_top_low_recall_board():
+    pipeline = Pipeline.__new__(Pipeline)
+    pipeline._red_pixel_fraction = lambda board: 0.30
+    pipeline._visual_initial_occupied_hits = lambda board, rows, cols: 25
+    predictions = [EMPTY_IDX] * 90
+    confidences = [0.60] * 90
+    probabilities = np.full((90, 15), 0.001, dtype=np.float32)
+    for index, target in enumerate(STANDARD_INITIAL_INDICES):
+        probabilities[index, target] = 0.40
+
+    corrected, corrected_confidences, corrections = pipeline._apply_visual_initial_position_prior(
+        predictions,
+        confidences,
+        probabilities,
+        np.zeros((100, 100, 3), dtype=np.uint8),
+        list(range(10)),
+        list(range(9)),
+        "red_top",
+    )
+
+    assert corrected == STANDARD_INITIAL_INDICES
+    assert corrected_confidences[0] == probabilities[0, STANDARD_INITIAL_INDICES[0]]
+    assert corrections
+    assert corrections[0].reason == "瑙嗚鍒濆灞€鍗犱綅琛ュ叏"
+
+
+def test_visual_initial_position_prior_rejects_without_red_piece_evidence():
+    pipeline = Pipeline.__new__(Pipeline)
+    pipeline._red_pixel_fraction = lambda board: 0.10
+    pipeline._visual_initial_occupied_hits = lambda board, rows, cols: 30
+    predictions = [EMPTY_IDX] * 90
+    confidences = [0.60] * 90
+
+    corrected, corrected_confidences, corrections = pipeline._apply_visual_initial_position_prior(
+        predictions,
+        confidences,
+        None,
+        np.zeros((100, 100, 3), dtype=np.uint8),
+        list(range(10)),
+        list(range(9)),
+        "red_top",
+    )
+
+    assert corrected == predictions
+    assert corrected_confidences == confidences
+    assert corrections == []

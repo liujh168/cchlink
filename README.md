@@ -91,12 +91,12 @@ cchlink/
 ### 训练模型
 
 推荐训练路径是先生成按整盘分组的数据集，再用 `train_v2.py` 训练，避免同一棋盘泄漏到训练集和验证集。当前已通过晋级门槛的权重仍为
-`checkpoint_standard_v4.pth`；下一轮真实照片鲁棒性候选数据版本为 `standard-v5`：
+`checkpoint_standard_v4.pth`；下一轮真实照片鲁棒性候选数据版本为 `standard-v6`：
 
 ```bash
-python scripts/generate_grouped_data.py -o data/pieces_grouped_v5 -n 3000
-python scripts/audit_dataset.py data/pieces_grouped_v5 --against-manifest evaluation/standard_manifest.csv
-python scripts/train_v2.py -d data/pieces_grouped_v5 -o data/models/checkpoint_standard_v5.pth
+python scripts/generate_grouped_data.py -o data/pieces_grouped_v6 -n 3000
+python scripts/audit_dataset.py data/pieces_grouped_v6 --against-manifest evaluation/standard_manifest.csv
+python scripts/train_v2.py -d data/pieces_grouped_v6 -o data/models/checkpoint_standard_v6.pth
 ```
 
 `data/pieces/` 是保留的基础棋子训练图块；`data/pieces_grouped_v4/` 和 `data/models/`
@@ -111,6 +111,16 @@ python scripts/train_v2.py -d data/pieces_grouped_v5 -o data/models/checkpoint_s
 `standard-v5` 在 v4 基础上增加真实照片风格增强（色偏、不均匀光照、轻微虚焦、
 降采样和 JPEG 压缩），并针对边缘有子交点记录并生成多裁剪尺度、轻微外向偏移的
 训练图块，用于补强真实照片中外圈棋子容易被判空的问题。
+
+`standard-v6` 继续沿用不得使用真实回归照片派生样本的约束，并根据最新诊断报告
+加强木质棋盘、初始布局、边缘大棋子/贴边棋子、低清晰度和压缩场景的占比。当前
+诊断显示真实集主要瓶颈为 `piece_to_empty`，尤其是 `edge:piece_to_empty`，因此
+v6 的目标是优先提升真实照片外圈有子召回，同时用空棋盘和困难空位样本防止误报回升。
+`checkpoint_standard_v6.pth` 单模型标准集达到 5400/5400、60/60，但真实集为
+1307/1620，暂不作为单模型晋级；当前最佳候选是 v4/v5/v6 概率融合，权重为
+0.55/0.05/0.40，并叠加近完整初始局模板补全与低饱和真实木盘视觉占位补全。
+`standard-v7` 新增浅色木盘合成风格并训练 `checkpoint_standard_v7.pth`，单模型标准集
+5400/5400、真实集 1332/1620，融合扫权重未超过当前最佳，因此暂不晋级。
 
 参数说明：
 - `-d` / `--data`：训练数据根目录（必填）
@@ -128,7 +138,8 @@ python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth --
 python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth --debug-dir output/debug
 python scripts/predict.py photo.jpg -m data/models/checkpoint_standard_v4.pth \
   --ensemble-model data/models/checkpoint_standard_v5.pth \
-  --ensemble-weight 0.9 --ensemble-weight 0.1
+  --ensemble-model data/models/checkpoint_standard_v6.pth \
+  --ensemble-weight 0.55 --ensemble-weight 0.05 --ensemble-weight 0.40
 ```
 
 参数说明：
@@ -158,12 +169,16 @@ print(result.warnings)
 print(result.corrections)
 ```
 
-如需使用当前 v5 候选融合，可传入多个模型和权重：
+如需使用当前 v6 候选融合，可传入多个模型和权重：
 
 ```python
 pipeline = Pipeline(
-    ["data/models/checkpoint_standard_v4.pth", "data/models/checkpoint_standard_v5.pth"],
-    model_weights=[0.9, 0.1],
+    [
+        "data/models/checkpoint_standard_v4.pth",
+        "data/models/checkpoint_standard_v5.pth",
+        "data/models/checkpoint_standard_v6.pth",
+    ],
+    model_weights=[0.55, 0.05, 0.40],
 )
 ```
 
@@ -177,7 +192,8 @@ python scripts/batch.py photos --model data/models/checkpoint_standard_v4.pth --
   --visualize-dir output/visual --debug-dir output/debug
 python scripts/batch.py photos --model data/models/checkpoint_standard_v4.pth \
   --ensemble-model data/models/checkpoint_standard_v5.pth \
-  --ensemble-weight 0.9 --ensemble-weight 0.1 \
+  --ensemble-model data/models/checkpoint_standard_v6.pth \
+  --ensemble-weight 0.55 --ensemble-weight 0.05 --ensemble-weight 0.40 \
   --output results.csv
 ```
 
@@ -218,9 +234,10 @@ python scripts/diagnose_eval_errors.py \
 `checkpoint_standard_v4.pth` 已通过该标准评测门槛：标准评测 5398/5400 格正确
 （99.96%），58/60 盘完全正确（96.67%）；三张人工确认预览全部完全正确。
 
-当前 v5 候选融合模式（v4 权重 0.9 + v5 权重 0.1）在固定清单上达到：标准评测
-5398/5400 格正确、58/60 盘完全正确；真实照片回归集 1308/1620 格正确（80.74%）、
-整盘 1/18。
+当前 v6 候选融合模式（v4/v5/v6 权重 0.55/0.05/0.40）加近完整初始局模板补全与视觉占位补全后，
+在固定清单上达到：标准评测 5400/5400 格正确、60/60 盘完全正确；真实照片回归集
+1505/1620 格正确（92.90%）、整盘 9/18。wood 子集达到 611/630、整盘 5/7，
+剩余错误主要转向 unknown/plastic/screen 与少量非初始 wood 场景。
 
 ## 开发状态
 

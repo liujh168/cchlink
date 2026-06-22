@@ -21,9 +21,9 @@ def test_standard_dataset_has_provenance_and_no_seed_leakage(tmp_path):
     assert summary["scene_augmented"] == 6 * 90
     assert summary["edge_augmented"] > 0
     assert summary["patch_scales"]
-    assert set(summary["styles"]) == {"classic", "plastic", "wood"}
+    assert set(summary["styles"]) == {"classic", "light_wood", "plastic", "wood"}
     rows = list(csv.DictReader(open(dataset / "manifest.csv", encoding="utf-8")))
-    assert all(row["source"] == "standard-v5" for row in rows)
+    assert all(row["source"] == "standard-v7" for row in rows)
     assert all(row["scene_augmented"] == "true" for row in rows)
     assert all(row["patch_scale"] for row in rows)
     assert all(row["patch_shift_y"] for row in rows)
@@ -46,7 +46,7 @@ def test_standard_dataset_edge_piece_augmentation_is_recorded(tmp_path):
     edge_rows = [row for row in rows if row["edge_augmented"] == "true" and row["label"] != "空"]
 
     assert edge_rows
-    edge_scales = {"0.68", "0.74", "0.82", "0.90", "1.00"}
+    edge_scales = {"0.60", "0.66", "0.72", "0.82", "0.92", "1.04"}
     assert all(row["patch_scale"] in edge_scales for row in edge_rows)
     assert any(row["patch_shift_y"] != "0" or row["patch_shift_x"] != "0" for row in edge_rows)
 
