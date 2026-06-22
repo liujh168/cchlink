@@ -68,7 +68,10 @@ def _score_candidate(image: np.ndarray, corners: np.ndarray) -> BoardDetection:
     right = np.linalg.norm(corners[2] - corners[1])
     ratio = ((top + bottom) / 2) / max((left + right) / 2, 1.0)
     ratio_score = float(np.exp(-abs(ratio - BOARD_WIDTH / BOARD_HEIGHT) * 2.0))
-    confidence = 0.78 * grid_confidence + 0.22 * ratio_score
+    image_area = max(float(image.shape[0] * image.shape[1]), 1.0)
+    area_ratio = cv2.contourArea(corners.reshape(-1, 1, 2)) / image_area
+    area_score = float(np.clip((area_ratio - 0.06) / 0.34, 0.0, 1.0))
+    confidence = 0.66 * grid_confidence + 0.18 * ratio_score + 0.16 * area_score
     return BoardDetection(corners, float(confidence), float(grid_confidence))
 
 

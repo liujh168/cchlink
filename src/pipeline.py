@@ -33,6 +33,9 @@ VISUAL_INITIAL_STRONG_RED_FRACTION = 0.55
 VISUAL_INITIAL_MAX_MEAN_SATURATION = 95.0
 VISUAL_INITIAL_MIN_CIRCLE_HITS = 24
 VISUAL_INITIAL_WEAK_CIRCLE_HITS = 15
+VISUAL_INITIAL_HIGH_CONTRAST_MAX_NON_EMPTY = 20
+VISUAL_INITIAL_HIGH_CONTRAST_MAX_SATURATION = 80.0
+VISUAL_INITIAL_HIGH_CONTRAST_MIN_CIRCLE_HITS = 31
 
 
 def _fen_to_indices(fen: str) -> list[int]:
@@ -298,24 +301,27 @@ class Pipeline:
             return predictions, confidences, []
 
         red_fraction = self._red_pixel_fraction(board)
-        if red_fraction < VISUAL_INITIAL_MIN_RED_FRACTION:
-            return predictions, confidences, []
         mean_saturation = self._mean_saturation(board)
-        if mean_saturation > VISUAL_INITIAL_MAX_MEAN_SATURATION:
-            return predictions, confidences, []
-
         circle_hits = self._visual_initial_occupied_hits(board, row_positions, col_positions)
         strong_red_top = (
             orientation == "red_top"
+            and red_fraction >= VISUAL_INITIAL_MIN_RED_FRACTION
+            and mean_saturation <= VISUAL_INITIAL_MAX_MEAN_SATURATION
             and circle_hits >= VISUAL_INITIAL_MIN_CIRCLE_HITS
             and non_empty <= VISUAL_INITIAL_MAX_NON_EMPTY
         )
         weak_but_red_rich = (
-            circle_hits >= VISUAL_INITIAL_WEAK_CIRCLE_HITS
+            red_fraction >= VISUAL_INITIAL_STRONG_RED_FRACTION
+            and mean_saturation <= VISUAL_INITIAL_MAX_MEAN_SATURATION
+            and circle_hits >= VISUAL_INITIAL_WEAK_CIRCLE_HITS
             and non_empty <= VISUAL_INITIAL_VERY_LOW_NON_EMPTY
-            and red_fraction >= VISUAL_INITIAL_STRONG_RED_FRACTION
         )
-        if not (strong_red_top or weak_but_red_rich):
+        high_contrast_initial = (
+            circle_hits >= VISUAL_INITIAL_HIGH_CONTRAST_MIN_CIRCLE_HITS
+            and non_empty <= VISUAL_INITIAL_HIGH_CONTRAST_MAX_NON_EMPTY
+            and mean_saturation <= VISUAL_INITIAL_HIGH_CONTRAST_MAX_SATURATION
+        )
+        if not (strong_red_top or weak_but_red_rich or high_contrast_initial):
             return predictions, confidences, []
 
         corrected = predictions.copy()

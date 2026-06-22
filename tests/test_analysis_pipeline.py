@@ -217,3 +217,26 @@ def test_visual_initial_position_prior_rejects_without_red_piece_evidence():
     assert corrected == predictions
     assert corrected_confidences == confidences
     assert corrections == []
+
+
+def test_visual_initial_position_prior_fills_high_contrast_initial_board():
+    pipeline = Pipeline.__new__(Pipeline)
+    pipeline._red_pixel_fraction = lambda board: 0.0
+    pipeline._mean_saturation = lambda board: 45.0
+    pipeline._visual_initial_occupied_hits = lambda board, rows, cols: 31
+    predictions = [EMPTY_IDX] * 90
+    confidences = [0.60] * 90
+
+    corrected, corrected_confidences, corrections = pipeline._apply_visual_initial_position_prior(
+        predictions,
+        confidences,
+        None,
+        np.zeros((100, 100, 3), dtype=np.uint8),
+        list(range(10)),
+        list(range(9)),
+        "red_bottom",
+    )
+
+    assert corrected == STANDARD_INITIAL_INDICES
+    assert corrected_confidences == confidences
+    assert corrections

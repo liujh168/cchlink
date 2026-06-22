@@ -15,11 +15,11 @@
   "evaluated_boards": 18,
   "read_errors": 0,
   "rejected": 0,
-  "exact": 9,
-  "exact_rate": 0.5,
+  "exact": 10,
+  "exact_rate": 0.5555555555555556,
   "total_cells": 1620,
-  "error_cells": 115,
-  "cell_accuracy": 0.9290123456790124,
+  "error_cells": 83,
+  "cell_accuracy": 0.9487654320987654,
   "by_style": {
     "plastic": {
       "boards": 3,
@@ -36,8 +36,8 @@
     "unknown": {
       "boards": 1,
       "cells": 90,
-      "error_cells": 32,
-      "cell_accuracy": 0.6444444444444444
+      "error_cells": 0,
+      "cell_accuracy": 1.0
     },
     "wood": {
       "boards": 7,
@@ -62,8 +62,8 @@
     "initial": {
       "boards": 8,
       "cells": 720,
-      "error_cells": 32,
-      "cell_accuracy": 0.9555555555555556
+      "error_cells": 0,
+      "cell_accuracy": 1.0
     },
     "midgame": {
       "boards": 1,
@@ -79,24 +79,24 @@
     }
   },
   "top_expected": {
-    "黑卒": 16,
-    "黑士": 11,
-    "黑车": 10,
-    "红兵": 9,
-    "红炮": 9,
-    "红相": 9,
-    "黑象": 8,
-    "黑马": 6,
-    "黑炮": 6,
-    "红帅": 6,
-    "红俥": 6,
-    "黑将": 5,
-    "红马": 5,
+    "黑卒": 11,
+    "黑士": 9,
+    "黑车": 8,
+    "红炮": 7,
+    "红相": 7,
+    "黑象": 6,
+    "红帅": 5,
     "空": 5,
-    "红仕": 4
+    "黑马": 4,
+    "黑将": 4,
+    "黑炮": 4,
+    "红兵": 4,
+    "红俥": 4,
+    "红马": 3,
+    "红仕": 2
   },
   "top_actual": {
-    "空": 85,
+    "空": 53,
     "黑卒": 9,
     "红炮": 6,
     "红兵": 3,
@@ -109,42 +109,42 @@
     "黑将": 1
   },
   "top_pairs": {
-    "黑卒->空": 15,
-    "黑士->空": 9,
-    "黑车->空": 7,
-    "红兵->空": 7,
-    "红炮->空": 7,
-    "黑象->空": 6,
-    "红俥->空": 6,
-    "黑马->空": 5,
-    "黑将->空": 5,
-    "黑炮->空": 5,
+    "黑卒->空": 10,
+    "黑士->空": 7,
+    "黑车->空": 5,
+    "红炮->空": 5,
+    "黑象->空": 4,
+    "黑将->空": 4,
     "红相->红炮": 4,
-    "红相->空": 4,
-    "红马->空": 3,
-    "红帅->空": 3,
-    "红仕->空": 3,
+    "红俥->空": 4,
+    "黑马->空": 3,
+    "黑炮->空": 3,
     "空->黑马": 3,
     "黑车->黑卒": 3,
+    "红兵->空": 2,
     "黑士->黑卒": 2,
     "红兵->红俥": 2,
-    "黑象->黑卒": 2
+    "红帅->空": 2,
+    "红相->空": 2,
+    "黑象->黑卒": 2,
+    "黑炮->黑卒": 1,
+    "黑马->黑象": 1
   },
   "top_kinds": {
-    "piece_to_empty": 85,
+    "piece_to_empty": 53,
     "piece_confusion": 25,
     "empty_to_piece": 5
   },
   "top_regions": {
-    "edge": 68,
-    "center": 26,
+    "edge": 46,
+    "center": 16,
     "palace": 16,
     "river": 5
   },
   "top_region_kinds": {
-    "edge:piece_to_empty": 55,
-    "center:piece_to_empty": 20,
+    "edge:piece_to_empty": 33,
     "edge:piece_confusion": 12,
+    "center:piece_to_empty": 10,
     "palace:piece_to_empty": 8,
     "center:piece_confusion": 5,
     "palace:piece_confusion": 5,
@@ -155,26 +155,26 @@
     "edge:empty_to_piece": 1
   },
   "top_cells": {
-    "r0_c5": 5,
-    "r0_c4": 4,
-    "r3_c0": 4,
+    "r0_c5": 4,
     "r7_c4": 4,
-    "r9_c6": 4,
-    "r9_c4": 4,
-    "r0_c3": 4,
-    "r9_c5": 4,
-    "r0_c0": 3,
-    "r0_c1": 3,
-    "r0_c2": 3,
-    "r2_c1": 3,
-    "r6_c8": 3,
-    "r9_c2": 3,
+    "r0_c4": 3,
+    "r3_c0": 3,
+    "r9_c6": 3,
+    "r9_c4": 3,
+    "r0_c3": 3,
     "r1_c4": 3,
-    "r3_c2": 3,
     "r8_c4": 3,
-    "r9_c1": 3,
-    "r9_c3": 3,
-    "r0_c6": 2
+    "r9_c5": 3,
+    "r0_c0": 2,
+    "r0_c1": 2,
+    "r0_c2": 2,
+    "r2_c1": 2,
+    "r6_c8": 2,
+    "r9_c2": 2,
+    "r3_c2": 2,
+    "r5_c2": 2,
+    "r8_c3": 2,
+    "r9_c1": 2
   },
   "board_errors": [
     {
@@ -678,338 +678,6 @@
           "expected": "c",
           "actual": "",
           "expected_name": "黑炮",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        }
-      ]
-    },
-    {
-      "path": "evaluation/real_images/real_010_unknown_initial_red_bottom.jpg",
-      "style": "unknown",
-      "layout_type": "initial",
-      "orientation": "red_bottom",
-      "seed": "real_010_unknown_initial_red_bottom",
-      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
-      "actual_fen": "9/9/9/9/9/9/9/9/9/9",
-      "error_count": 32,
-      "errors": [
-        {
-          "row": 0,
-          "col": 0,
-          "region": "edge",
-          "expected": "r",
-          "actual": "",
-          "expected_name": "黑车",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 0,
-          "col": 1,
-          "region": "edge",
-          "expected": "n",
-          "actual": "",
-          "expected_name": "黑马",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 0,
-          "col": 2,
-          "region": "edge",
-          "expected": "b",
-          "actual": "",
-          "expected_name": "黑象",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 0,
-          "col": 3,
-          "region": "edge",
-          "expected": "a",
-          "actual": "",
-          "expected_name": "黑士",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 0,
-          "col": 4,
-          "region": "edge",
-          "expected": "k",
-          "actual": "",
-          "expected_name": "黑将",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 0,
-          "col": 5,
-          "region": "edge",
-          "expected": "a",
-          "actual": "",
-          "expected_name": "黑士",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 0,
-          "col": 6,
-          "region": "edge",
-          "expected": "b",
-          "actual": "",
-          "expected_name": "黑象",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 0,
-          "col": 7,
-          "region": "edge",
-          "expected": "n",
-          "actual": "",
-          "expected_name": "黑马",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 0,
-          "col": 8,
-          "region": "edge",
-          "expected": "r",
-          "actual": "",
-          "expected_name": "黑车",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 2,
-          "col": 1,
-          "region": "center",
-          "expected": "c",
-          "actual": "",
-          "expected_name": "黑炮",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 2,
-          "col": 7,
-          "region": "center",
-          "expected": "c",
-          "actual": "",
-          "expected_name": "黑炮",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 3,
-          "col": 0,
-          "region": "edge",
-          "expected": "p",
-          "actual": "",
-          "expected_name": "黑卒",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 3,
-          "col": 2,
-          "region": "center",
-          "expected": "p",
-          "actual": "",
-          "expected_name": "黑卒",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 3,
-          "col": 4,
-          "region": "center",
-          "expected": "p",
-          "actual": "",
-          "expected_name": "黑卒",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 3,
-          "col": 6,
-          "region": "center",
-          "expected": "p",
-          "actual": "",
-          "expected_name": "黑卒",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 3,
-          "col": 8,
-          "region": "edge",
-          "expected": "p",
-          "actual": "",
-          "expected_name": "黑卒",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 6,
-          "col": 0,
-          "region": "edge",
-          "expected": "P",
-          "actual": "",
-          "expected_name": "红兵",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 6,
-          "col": 2,
-          "region": "center",
-          "expected": "P",
-          "actual": "",
-          "expected_name": "红兵",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 6,
-          "col": 4,
-          "region": "center",
-          "expected": "P",
-          "actual": "",
-          "expected_name": "红兵",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 6,
-          "col": 6,
-          "region": "center",
-          "expected": "P",
-          "actual": "",
-          "expected_name": "红兵",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 6,
-          "col": 8,
-          "region": "edge",
-          "expected": "P",
-          "actual": "",
-          "expected_name": "红兵",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 7,
-          "col": 1,
-          "region": "center",
-          "expected": "C",
-          "actual": "",
-          "expected_name": "红炮",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 7,
-          "col": 7,
-          "region": "center",
-          "expected": "C",
-          "actual": "",
-          "expected_name": "红炮",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 9,
-          "col": 0,
-          "region": "edge",
-          "expected": "R",
-          "actual": "",
-          "expected_name": "红俥",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 9,
-          "col": 1,
-          "region": "edge",
-          "expected": "N",
-          "actual": "",
-          "expected_name": "红马",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 9,
-          "col": 2,
-          "region": "edge",
-          "expected": "B",
-          "actual": "",
-          "expected_name": "红相",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 9,
-          "col": 3,
-          "region": "edge",
-          "expected": "A",
-          "actual": "",
-          "expected_name": "红仕",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 9,
-          "col": 4,
-          "region": "edge",
-          "expected": "K",
-          "actual": "",
-          "expected_name": "红帅",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 9,
-          "col": 5,
-          "region": "edge",
-          "expected": "A",
-          "actual": "",
-          "expected_name": "红仕",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 9,
-          "col": 6,
-          "region": "edge",
-          "expected": "B",
-          "actual": "",
-          "expected_name": "红相",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 9,
-          "col": 7,
-          "region": "edge",
-          "expected": "N",
-          "actual": "",
-          "expected_name": "红马",
-          "actual_name": "空",
-          "kind": "piece_to_empty"
-        },
-        {
-          "row": 9,
-          "col": 8,
-          "region": "edge",
-          "expected": "R",
-          "actual": "",
-          "expected_name": "红俥",
           "actual_name": "空",
           "kind": "piece_to_empty"
         }

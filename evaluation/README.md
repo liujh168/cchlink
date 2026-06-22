@@ -48,10 +48,10 @@ python scripts/diagnose_eval_errors.py \
 已删除；后续固定评估以 `standard_manifest.csv` 和 `real_manifest.csv` 为准。
 
 `real_manifest.csv` 真实照片回归集当前 v4 单模型结果为：检测 18/18、网格接受
-18/18、格子级准确率 1409/1620（86.98%）、整盘完全正确 5/18。
+18/18、格子级准确率 1441/1620（88.95%）、整盘完全正确 6/18。
 `checkpoint_standard_v6.pth` 单模型标准集为 5400/5400、真实集为 1307/1620，
 暂不单模型晋级。当前最佳候选为 v4/v5/v6=0.55/0.05/0.40 融合：标准集
-5400/5400、60/60，真实集 1505/1620（92.90%）、整盘 9/18。低饱和真实木盘
-视觉占位补全已拉回剩余 wood/initial 红上漏判，最佳融合诊断中 `piece_to_empty`
-为 85 个、`edge:piece_to_empty` 为 55 个。后续应继续补充不污染评估集的真实训练照片，
-并加强 unknown/plastic/screen 与非初始 wood 场景。
+5400/5400、60/60，真实集 1537/1620（94.88%）、整盘 10/18。低饱和真实木盘
+视觉占位补全和候选面积先验已拉回全部 initial 真实图，最佳融合诊断中 `piece_to_empty`
+为 53 个、`edge:piece_to_empty` 为 33 个。后续应继续补充不污染评估集的真实训练照片，
+并加强 plastic midgame、非初始 wood 与 screen endgame 场景。

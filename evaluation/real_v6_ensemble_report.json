@@ -15,10 +15,10 @@
     "count": 18,
     "detected": 18,
     "grid_accepted": 18,
-    "correct_cells": 1505,
-    "exact": 9,
-    "cell_accuracy": 0.9290123456790124,
-    "exact_rate": 0.5
+    "correct_cells": 1537,
+    "exact": 10,
+    "cell_accuracy": 0.9487654320987654,
+    "exact_rate": 0.5555555555555556
   },
   "by_style": {
     "plastic": {
@@ -43,10 +43,10 @@
       "count": 1,
       "detected": 1,
       "grid_accepted": 1,
-      "correct_cells": 58,
-      "exact": 0,
-      "cell_accuracy": 0.6444444444444445,
-      "exact_rate": 0.0
+      "correct_cells": 90,
+      "exact": 1,
+      "cell_accuracy": 1.0,
+      "exact_rate": 1.0
     },
     "wood": {
       "count": 7,
@@ -58,7 +58,7 @@
       "exact_rate": 0.7142857142857143
     }
   },
-  "mean_latency_seconds": 0.14431596111110898,
+  "mean_latency_seconds": 0.16497958333356008,
   "results": [
     {
       "path": "evaluation/real_images/real_001_wood_initial_red_bottom.jpg",
@@ -143,9 +143,9 @@
     },
     {
       "path": "evaluation/real_images/real_010_unknown_initial_red_bottom.jpg",
-      "status": "NG",
-      "correct_cells": 58,
-      "fen": "9/9/9/9/9/9/9/9/9/9",
+      "status": "OK",
+      "correct_cells": 90,
+      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "unknown",
       "layout_type": "initial"
