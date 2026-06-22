@@ -24,6 +24,7 @@ STANDARD_DATASET_SOURCES = {
     "standard-v5",
     "standard-v6",
     "standard-v7",
+    "standard-v8",
 }
 
 
@@ -51,11 +52,18 @@ def audit_dataset(root: Path, against_manifest: Path | None = None) -> dict:
             raise ValueError(f"未知标准数据源: {row['source']}")
         if (
             row["source"]
-            in {"standard-v3", "standard-v4", "standard-v5", "standard-v6", "standard-v7"}
+            in {
+                "standard-v3",
+                "standard-v4",
+                "standard-v5",
+                "standard-v6",
+                "standard-v7",
+                "standard-v8",
+            }
             and "scene_augmented" not in fieldnames
         ):
             raise ValueError(f"{row['source']} 清单缺少 scene_augmented 字段")
-        if row["source"] in {"standard-v5", "standard-v6", "standard-v7"}:
+        if row["source"] in {"standard-v5", "standard-v6", "standard-v7", "standard-v8"}:
             patch_fields = {"patch_scale", "patch_shift_y", "patch_shift_x", "edge_augmented"}
             missing_patch_fields = patch_fields - fieldnames
             if missing_patch_fields:

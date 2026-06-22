@@ -59,6 +59,36 @@ BOARD_STYLES = {
         "piece_inner": (248, 246, 232),
         "piece_outline": (120, 120, 110),
     },
+    "cloth_red": {
+        "background": (235, 236, 226),
+        "line": (164, 34, 45),
+        "border": (150, 22, 36),
+        "piece_outer": (215, 210, 190),
+        "piece_inner": (248, 245, 229),
+        "piece_outline": (116, 96, 72),
+        "text_red": (198, 28, 36),
+        "text_black": (24, 28, 28),
+    },
+    "light_cloth": {
+        "background": (226, 220, 198),
+        "line": (42, 52, 54),
+        "border": (54, 60, 64),
+        "piece_outer": (222, 216, 198),
+        "piece_inner": (250, 246, 232),
+        "piece_outline": (122, 112, 96),
+        "text_red": (198, 36, 34),
+        "text_black": (22, 24, 24),
+    },
+    "screen": {
+        "background": (204, 190, 82),
+        "line": (36, 44, 34),
+        "border": (62, 72, 52),
+        "piece_outer": (226, 218, 176),
+        "piece_inner": (252, 244, 204),
+        "piece_outline": (108, 98, 62),
+        "text_red": (205, 32, 28),
+        "text_black": (24, 28, 24),
+    },
 }
 
 PIECE_CHARS = {

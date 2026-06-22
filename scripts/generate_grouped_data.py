@@ -11,7 +11,7 @@ import numpy as np
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.generate_board import generate_random_midgame, render_board  # noqa: E402
+from scripts.generate_board import render_board  # noqa: E402
 from src.geometry import (  # noqa: E402
     PATCH_SIZE,
     extract_intersection_patches,
@@ -19,7 +19,11 @@ from src.geometry import (  # noqa: E402
 )
 from src.preprocess.perspective import WARP_PAD, warp_board  # noqa: E402
 from src.standard_board import (  # noqa: E402
+    COLS,
+    ROWS,
+    STANDARD_INITIAL_FEN,
     STANDARD_INITIAL_LAYOUT,
+    clone_layout,
     empty_layout,
     layout_to_fen,
     rotate_layout,
@@ -43,28 +47,169 @@ MANIFEST_FIELDS = [
     "patch_shift_x",
     "edge_augmented",
 ]
-GENERATOR_VERSION = "standard-v7"
-STYLE_SEQUENCE = ("light_wood", "wood", "light_wood", "classic", "plastic")
+GENERATOR_VERSION = "standard-v8"
+STYLE_SEQUENCE = (
+    "cloth_red",
+    "plastic",
+    "light_cloth",
+    "screen",
+    "light_wood",
+    "wood",
+    "classic",
+    "cloth_red",
+    "screen",
+    "plastic",
+)
 STYLES = tuple(dict.fromkeys(STYLE_SEQUENCE))
 EDGE_ROWS = {0, 9}
 EDGE_COLS = {0, 8}
+RED_KING = STANDARD_INITIAL_LAYOUT[9][4]
+BLACK_GENERAL = STANDARD_INITIAL_LAYOUT[0][4]
+OPENING_MOVES = (
+    ((7, 1), (7, 4)),
+    ((2, 7), (2, 5)),
+    ((9, 1), (7, 2)),
+    ((0, 7), (2, 6)),
+    ((6, 0), (5, 0)),
+    ((3, 8), (4, 8)),
+    ((7, 7), (7, 5)),
+    ((2, 1), (2, 3)),
+    ((9, 7), (7, 6)),
+    ((0, 1), (2, 2)),
+    ((6, 4), (5, 4)),
+    ((3, 4), (4, 4)),
+    ((9, 8), (8, 8)),
+    ((0, 0), (1, 0)),
+)
+
+
+def _piece_positions(layout: list[list[str | None]]) -> list[tuple[int, int]]:
+    return [
+        (row, col)
+        for row in range(ROWS)
+        for col in range(COLS)
+        if layout[row][col] is not None
+    ]
+
+
+def _move_piece(
+    layout: list[list[str | None]], source: tuple[int, int], target: tuple[int, int]
+) -> bool:
+    src_row, src_col = source
+    dst_row, dst_col = target
+    if layout[src_row][src_col] is None or layout[dst_row][dst_col] is not None:
+        return False
+    layout[dst_row][dst_col] = layout[src_row][src_col]
+    layout[src_row][src_col] = None
+    return True
+
+
+def generate_random_opening(rng: random.Random) -> list[list[str | None]]:
+    layout = clone_layout(STANDARD_INITIAL_LAYOUT)
+    moves = list(OPENING_MOVES)
+    rng.shuffle(moves)
+    target_moves = rng.randint(3, 7)
+    applied = 0
+    for source, target in moves:
+        if _move_piece(layout, source, target):
+            applied += 1
+        if applied >= target_moves:
+            break
+
+    if layout_to_fen(layout) == STANDARD_INITIAL_FEN:
+        _move_piece(layout, (7, 1), (7, 4))
+    return layout
+
+
+def generate_complex_midgame(rng: random.Random) -> list[list[str | None]]:
+    layout = clone_layout(STANDARD_INITIAL_LAYOUT)
+    removable = [
+        (row, col)
+        for row, col in _piece_positions(layout)
+        if layout[row][col] not in {RED_KING, BLACK_GENERAL}
+    ]
+    rng.shuffle(removable)
+    for row, col in removable[: rng.randint(0, 8)]:
+        layout[row][col] = None
+
+    movable = [
+        (row, col)
+        for row, col in _piece_positions(layout)
+        if layout[row][col] not in {RED_KING, BLACK_GENERAL}
+    ]
+    rng.shuffle(movable)
+    for row, col in movable[: rng.randint(6, 16)]:
+        piece = layout[row][col]
+        if piece is None:
+            continue
+        candidates = [
+            (new_row, new_col)
+            for new_row in range(ROWS)
+            for new_col in range(COLS)
+            if layout[new_row][new_col] is None
+            and (new_row >= 3 if piece.startswith("红") else new_row <= 6)
+        ]
+        if candidates:
+            new_row, new_col = rng.choice(candidates)
+            layout[new_row][new_col] = piece
+            layout[row][col] = None
+    return layout
+
+
+def _pieces_by_side(side: str) -> list[str]:
+    return [
+        piece
+        for row in STANDARD_INITIAL_LAYOUT
+        for piece in row
+        if piece is not None and piece.startswith(side) and piece not in {RED_KING, BLACK_GENERAL}
+    ]
+
+
+def _empty_positions_for_piece(layout: list[list[str | None]], piece: str) -> list[tuple[int, int]]:
+    if piece.startswith("红"):
+        row_range = range(3, ROWS)
+    else:
+        row_range = range(0, 7)
+    return [
+        (row, col)
+        for row in row_range
+        for col in range(COLS)
+        if layout[row][col] is None
+    ]
+
+
+def generate_sparse_endgame(rng: random.Random) -> list[list[str | None]]:
+    layout = empty_layout()
+    black_palace = [(row, col) for row in range(0, 3) for col in range(3, 6)]
+    red_palace = [(row, col) for row in range(7, 10) for col in range(3, 6)]
+    black_row, black_col = rng.choice(black_palace)
+    red_row, red_col = rng.choice(red_palace)
+    layout[black_row][black_col] = BLACK_GENERAL
+    layout[red_row][red_col] = RED_KING
+
+    extras = rng.sample(_pieces_by_side("黑"), rng.randint(1, 5))
+    extras += rng.sample(_pieces_by_side("红"), rng.randint(1, 5))
+    rng.shuffle(extras)
+    for piece in extras:
+        candidates = _empty_positions_for_piece(layout, piece)
+        if not candidates:
+            continue
+        row, col = rng.choice(candidates)
+        layout[row][col] = piece
+    return layout
 
 
 def choose_layout(board_index: int, rng: random.Random):
-    fraction = board_index % 24
-    if fraction < 8:
-        return [row.copy() for row in STANDARD_INITIAL_LAYOUT], "initial"
-    if fraction < 10:
+    fraction = board_index % 20
+    if fraction < 2:
+        return clone_layout(STANDARD_INITIAL_LAYOUT), "initial"
+    if fraction < 4:
         return empty_layout(), "empty"
-
-    state = random.getstate()
-    random.setstate(rng.getstate())
-    try:
-        layout = generate_random_midgame()
-        rng.setstate(random.getstate())
-    finally:
-        random.setstate(state)
-    return layout, "midgame"
+    if fraction < 9:
+        return generate_random_opening(rng), "opening"
+    if fraction < 16:
+        return generate_complex_midgame(rng), "midgame"
+    return generate_sparse_endgame(rng), "sparse_endgame"
 
 
 def apply_rectified_variation(board: np.ndarray, seed: int) -> np.ndarray:
@@ -306,7 +451,7 @@ def generate_dataset(
 
 def main():
     parser = argparse.ArgumentParser(description="生成标准棋盘按完整棋盘分组的训练图块")
-    parser.add_argument("-o", "--output", default="data/pieces_grouped_v7", help="输出目录")
+    parser.add_argument("-o", "--output", default="data/pieces_grouped_v8", help="输出目录")
     parser.add_argument("-n", "--num-boards", type=int, default=3000, help="生成棋盘数量")
     parser.add_argument("--seed", type=int, default=42000, help="训练数据随机种子")
     parser.add_argument("--empty-keep-prob", type=float, default=0.18, help="空交点保留概率")

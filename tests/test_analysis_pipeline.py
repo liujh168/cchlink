@@ -240,3 +240,47 @@ def test_visual_initial_position_prior_fills_high_contrast_initial_board():
     assert corrected == STANDARD_INITIAL_INDICES
     assert corrected_confidences == confidences
     assert corrections
+
+
+def test_static_position_prior_replaces_illegal_pawn_with_probable_elephant():
+    pipeline = Pipeline.__new__(Pipeline)
+    predictions = [EMPTY_IDX] * 90
+    confidences = [0.99] * 90
+    index = 2 * 9 + 8
+    predictions[index] = 13
+    confidences[index] = 0.62
+    probabilities = np.full((90, 15), 0.001, dtype=np.float32)
+    probabilities[:, EMPTY_IDX] = 0.99
+    probabilities[index, 13] = 0.62
+    probabilities[index, 9] = 0.24
+
+    corrected, corrected_confidences, corrections = (
+        pipeline._apply_static_position_probability_prior(
+            predictions, confidences, probabilities
+        )
+    )
+
+    assert corrected[index] == 9
+    assert corrected_confidences[index] == probabilities[index, 9]
+    assert len(corrections) == 1
+    assert corrections[0].reason == "非法兵卒位置概率先验修正"
+
+
+def test_static_position_prior_replaces_weak_pawn_on_elephant_point():
+    pipeline = Pipeline.__new__(Pipeline)
+    predictions = [EMPTY_IDX] * 90
+    confidences = [0.99] * 90
+    index = 4 * 9 + 6
+    predictions[index] = 13
+    confidences[index] = 0.43
+    probabilities = np.full((90, 15), 0.001, dtype=np.float32)
+    probabilities[:, EMPTY_IDX] = 0.99
+    probabilities[index, 13] = 0.43
+    probabilities[index, 9] = 0.31
+
+    corrected, _, corrections = pipeline._apply_static_position_probability_prior(
+        predictions, confidences, probabilities
+    )
+
+    assert corrected[index] == 9
+    assert corrections

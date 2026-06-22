@@ -1,0 +1,220 @@
+{
+  "manifest": "evaluation\\real_manifest.csv",
+  "model": "data\\models\\checkpoint_standard_v8.pth",
+  "model_paths": [
+    "data\\models\\checkpoint_standard_v8.pth"
+  ],
+  "model_weights": null,
+  "overall": {
+    "count": 18,
+    "detected": 18,
+    "grid_accepted": 18,
+    "correct_cells": 1327,
+    "exact": 4,
+    "cell_accuracy": 0.8191358024691358,
+    "exact_rate": 0.2222222222222222
+  },
+  "by_style": {
+    "plastic": {
+      "count": 3,
+      "detected": 3,
+      "grid_accepted": 3,
+      "correct_cells": 241,
+      "exact": 1,
+      "cell_accuracy": 0.8925925925925926,
+      "exact_rate": 0.3333333333333333
+    },
+    "screen": {
+      "count": 7,
+      "detected": 7,
+      "grid_accepted": 7,
+      "correct_cells": 559,
+      "exact": 1,
+      "cell_accuracy": 0.8873015873015873,
+      "exact_rate": 0.14285714285714285
+    },
+    "unknown": {
+      "count": 1,
+      "detected": 1,
+      "grid_accepted": 1,
+      "correct_cells": 47,
+      "exact": 0,
+      "cell_accuracy": 0.5222222222222223,
+      "exact_rate": 0.0
+    },
+    "wood": {
+      "count": 7,
+      "detected": 7,
+      "grid_accepted": 7,
+      "correct_cells": 480,
+      "exact": 2,
+      "cell_accuracy": 0.7619047619047619,
+      "exact_rate": 0.2857142857142857
+    }
+  },
+  "mean_latency_seconds": 0.11732689444397693,
+  "results": [
+    {
+      "path": "evaluation/real_images/real_001_wood_initial_red_bottom.jpg",
+      "status": "OK",
+      "correct_cells": 90,
+      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "style": "wood",
+      "layout_type": "initial"
+    },
+    {
+      "path": "evaluation/real_images/real_002_wood_initial_red_top.jpeg",
+      "status": "NG",
+      "correct_cells": 45,
+      "fen": "9/n8/2b2B3/a5R2/3P3NN/c2b5/5b1P1/6crb/3n5/2r3R2",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "style": "wood",
+      "layout_type": "initial"
+    },
+    {
+      "path": "evaluation/real_images/real_003_plastic_initial_red_top.jpg",
+      "status": "OK",
+      "correct_cells": 90,
+      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "style": "plastic",
+      "layout_type": "initial"
+    },
+    {
+      "path": "evaluation/real_images/real_004_screen_initial_red_bottom.png",
+      "status": "NG",
+      "correct_cells": 65,
+      "fen": "pnc1k2bp/9/1b7/c3p3p/9/9/8N/9/9/1NNP1AR1R",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "style": "screen",
+      "layout_type": "initial"
+    },
+    {
+      "path": "evaluation/real_images/real_005_wood_opening_red_bottom.jpg",
+      "status": "NG",
+      "correct_cells": 76,
+      "fen": "1b1pkpb2/9/7k1/b1p1p2Rp/9/9/B1P1P1P1P/4C1N2/9/RNBAKAC2",
+      "expected_fen": "rnbakabr1/9/1c4nc1/p1p1p2Rp/6p2/9/P1P1P1P1P/1C2C1N2/9/RNBAKAB2",
+      "style": "wood",
+      "layout_type": "opening"
+    },
+    {
+      "path": "evaluation/real_images/real_006_wood_endgame_red_bottom.jpg",
+      "status": "NG",
+      "correct_cells": 87,
+      "fen": "4kp3/9/9/9/9/9/9/4C4/9/4N4",
+      "expected_fen": "4ka3/9/9/9/9/9/9/4N4/9/4K4",
+      "style": "wood",
+      "layout_type": "endgame"
+    },
+    {
+      "path": "evaluation/real_images/real_007_wood_initial_red_bottom.jpg",
+      "status": "OK",
+      "correct_cells": 90,
+      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "style": "wood",
+      "layout_type": "initial"
+    },
+    {
+      "path": "evaluation/real_images/real_008_plastic_midgame_red_bottom.jpg",
+      "status": "NG",
+      "correct_cells": 62,
+      "fen": "4b4/9/1b7/9/9/9/9/7R1/4R4/9",
+      "expected_fen": "1rbak4/4a4/1cn1b4/p1p1p3p/9/2P3p2/P1N5P/4C1nC1/3RK4/1RBA1rBc1",
+      "style": "plastic",
+      "layout_type": "midgame"
+    },
+    {
+      "path": "evaluation/real_images/real_009_wood_initial_red_top.png",
+      "status": "NG",
+      "correct_cells": 48,
+      "fen": "6rp1/r8/8b/5b3/9/5N3/2N5R/2R4A1/n1kkKa3/2n6",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "style": "wood",
+      "layout_type": "initial"
+    },
+    {
+      "path": "evaluation/real_images/real_010_unknown_initial_red_bottom.jpg",
+      "status": "NG",
+      "correct_cells": 47,
+      "fen": "3a1ab2/9/7b1/9/2c6/P1P5P/7A1/9/RRRAKPRRP/1p2kn3",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "style": "unknown",
+      "layout_type": "initial"
+    },
+    {
+      "path": "evaluation/real_images/real_011_screen_endgame_red_bottom_01.png",
+      "status": "NG",
+      "correct_cells": 82,
+      "fen": "3pkp3/9/9/2p4N1/2b6/2C6/9/9/4A4/1b2K4",
+      "expected_fen": "3aka3/9/9/2p4N1/2r6/2B6/9/3A5/4A4/1C3K3",
+      "style": "screen",
+      "layout_type": "endgame"
+    },
+    {
+      "path": "evaluation/real_images/real_012_screen_endgame_red_bottom_02.png",
+      "status": "NG",
+      "correct_cells": 72,
+      "fen": "b4p3/4P4/1R7/1N7/9/3b5/9/4N4/3K1Rna1/9",
+      "expected_fen": "3k1a3/4a4/9/9/9/9/9/3p5/4C4/3KCRR2",
+      "style": "screen",
+      "layout_type": "endgame"
+    },
+    {
+      "path": "evaluation/real_images/real_013_screen_endgame_red_bottom_03.png",
+      "status": "NG",
+      "correct_cells": 78,
+      "fen": "a3k3n/5R3/8r/r8/b8/b4R2P/9/4C4/4p4/5c3",
+      "expected_fen": "4k4/C4R3/9/9/9/5R2P/4r4/4B3B/4p2r1/5K3",
+      "style": "screen",
+      "layout_type": "endgame"
+    },
+    {
+      "path": "evaluation/real_images/real_014_screen_endgame_red_bottom_04.png",
+      "status": "NG",
+      "correct_cells": 88,
+      "fen": "9/4pR3/3k1p2b/9/6b2/9/9/9/9/4K4",
+      "expected_fen": "9/4aR3/3k1a2b/9/6b2/9/9/9/9/4K4",
+      "style": "screen",
+      "layout_type": "endgame"
+    },
+    {
+      "path": "evaluation/real_images/real_015_screen_endgame_red_top_01.png",
+      "status": "OK",
+      "correct_cells": 90,
+      "fen": "4k4/5R1C1/5R3/9/9/9/9/9/4r1r2/5K3",
+      "expected_fen": "4k4/5R1C1/5R3/9/9/9/9/9/4r1r2/5K3",
+      "style": "screen",
+      "layout_type": "endgame"
+    },
+    {
+      "path": "evaluation/real_images/real_016_screen_endgame_red_top_02.png",
+      "status": "NG",
+      "correct_cells": 84,
+      "fen": "9/4k4/9/p8/8p/9/8C/5A3/4P4/b3N4",
+      "expected_fen": "4k4/9/9/p8/8p/9/8P/5A3/4A4/r3K4",
+      "style": "screen",
+      "layout_type": "endgame"
+    },
+    {
+      "path": "evaluation/real_images/real_017_wood_initial_red_top.jpg",
+      "status": "NG",
+      "correct_cells": 44,
+      "fen": "5n3/4r4/1cN2p2c/7bb/cR7/2P3r2/7n1/2N2RR1p/4P4/4a4",
+      "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "style": "wood",
+      "layout_type": "initial"
+    },
+    {
+      "path": "evaluation/real_images/real_018_plastic_empty_unknown.png",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "9/9/9/9/9/9/9/9/9/7b1",
+      "expected_fen": "9/9/9/9/9/9/9/9/9/9",
+      "style": "plastic",
+      "layout_type": "empty"
+    }
+  ]
+}

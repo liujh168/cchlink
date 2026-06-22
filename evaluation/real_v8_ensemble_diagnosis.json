@@ -1,0 +1,1036 @@
+{
+  "manifest": "evaluation\\real_manifest.csv",
+  "model": "data\\models\\checkpoint_standard_v4.pth",
+  "model_paths": [
+    "data\\models\\checkpoint_standard_v4.pth",
+    "data\\models\\checkpoint_standard_v5.pth",
+    "data\\models\\checkpoint_standard_v6.pth",
+    "data\\models\\checkpoint_standard_v8.pth"
+  ],
+  "model_weights": [
+    0.44,
+    0.03,
+    0.36,
+    0.17
+  ],
+  "total_boards": 18,
+  "evaluated_boards": 18,
+  "read_errors": 0,
+  "rejected": 0,
+  "exact": 11,
+  "exact_rate": 0.6111111111111112,
+  "total_cells": 1620,
+  "error_cells": 77,
+  "cell_accuracy": 0.9524691358024692,
+  "by_style": {
+    "plastic": {
+      "boards": 3,
+      "cells": 270,
+      "error_cells": 28,
+      "cell_accuracy": 0.8962962962962963
+    },
+    "screen": {
+      "boards": 7,
+      "cells": 630,
+      "error_cells": 32,
+      "cell_accuracy": 0.9492063492063492
+    },
+    "unknown": {
+      "boards": 1,
+      "cells": 90,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
+    },
+    "wood": {
+      "boards": 7,
+      "cells": 630,
+      "error_cells": 17,
+      "cell_accuracy": 0.973015873015873
+    }
+  },
+  "by_layout_type": {
+    "empty": {
+      "boards": 1,
+      "cells": 90,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
+    },
+    "endgame": {
+      "boards": 7,
+      "cells": 630,
+      "error_cells": 34,
+      "cell_accuracy": 0.946031746031746
+    },
+    "initial": {
+      "boards": 8,
+      "cells": 720,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
+    },
+    "midgame": {
+      "boards": 1,
+      "cells": 90,
+      "error_cells": 28,
+      "cell_accuracy": 0.6888888888888889
+    },
+    "opening": {
+      "boards": 1,
+      "cells": 90,
+      "error_cells": 15,
+      "cell_accuracy": 0.8333333333333334
+    }
+  },
+  "top_expected": {
+    "黑卒": 10,
+    "黑车": 8,
+    "黑士": 7,
+    "红炮": 7,
+    "红相": 7,
+    "空": 7,
+    "红帅": 5,
+    "黑马": 4,
+    "黑象": 4,
+    "黑炮": 4,
+    "红兵": 4,
+    "红俥": 4,
+    "黑将": 3,
+    "红马": 2,
+    "红仕": 1
+  },
+  "top_actual": {
+    "空": 51,
+    "黑卒": 6,
+    "红炮": 6,
+    "红俥": 3,
+    "红马": 3,
+    "黑马": 3,
+    "红兵": 2,
+    "黑象": 1,
+    "红相": 1,
+    "黑将": 1
+  },
+  "top_pairs": {
+    "黑卒->空": 10,
+    "黑士->空": 6,
+    "黑车->空": 5,
+    "红炮->空": 5,
+    "黑象->空": 4,
+    "红相->红炮": 4,
+    "红俥->空": 4,
+    "黑马->空": 3,
+    "黑炮->空": 3,
+    "黑将->空": 3,
+    "空->黑马": 3,
+    "黑车->黑卒": 3,
+    "红兵->空": 2,
+    "红兵->红俥": 2,
+    "红帅->空": 2,
+    "红相->空": 2,
+    "黑炮->黑卒": 1,
+    "黑马->黑象": 1,
+    "红马->红炮": 1,
+    "红帅->红兵": 1
+  },
+  "top_kinds": {
+    "piece_to_empty": 51,
+    "piece_confusion": 19,
+    "empty_to_piece": 7
+  },
+  "top_regions": {
+    "edge": 43,
+    "center": 16,
+    "palace": 14,
+    "river": 4
+  },
+  "top_region_kinds": {
+    "edge:piece_to_empty": 32,
+    "center:piece_to_empty": 10,
+    "edge:piece_confusion": 10,
+    "palace:piece_to_empty": 7,
+    "center:piece_confusion": 4,
+    "palace:empty_to_piece": 4,
+    "palace:piece_confusion": 3,
+    "river:piece_confusion": 2,
+    "river:piece_to_empty": 2,
+    "center:empty_to_piece": 2,
+    "edge:empty_to_piece": 1
+  },
+  "top_cells": {
+    "r7_c4": 5,
+    "r0_c5": 3,
+    "r2_c1": 3,
+    "r3_c0": 3,
+    "r9_c6": 3,
+    "r9_c4": 3,
+    "r0_c3": 3,
+    "r1_c4": 3,
+    "r9_c5": 3,
+    "r0_c0": 2,
+    "r0_c1": 2,
+    "r0_c2": 2,
+    "r6_c8": 2,
+    "r9_c2": 2,
+    "r0_c4": 2,
+    "r3_c2": 2,
+    "r5_c2": 2,
+    "r8_c3": 2,
+    "r9_c1": 2,
+    "r9_c3": 2
+  },
+  "board_errors": [
+    {
+      "path": "evaluation/real_images/real_005_wood_opening_red_bottom.jpg",
+      "style": "wood",
+      "layout_type": "opening",
+      "orientation": "red_bottom",
+      "seed": "real_005_wood_opening_red_bottom",
+      "expected_fen": "rnbakabr1/9/1c4nc1/p1p1p2Rp/6p2/9/P1P1P1P1P/1C2C1N2/9/RNBAKAB2",
+      "actual_fen": "3ak4/9/1p4b2/2p1p2Rp/6p2/9/P1P1P1P2/6N2/9/RNCAKAC2",
+      "error_count": 15,
+      "errors": [
+        {
+          "row": 0,
+          "col": 0,
+          "region": "edge",
+          "expected": "r",
+          "actual": "",
+          "expected_name": "黑车",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "region": "edge",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "region": "edge",
+          "expected": "b",
+          "actual": "",
+          "expected_name": "黑象",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "region": "edge",
+          "expected": "a",
+          "actual": "",
+          "expected_name": "黑士",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 6,
+          "region": "edge",
+          "expected": "b",
+          "actual": "",
+          "expected_name": "黑象",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 7,
+          "region": "edge",
+          "expected": "r",
+          "actual": "",
+          "expected_name": "黑车",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "region": "center",
+          "expected": "c",
+          "actual": "p",
+          "expected_name": "黑炮",
+          "actual_name": "黑卒",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 2,
+          "col": 6,
+          "region": "center",
+          "expected": "n",
+          "actual": "b",
+          "expected_name": "黑马",
+          "actual_name": "黑象",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 2,
+          "col": 7,
+          "region": "center",
+          "expected": "c",
+          "actual": "",
+          "expected_name": "黑炮",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 3,
+          "col": 0,
+          "region": "edge",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 6,
+          "col": 8,
+          "region": "edge",
+          "expected": "P",
+          "actual": "",
+          "expected_name": "红兵",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 7,
+          "col": 1,
+          "region": "center",
+          "expected": "C",
+          "actual": "",
+          "expected_name": "红炮",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 7,
+          "col": 4,
+          "region": "palace",
+          "expected": "C",
+          "actual": "",
+          "expected_name": "红炮",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 2,
+          "region": "edge",
+          "expected": "B",
+          "actual": "C",
+          "expected_name": "红相",
+          "actual_name": "红炮",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 9,
+          "col": 6,
+          "region": "edge",
+          "expected": "B",
+          "actual": "C",
+          "expected_name": "红相",
+          "actual_name": "红炮",
+          "kind": "piece_confusion"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/real_images/real_006_wood_endgame_red_bottom.jpg",
+      "style": "wood",
+      "layout_type": "endgame",
+      "orientation": "red_bottom",
+      "seed": "real_006_wood_endgame_red_bottom",
+      "expected_fen": "4ka3/9/9/9/9/9/9/4N4/9/4K4",
+      "actual_fen": "4ka3/9/9/9/9/9/9/4C4/9/4P4",
+      "error_count": 2,
+      "errors": [
+        {
+          "row": 7,
+          "col": 4,
+          "region": "palace",
+          "expected": "N",
+          "actual": "C",
+          "expected_name": "红马",
+          "actual_name": "红炮",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 9,
+          "col": 4,
+          "region": "edge",
+          "expected": "K",
+          "actual": "P",
+          "expected_name": "红帅",
+          "actual_name": "红兵",
+          "kind": "piece_confusion"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/real_images/real_008_plastic_midgame_red_bottom.jpg",
+      "style": "plastic",
+      "layout_type": "midgame",
+      "orientation": "red_bottom",
+      "seed": "real_008_plastic_midgame_red_bottom",
+      "expected_fen": "1rbak4/4a4/1cn1b4/p1p1p3p/9/2P3p2/P1N5P/4C1nC1/3RK4/1RBA1rBc1",
+      "actual_fen": "9/9/9/9/9/2R6/R8/4N4/9/6P2",
+      "error_count": 28,
+      "errors": [
+        {
+          "row": 0,
+          "col": 1,
+          "region": "edge",
+          "expected": "r",
+          "actual": "",
+          "expected_name": "黑车",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "region": "edge",
+          "expected": "b",
+          "actual": "",
+          "expected_name": "黑象",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "region": "edge",
+          "expected": "a",
+          "actual": "",
+          "expected_name": "黑士",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "",
+          "expected_name": "黑将",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "region": "palace",
+          "expected": "a",
+          "actual": "",
+          "expected_name": "黑士",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "region": "center",
+          "expected": "c",
+          "actual": "",
+          "expected_name": "黑炮",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 2,
+          "col": 2,
+          "region": "center",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 2,
+          "col": 4,
+          "region": "palace",
+          "expected": "b",
+          "actual": "",
+          "expected_name": "黑象",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 3,
+          "col": 0,
+          "region": "edge",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 3,
+          "col": 2,
+          "region": "center",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 3,
+          "col": 4,
+          "region": "center",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 3,
+          "col": 8,
+          "region": "edge",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 5,
+          "col": 2,
+          "region": "river",
+          "expected": "P",
+          "actual": "R",
+          "expected_name": "红兵",
+          "actual_name": "红俥",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 5,
+          "col": 6,
+          "region": "river",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 6,
+          "col": 0,
+          "region": "edge",
+          "expected": "P",
+          "actual": "R",
+          "expected_name": "红兵",
+          "actual_name": "红俥",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 6,
+          "col": 2,
+          "region": "center",
+          "expected": "N",
+          "actual": "",
+          "expected_name": "红马",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 6,
+          "col": 8,
+          "region": "edge",
+          "expected": "P",
+          "actual": "",
+          "expected_name": "红兵",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 7,
+          "col": 4,
+          "region": "palace",
+          "expected": "C",
+          "actual": "N",
+          "expected_name": "红炮",
+          "actual_name": "红马",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 7,
+          "col": 6,
+          "region": "center",
+          "expected": "n",
+          "actual": "",
+          "expected_name": "黑马",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 7,
+          "col": 7,
+          "region": "center",
+          "expected": "C",
+          "actual": "",
+          "expected_name": "红炮",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 8,
+          "col": 3,
+          "region": "palace",
+          "expected": "R",
+          "actual": "",
+          "expected_name": "红俥",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 8,
+          "col": 4,
+          "region": "palace",
+          "expected": "K",
+          "actual": "",
+          "expected_name": "红帅",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "R",
+          "actual": "",
+          "expected_name": "红俥",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 2,
+          "region": "edge",
+          "expected": "B",
+          "actual": "",
+          "expected_name": "红相",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 3,
+          "region": "edge",
+          "expected": "A",
+          "actual": "",
+          "expected_name": "红仕",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 5,
+          "region": "edge",
+          "expected": "r",
+          "actual": "",
+          "expected_name": "黑车",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 6,
+          "region": "edge",
+          "expected": "B",
+          "actual": "P",
+          "expected_name": "红相",
+          "actual_name": "红兵",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 9,
+          "col": 7,
+          "region": "edge",
+          "expected": "c",
+          "actual": "",
+          "expected_name": "黑炮",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/real_images/real_011_screen_endgame_red_bottom_01.png",
+      "style": "screen",
+      "layout_type": "endgame",
+      "orientation": "red_bottom",
+      "seed": "real_011_screen_endgame_red_bottom_01",
+      "expected_fen": "3aka3/9/9/2p4N1/2r6/2B6/9/3A5/4A4/1C3K3",
+      "actual_fen": "4k4/9/9/7N1/9/2C6/9/3A5/4A4/1B3K3",
+      "error_count": 6,
+      "errors": [
+        {
+          "row": 0,
+          "col": 3,
+          "region": "edge",
+          "expected": "a",
+          "actual": "",
+          "expected_name": "黑士",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "region": "edge",
+          "expected": "a",
+          "actual": "",
+          "expected_name": "黑士",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 3,
+          "col": 2,
+          "region": "center",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 4,
+          "col": 2,
+          "region": "river",
+          "expected": "r",
+          "actual": "",
+          "expected_name": "黑车",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 5,
+          "col": 2,
+          "region": "river",
+          "expected": "B",
+          "actual": "C",
+          "expected_name": "红相",
+          "actual_name": "红炮",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 9,
+          "col": 1,
+          "region": "edge",
+          "expected": "C",
+          "actual": "B",
+          "expected_name": "红炮",
+          "actual_name": "红相",
+          "kind": "piece_confusion"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/real_images/real_012_screen_endgame_red_bottom_02.png",
+      "style": "screen",
+      "layout_type": "endgame",
+      "orientation": "red_bottom",
+      "seed": "real_012_screen_endgame_red_bottom_02",
+      "expected_fen": "3k1a3/4a4/9/9/9/9/9/3p5/4C4/3KCRR2",
+      "actual_fen": "5p3/9/1R7/3n5/9/9/9/4N4/3nCp3/9",
+      "error_count": 13,
+      "errors": [
+        {
+          "row": 0,
+          "col": 3,
+          "region": "edge",
+          "expected": "k",
+          "actual": "",
+          "expected_name": "黑将",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 0,
+          "col": 5,
+          "region": "edge",
+          "expected": "a",
+          "actual": "p",
+          "expected_name": "黑士",
+          "actual_name": "黑卒",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "region": "palace",
+          "expected": "a",
+          "actual": "",
+          "expected_name": "黑士",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 2,
+          "col": 1,
+          "region": "center",
+          "expected": "",
+          "actual": "R",
+          "expected_name": "空",
+          "actual_name": "红俥",
+          "kind": "empty_to_piece"
+        },
+        {
+          "row": 3,
+          "col": 3,
+          "region": "center",
+          "expected": "",
+          "actual": "n",
+          "expected_name": "空",
+          "actual_name": "黑马",
+          "kind": "empty_to_piece"
+        },
+        {
+          "row": 7,
+          "col": 3,
+          "region": "palace",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 7,
+          "col": 4,
+          "region": "palace",
+          "expected": "",
+          "actual": "N",
+          "expected_name": "空",
+          "actual_name": "红马",
+          "kind": "empty_to_piece"
+        },
+        {
+          "row": 8,
+          "col": 3,
+          "region": "palace",
+          "expected": "",
+          "actual": "n",
+          "expected_name": "空",
+          "actual_name": "黑马",
+          "kind": "empty_to_piece"
+        },
+        {
+          "row": 8,
+          "col": 5,
+          "region": "palace",
+          "expected": "",
+          "actual": "p",
+          "expected_name": "空",
+          "actual_name": "黑卒",
+          "kind": "empty_to_piece"
+        },
+        {
+          "row": 9,
+          "col": 3,
+          "region": "edge",
+          "expected": "K",
+          "actual": "",
+          "expected_name": "红帅",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 4,
+          "region": "edge",
+          "expected": "C",
+          "actual": "",
+          "expected_name": "红炮",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 5,
+          "region": "edge",
+          "expected": "R",
+          "actual": "",
+          "expected_name": "红俥",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 6,
+          "region": "edge",
+          "expected": "R",
+          "actual": "",
+          "expected_name": "红俥",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/real_images/real_013_screen_endgame_red_bottom_03.png",
+      "style": "screen",
+      "layout_type": "endgame",
+      "orientation": "red_bottom",
+      "seed": "real_013_screen_endgame_red_bottom_03",
+      "expected_fen": "4k4/C4R3/9/9/9/5R2P/4r4/4B3B/4p2r1/5K3",
+      "actual_fen": "n3k4/5R3/9/9/9/5R2P/4p4/4C4/4p2p1/5C3",
+      "error_count": 7,
+      "errors": [
+        {
+          "row": 0,
+          "col": 0,
+          "region": "edge",
+          "expected": "",
+          "actual": "n",
+          "expected_name": "空",
+          "actual_name": "黑马",
+          "kind": "empty_to_piece"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "region": "edge",
+          "expected": "C",
+          "actual": "",
+          "expected_name": "红炮",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 6,
+          "col": 4,
+          "region": "center",
+          "expected": "r",
+          "actual": "p",
+          "expected_name": "黑车",
+          "actual_name": "黑卒",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 7,
+          "col": 4,
+          "region": "palace",
+          "expected": "B",
+          "actual": "C",
+          "expected_name": "红相",
+          "actual_name": "红炮",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 7,
+          "col": 8,
+          "region": "edge",
+          "expected": "B",
+          "actual": "",
+          "expected_name": "红相",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 8,
+          "col": 7,
+          "region": "center",
+          "expected": "r",
+          "actual": "p",
+          "expected_name": "黑车",
+          "actual_name": "黑卒",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 9,
+          "col": 5,
+          "region": "edge",
+          "expected": "K",
+          "actual": "C",
+          "expected_name": "红帅",
+          "actual_name": "红炮",
+          "kind": "piece_confusion"
+        }
+      ]
+    },
+    {
+      "path": "evaluation/real_images/real_016_screen_endgame_red_top_02.png",
+      "style": "screen",
+      "layout_type": "endgame",
+      "orientation": "red_top",
+      "seed": "real_016_screen_endgame_red_top_02",
+      "expected_fen": "4k4/9/9/p8/8p/9/8P/5A3/4A4/r3K4",
+      "actual_fen": "9/4k4/9/9/9/9/8P/5A3/4A4/p3N4",
+      "error_count": 6,
+      "errors": [
+        {
+          "row": 0,
+          "col": 4,
+          "region": "edge",
+          "expected": "k",
+          "actual": "",
+          "expected_name": "黑将",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 1,
+          "col": 4,
+          "region": "palace",
+          "expected": "",
+          "actual": "k",
+          "expected_name": "空",
+          "actual_name": "黑将",
+          "kind": "empty_to_piece"
+        },
+        {
+          "row": 3,
+          "col": 0,
+          "region": "edge",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 4,
+          "col": 8,
+          "region": "edge",
+          "expected": "p",
+          "actual": "",
+          "expected_name": "黑卒",
+          "actual_name": "空",
+          "kind": "piece_to_empty"
+        },
+        {
+          "row": 9,
+          "col": 0,
+          "region": "edge",
+          "expected": "r",
+          "actual": "p",
+          "expected_name": "黑车",
+          "actual_name": "黑卒",
+          "kind": "piece_confusion"
+        },
+        {
+          "row": 9,
+          "col": 4,
+          "region": "edge",
+          "expected": "K",
+          "actual": "N",
+          "expected_name": "红帅",
+          "actual_name": "红马",
+          "kind": "piece_confusion"
+        }
+      ]
+    }
+  ]
+}

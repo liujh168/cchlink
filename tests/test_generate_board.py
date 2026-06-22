@@ -27,7 +27,7 @@ def test_scaled_grid_points_match_piece_centers():
 
 
 def test_board_styles_render_at_high_resolution():
-    for style in ("wood", "plastic"):
+    for style in ("wood", "plastic", "cloth_red", "light_cloth", "screen"):
         image = np.asarray(render_board(INITIAL_LAYOUT, style=style, scale=3))
         assert image.shape == (1500, 1350, 3)
 

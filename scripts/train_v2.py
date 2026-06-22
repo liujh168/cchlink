@@ -24,6 +24,7 @@ STANDARD_DATASET_SOURCES = {
     "standard-v5",
     "standard-v6",
     "standard-v7",
+    "standard-v8",
 }
 
 
@@ -204,7 +205,7 @@ def main():
         if not sources or not sources <= STANDARD_DATASET_SOURCES:
             raise ValueError(
                 "标准训练仅接受 source="
-                "standard-v2/standard-v3/standard-v4/standard-v5/standard-v6/standard-v7，"
+                "standard-v2/standard-v3/standard-v4/standard-v5/standard-v6/standard-v7/standard-v8，"
                 f"当前为: {sorted(sources)}"
             )
     train_indices, val_indices = group_split_indices(

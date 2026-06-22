@@ -5,6 +5,10 @@ from src.analysis import AnalysisResult, AnalysisWarning, CellResult, Correction
 from src.artifacts import save_debug_artifacts, save_visualizations
 from src.fen.fen_builder import EMPTY_IDX, IDX_TO_FEN, IDX_TO_NAME, build_fen
 from src.fen.rules import (
+    BLACK_ADVISOR_POINTS,
+    BLACK_ELEPHANT_POINTS,
+    RED_ADVISOR_POINTS,
+    RED_ELEPHANT_POINTS,
     detect_orientation,
     legalize_predictions_with_corrections,
     normalize_orientation,
@@ -36,6 +40,12 @@ VISUAL_INITIAL_WEAK_CIRCLE_HITS = 15
 VISUAL_INITIAL_HIGH_CONTRAST_MAX_NON_EMPTY = 20
 VISUAL_INITIAL_HIGH_CONTRAST_MAX_SATURATION = 80.0
 VISUAL_INITIAL_HIGH_CONTRAST_MIN_CIRCLE_HITS = 31
+STATIC_PRIOR_MAX_ILLEGAL_PAWN_PROB = 0.70
+STATIC_PRIOR_MIN_TARGET_PROB = 0.20
+STATIC_PRIOR_MIN_TARGET_RATIO = 0.35
+STATIC_PRIOR_MAX_PAWN_ON_MINOR_POINT_PROB = 0.45
+STATIC_PRIOR_MIN_MINOR_POINT_TARGET_PROB = 0.30
+STATIC_PRIOR_MIN_MINOR_POINT_TARGET_RATIO = 0.70
 
 
 def _fen_to_indices(fen: str) -> list[int]:
@@ -339,6 +349,64 @@ class Pipeline:
                 corrected_confidences[index] = float(probabilities[index, target])
         return corrected, corrected_confidences, corrections
 
+    def _apply_static_position_probability_prior(
+        self,
+        predictions: list[int],
+        confidences: list[float],
+        probabilities: np.ndarray | None,
+    ) -> tuple[list[int], list[float], list[Correction]]:
+        if probabilities is None:
+            return predictions, confidences, []
+
+        corrected = predictions.copy()
+        corrected_confidences = confidences.copy()
+        corrections = []
+        for index, piece in enumerate(predictions):
+            if piece not in {6, 13}:
+                continue
+            row, col = divmod(index, COLS)
+            position = (row, col)
+            if piece == 6:
+                illegal_pawn = row >= 7 or (row in (5, 6) and col % 2 == 1)
+                candidates = []
+                if position in RED_ADVISOR_POINTS:
+                    candidates.append(1)
+                if position in RED_ELEPHANT_POINTS:
+                    candidates.append(2)
+            else:
+                illegal_pawn = row <= 2 or (row in (3, 4) and col % 2 == 1)
+                candidates = []
+                if position in BLACK_ADVISOR_POINTS:
+                    candidates.append(8)
+                if position in BLACK_ELEPHANT_POINTS:
+                    candidates.append(9)
+            if not candidates:
+                continue
+
+            current_probability = float(probabilities[index, piece])
+            target = max(candidates, key=lambda candidate: probabilities[index, candidate])
+            target_probability = float(probabilities[index, target])
+            target_ratio = target_probability / max(current_probability, 1e-6)
+            illegal_pawn_match = (
+                illegal_pawn
+                and current_probability <= STATIC_PRIOR_MAX_ILLEGAL_PAWN_PROB
+                and target_probability >= STATIC_PRIOR_MIN_TARGET_PROB
+                and target_ratio >= STATIC_PRIOR_MIN_TARGET_RATIO
+            )
+            minor_point_match = (
+                not illegal_pawn
+                and current_probability <= STATIC_PRIOR_MAX_PAWN_ON_MINOR_POINT_PROB
+                and target_probability >= STATIC_PRIOR_MIN_MINOR_POINT_TARGET_PROB
+                and target_ratio >= STATIC_PRIOR_MIN_MINOR_POINT_TARGET_RATIO
+            )
+            if illegal_pawn_match or minor_point_match:
+                corrections.append(
+                    Correction(row, col, piece, target, "非法兵卒位置概率先验修正")
+                )
+                corrected[index] = target
+                corrected_confidences[index] = target_probability
+        return corrected, corrected_confidences, corrections
+
     def analyze(self, image: np.ndarray, debug_dir=None, visualize_dir=None) -> AnalysisResult:
         """返回完整结构化结果，并可选择保存本次识别的调试产物。"""
         detection, grid, board, cells = self._extract(image)
@@ -385,6 +453,11 @@ class Pipeline:
             col_positions,
             orientation,
         )
+        (
+            predictions,
+            confidences,
+            static_position_corrections,
+        ) = self._apply_static_position_probability_prior(predictions, confidences, probabilities)
         if self.apply_rules:
             final_predictions, rule_corrections = legalize_predictions_with_corrections(
                 predictions, confidences
@@ -393,11 +466,17 @@ class Pipeline:
                 calibration_corrections
                 + initial_corrections
                 + visual_initial_corrections
+                + static_position_corrections
                 + rule_corrections
             )
         else:
             final_predictions = predictions
-            corrections = calibration_corrections + initial_corrections + visual_initial_corrections
+            corrections = (
+                calibration_corrections
+                + initial_corrections
+                + visual_initial_corrections
+                + static_position_corrections
+            )
         warnings = validate_position(final_predictions, orientation)
         low_confidence = [
             divmod(index, COLS) for index, confidence in enumerate(confidences) if confidence < 0.5

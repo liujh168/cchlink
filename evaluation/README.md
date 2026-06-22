@@ -49,9 +49,9 @@ python scripts/diagnose_eval_errors.py \
 
 `real_manifest.csv` 真实照片回归集当前 v4 单模型结果为：检测 18/18、网格接受
 18/18、格子级准确率 1441/1620（88.95%）、整盘完全正确 6/18。
-`checkpoint_standard_v6.pth` 单模型标准集为 5400/5400、真实集为 1307/1620，
-暂不单模型晋级。当前最佳候选为 v4/v5/v6=0.55/0.05/0.40 融合：标准集
-5400/5400、60/60，真实集 1537/1620（94.88%）、整盘 10/18。低饱和真实木盘
-视觉占位补全和候选面积先验已拉回全部 initial 真实图，最佳融合诊断中 `piece_to_empty`
-为 53 个、`edge:piece_to_empty` 为 33 个。后续应继续补充不污染评估集的真实训练照片，
-并加强 plastic midgame、非初始 wood 与 screen endgame 场景。
+`checkpoint_standard_v8.pth` 单模型标准集为 5400/5400、60/60，真实集单模型不晋级。
+当前最佳候选为 v4/v5/v6/v8=0.44/0.03/0.36/0.17 融合，并叠加低饱和真实木盘
+视觉占位补全、候选面积先验和士/象静态点概率先验：标准集 5400/5400、60/60，
+真实集 1543/1620（95.25%）、整盘 11/18。最佳融合诊断中 `piece_to_empty`
+为 51 个、`edge:piece_to_empty` 为 32 个。后续应继续补充不污染评估集的真实训练照片，
+并加强 plastic midgame、非初始 wood opening/endgame 与 screen endgame 弱棋子召回。

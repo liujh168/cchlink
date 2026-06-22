@@ -1,0 +1,73 @@
+{
+  "manifest": "evaluation\\standard_manifest.csv",
+  "model": "data\\models\\checkpoint_standard_v4.pth",
+  "model_paths": [
+    "data\\models\\checkpoint_standard_v4.pth",
+    "data\\models\\checkpoint_standard_v5.pth",
+    "data\\models\\checkpoint_standard_v6.pth",
+    "data\\models\\checkpoint_standard_v8.pth"
+  ],
+  "model_weights": [
+    0.44,
+    0.03,
+    0.36,
+    0.17
+  ],
+  "total_boards": 60,
+  "evaluated_boards": 60,
+  "read_errors": 0,
+  "rejected": 0,
+  "exact": 60,
+  "exact_rate": 1.0,
+  "total_cells": 5400,
+  "error_cells": 0,
+  "cell_accuracy": 1.0,
+  "by_style": {
+    "classic": {
+      "boards": 20,
+      "cells": 1800,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
+    },
+    "plastic": {
+      "boards": 20,
+      "cells": 1800,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
+    },
+    "wood": {
+      "boards": 20,
+      "cells": 1800,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
+    }
+  },
+  "by_layout_type": {
+    "empty": {
+      "boards": 6,
+      "cells": 540,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
+    },
+    "initial": {
+      "boards": 9,
+      "cells": 810,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
+    },
+    "midgame": {
+      "boards": 45,
+      "cells": 4050,
+      "error_cells": 0,
+      "cell_accuracy": 1.0
+    }
+  },
+  "top_expected": {},
+  "top_actual": {},
+  "top_pairs": {},
+  "top_kinds": {},
+  "top_regions": {},
+  "top_region_kinds": {},
+  "top_cells": {},
+  "board_errors": []
+}
