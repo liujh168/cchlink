@@ -1,26 +1,18 @@
 {
   "manifest": "evaluation\\standard_manifest.csv",
-  "model": "data\\models\\checkpoint_standard_v4.pth",
+  "model": "data\\models\\checkpoint_standard_v9.pth",
   "model_paths": [
-    "data\\models\\checkpoint_standard_v4.pth",
-    "data\\models\\checkpoint_standard_v5.pth",
-    "data\\models\\checkpoint_standard_v6.pth",
-    "data\\models\\checkpoint_standard_v8.pth"
+    "data\\models\\checkpoint_standard_v9.pth"
   ],
-  "model_weights": [
-    0.44,
-    0.03,
-    0.36,
-    0.17
-  ],
+  "model_weights": null,
   "overall": {
     "count": 60,
     "detected": 60,
     "grid_accepted": 60,
-    "correct_cells": 5400,
-    "exact": 60,
-    "cell_accuracy": 1.0,
-    "exact_rate": 1.0
+    "correct_cells": 5393,
+    "exact": 53,
+    "cell_accuracy": 0.9987037037037036,
+    "exact_rate": 0.8833333333333333
   },
   "by_style": {
     "classic": {
@@ -45,13 +37,13 @@
       "count": 20,
       "detected": 20,
       "grid_accepted": 20,
-      "correct_cells": 1800,
-      "exact": 20,
-      "cell_accuracy": 1.0,
-      "exact_rate": 1.0
+      "correct_cells": 1793,
+      "exact": 13,
+      "cell_accuracy": 0.9961111111111111,
+      "exact_rate": 0.65
     }
   },
-  "mean_latency_seconds": 0.10389937833324439,
+  "mean_latency_seconds": 0.1375056383334595,
   "results": [
     {
       "path": "evaluation/generated_v2/board_000_classic_initial.png",
@@ -91,9 +83,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_004_wood_empty.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "9/9/9/9/9/9/9/9/9/9",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "9/9/9/9/9/9/9/B8/9/9",
       "expected_fen": "9/9/9/9/9/9/9/9/9/9",
       "style": "wood",
       "layout_type": "empty"
@@ -118,9 +110,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_007_wood_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "r3kabn1/9/1c5n1/2p5p/2P6/8C/P1r3P2/NC7/A8/R1BAK2NR",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "r3kabn1/9/1c5nB/2p5p/2P6/8C/P1r3P2/NC7/A8/R1BAK2NR",
       "expected_fen": "r3kabn1/9/1c5n1/2p5p/2P6/8C/P1r3P2/NC7/A8/R1BAK2NR",
       "style": "wood",
       "layout_type": "midgame"
@@ -199,9 +191,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_016_wood_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "2bak4/9/1r7/2p1p1pcp/9/4R1P2/9/N6C1/9/2B1KA3",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "2bak4/9/1r7/2p1p1pcp/9/4R1P2/9/N6C1/B8/2B1KA3",
       "expected_fen": "2bak4/9/1r7/2p1p1pcp/9/4R1P2/9/N6C1/9/2B1KA3",
       "style": "wood",
       "layout_type": "midgame"
@@ -280,9 +272,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_025_wood_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "r1b1ka1n1/9/9/4p4/1N7/9/7A1/6P2/9/RN2K3R",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "r1b1ka1n1/9/8B/4p4/1N7/9/7A1/6P2/9/RN2K3R",
       "expected_fen": "r1b1ka1n1/9/9/4p4/1N7/9/7A1/6P2/9/RN2K3R",
       "style": "wood",
       "layout_type": "midgame"
@@ -361,9 +353,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_034_wood_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "1n2k1bnr/9/bcr6/4p1p2/7c1/4p4/P1P1P1P1P/1C7/1A2R4/4KABNR",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "1n2k1bnr/9/bcr6/4p1p2/7c1/4p4/P1P1P1P1P/BC7/1A2R4/4KABNR",
       "expected_fen": "1n2k1bnr/9/bcr6/4p1p2/7c1/4p4/P1P1P1P1P/1C7/1A2R4/4KABNR",
       "style": "wood",
       "layout_type": "midgame"
@@ -523,9 +515,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_052_wood_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "4k4/6n2/9/1pA2cb2/c1b6/9/5pP1P/1P7/9/4KRB2",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "4k4/6n2/9/1pA2cb2/c1b6/9/5pP1P/BP7/9/4KRB2",
       "expected_fen": "4k4/6n2/9/1pA2cb2/c1b6/9/5pP1P/1P7/9/4KRB2",
       "style": "wood",
       "layout_type": "midgame"
@@ -550,9 +542,9 @@
     },
     {
       "path": "evaluation/generated_v2/board_055_wood_midgame.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "rc2k4/3pp4/ac7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
+      "status": "NG",
+      "correct_cells": 89,
+      "fen": "rc2k4/3pp4/ac6B/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
       "expected_fen": "rc2k4/3pp4/ac7/p3pR1Pp/3P2nb1/9/2P5r/9/A8/NNA1K1B2",
       "style": "wood",
       "layout_type": "midgame"

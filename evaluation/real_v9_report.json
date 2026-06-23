@@ -1,66 +1,58 @@
 {
   "manifest": "evaluation\\real_manifest.csv",
-  "model": "data\\models\\checkpoint_standard_v4.pth",
+  "model": "data\\models\\checkpoint_standard_v9.pth",
   "model_paths": [
-    "data\\models\\checkpoint_standard_v4.pth",
-    "data\\models\\checkpoint_standard_v5.pth",
-    "data\\models\\checkpoint_standard_v6.pth",
-    "data\\models\\checkpoint_standard_v8.pth"
+    "data\\models\\checkpoint_standard_v9.pth"
   ],
-  "model_weights": [
-    0.44,
-    0.03,
-    0.36,
-    0.17
-  ],
+  "model_weights": null,
   "overall": {
     "count": 18,
     "detected": 18,
     "grid_accepted": 18,
-    "correct_cells": 1546,
-    "exact": 12,
-    "cell_accuracy": 0.9543209876543209,
-    "exact_rate": 0.6666666666666666
+    "correct_cells": 1321,
+    "exact": 5,
+    "cell_accuracy": 0.8154320987654321,
+    "exact_rate": 0.2777777777777778
   },
   "by_style": {
     "plastic": {
       "count": 3,
       "detected": 3,
       "grid_accepted": 3,
-      "correct_cells": 242,
-      "exact": 2,
-      "cell_accuracy": 0.8962962962962963,
-      "exact_rate": 0.6666666666666666
+      "correct_cells": 236,
+      "exact": 1,
+      "cell_accuracy": 0.8740740740740741,
+      "exact_rate": 0.3333333333333333
     },
     "screen": {
       "count": 7,
       "detected": 7,
       "grid_accepted": 7,
-      "correct_cells": 599,
+      "correct_cells": 591,
       "exact": 3,
-      "cell_accuracy": 0.9507936507936507,
+      "cell_accuracy": 0.9380952380952381,
       "exact_rate": 0.42857142857142855
     },
     "unknown": {
       "count": 1,
       "detected": 1,
       "grid_accepted": 1,
-      "correct_cells": 90,
-      "exact": 1,
-      "cell_accuracy": 1.0,
-      "exact_rate": 1.0
+      "correct_cells": 51,
+      "exact": 0,
+      "cell_accuracy": 0.5666666666666667,
+      "exact_rate": 0.0
     },
     "wood": {
       "count": 7,
       "detected": 7,
       "grid_accepted": 7,
-      "correct_cells": 615,
-      "exact": 6,
-      "cell_accuracy": 0.9761904761904762,
-      "exact_rate": 0.8571428571428571
+      "correct_cells": 443,
+      "exact": 1,
+      "cell_accuracy": 0.7031746031746032,
+      "exact_rate": 0.14285714285714285
     }
   },
-  "mean_latency_seconds": 0.13719652222193368,
+  "mean_latency_seconds": 0.1521124944441302,
   "results": [
     {
       "path": "evaluation/real_images/real_001_wood_initial_red_bottom.jpg",
@@ -73,9 +65,9 @@
     },
     {
       "path": "evaluation/real_images/real_002_wood_initial_red_top.jpeg",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "status": "NG",
+      "correct_cells": 40,
+      "fen": "a1r2c3/7na/1r3bb2/8b/1P2bb2c/5P1bb/RR7/2NNK1b2/1p6n/9",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"
@@ -101,26 +93,26 @@
     {
       "path": "evaluation/real_images/real_005_wood_opening_red_bottom.jpg",
       "status": "NG",
-      "correct_cells": 75,
-      "fen": "3ak4/9/1p4b2/2p1p2Rp/6p2/9/P1P1P1P2/6N2/9/RNCAKAC2",
+      "correct_cells": 72,
+      "fen": "1bbpkp3/9/6bk1/2p1p2R1/6p2/9/P3P4/1C7/9/RNCAKA3",
       "expected_fen": "rnbakabr1/9/1c4nc1/p1p1p2Rp/6p2/9/P1P1P1P1P/1C2C1N2/9/RNBAKAB2",
       "style": "wood",
       "layout_type": "opening"
     },
     {
       "path": "evaluation/real_images/real_006_wood_endgame_red_bottom.jpg",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "4ka3/9/9/9/9/9/9/4N4/9/4K4",
+      "status": "NG",
+      "correct_cells": 86,
+      "fen": "4kp3/9/9/9/9/3K5/9/4K4/9/4P4",
       "expected_fen": "4ka3/9/9/9/9/9/9/4N4/9/4K4",
       "style": "wood",
       "layout_type": "endgame"
     },
     {
       "path": "evaluation/real_images/real_007_wood_initial_red_bottom.jpg",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "status": "NG",
+      "correct_cells": 61,
+      "fen": "4ba3/4b4/rp5p1/2a1p4/9/r1n6/PnP1P1P1P/1R7/4A4/1R1AK1K2",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"
@@ -128,26 +120,26 @@
     {
       "path": "evaluation/real_images/real_008_plastic_midgame_red_bottom.jpg",
       "status": "NG",
-      "correct_cells": 62,
-      "fen": "9/9/9/9/9/2R6/R8/4N4/9/6P2",
+      "correct_cells": 59,
+      "fen": "1na1b4/9/1b6n/9/9/9/8A/7R1/4RP3/P1N3A2",
       "expected_fen": "1rbak4/4a4/1cn1b4/p1p1p3p/9/2P3p2/P1N5P/4C1nC1/3RK4/1RBA1rBc1",
       "style": "plastic",
       "layout_type": "midgame"
     },
     {
       "path": "evaluation/real_images/real_009_wood_initial_red_top.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "status": "NG",
+      "correct_cells": 51,
+      "fen": "5nn2/4c4/1r5R1/R8/3N3N1/9/7a1/6k2/7bc/bpr6",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"
     },
     {
       "path": "evaluation/real_images/real_010_unknown_initial_red_bottom.jpg",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "status": "NG",
+      "correct_cells": 51,
+      "fen": "4k4/P2P1AR1R/1B5B1/1A7/9/6c2/4p1p2/1b7/2a6/2ba2bb1",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "unknown",
       "layout_type": "initial"
@@ -156,7 +148,7 @@
       "path": "evaluation/real_images/real_011_screen_endgame_red_bottom_01.png",
       "status": "NG",
       "correct_cells": 84,
-      "fen": "4k4/9/9/7N1/9/2C6/9/3A5/4A4/1B3K3",
+      "fen": "4kp3/9/9/2p4N1/2b6/2C6/9/9/4A4/1B3K3",
       "expected_fen": "3aka3/9/9/2p4N1/2r6/2B6/9/3A5/4A4/1C3K3",
       "style": "screen",
       "layout_type": "endgame"
@@ -164,8 +156,8 @@
     {
       "path": "evaluation/real_images/real_012_screen_endgame_red_bottom_02.png",
       "status": "NG",
-      "correct_cells": 77,
-      "fen": "5p3/9/1R7/3n5/9/9/9/4N4/3nCp3/9",
+      "correct_cells": 76,
+      "fen": "b4p3/4a4/1RR6/1n7/9/3b5/3a5/4n4/3CC4/3K5",
       "expected_fen": "3k1a3/4a4/9/9/9/9/9/3p5/4C4/3KCRR2",
       "style": "screen",
       "layout_type": "endgame"
@@ -173,8 +165,8 @@
     {
       "path": "evaluation/real_images/real_013_screen_endgame_red_bottom_03.png",
       "status": "NG",
-      "correct_cells": 83,
-      "fen": "n3k4/5R3/9/9/9/5R2P/4p4/4C4/4p2p1/5C3",
+      "correct_cells": 77,
+      "fen": "a1n1k1n2/R4R2b/a8/r8/b8/8P/4r4/4C4/4p2p1/5c3",
       "expected_fen": "4k4/C4R3/9/9/9/5R2P/4r4/4B3B/4p2r1/5K3",
       "style": "screen",
       "layout_type": "endgame"
@@ -200,26 +192,26 @@
     {
       "path": "evaluation/real_images/real_016_screen_endgame_red_top_02.png",
       "status": "NG",
-      "correct_cells": 85,
-      "fen": "9/4k4/9/9/9/9/8P/5A3/4A4/p3K4",
+      "correct_cells": 84,
+      "fen": "9/4k4/9/p8/8p/9/8p/5A3/4B4/b3P4",
       "expected_fen": "4k4/9/9/p8/8p/9/8P/5A3/4A4/r3K4",
       "style": "screen",
       "layout_type": "endgame"
     },
     {
       "path": "evaluation/real_images/real_017_wood_initial_red_top.jpg",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
+      "status": "NG",
+      "correct_cells": 43,
+      "fen": "4c2n1/1c2r1c2/3k1ab1c/7bb/n5K2/2P4b1/P8/1CP2RR1p/4NP3/4a3r",
       "expected_fen": "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR",
       "style": "wood",
       "layout_type": "initial"
     },
     {
       "path": "evaluation/real_images/real_018_plastic_empty_unknown.png",
-      "status": "OK",
-      "correct_cells": 90,
-      "fen": "9/9/9/9/9/9/9/9/9/9",
+      "status": "NG",
+      "correct_cells": 87,
+      "fen": "1bb6/9/9/9/5K3/9/9/9/9/9",
       "expected_fen": "9/9/9/9/9/9/9/9/9/9",
       "style": "plastic",
       "layout_type": "empty"

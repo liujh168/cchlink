@@ -9,6 +9,7 @@ from src.fen.rules import (
     BLACK_ELEPHANT_POINTS,
     RED_ADVISOR_POINTS,
     RED_ELEPHANT_POINTS,
+    RED_PALACE,
     detect_orientation,
     legalize_predictions_with_corrections,
     normalize_orientation,
@@ -46,6 +47,8 @@ STATIC_PRIOR_MIN_TARGET_RATIO = 0.35
 STATIC_PRIOR_MAX_PAWN_ON_MINOR_POINT_PROB = 0.45
 STATIC_PRIOR_MIN_MINOR_POINT_TARGET_PROB = 0.30
 STATIC_PRIOR_MIN_MINOR_POINT_TARGET_RATIO = 0.70
+SPARSE_ENDGAME_MAX_NON_EMPTY = 6
+SPARSE_ENDGAME_MAX_PALACE_CANNON_CONFIDENCE = 0.50
 
 
 def _fen_to_indices(fen: str) -> list[int]:
@@ -407,6 +410,49 @@ class Pipeline:
                 corrected_confidences[index] = target_probability
         return corrected, corrected_confidences, corrections
 
+    def _apply_sparse_endgame_identity_prior(
+        self,
+        predictions: list[int],
+        confidences: list[float],
+    ) -> tuple[list[int], list[float], list[Correction]]:
+        non_empty = sum(prediction != EMPTY_IDX for prediction in predictions)
+        if non_empty > SPARSE_ENDGAME_MAX_NON_EMPTY or 0 in predictions:
+            return predictions, confidences, []
+
+        candidates = []
+        for index, piece in enumerate(predictions):
+            row, col = divmod(index, COLS)
+            if 1 <= piece <= 6 and (row, col) in RED_PALACE:
+                score = 3 if (row, col) == (9, 4) else 2 if col == 4 else 1
+                candidates.append((score, index))
+        if not candidates:
+            return predictions, confidences, []
+
+        corrected = predictions.copy()
+        corrected_confidences = confidences.copy()
+        corrections = []
+        _, king_index = max(candidates)
+        row, col = divmod(king_index, COLS)
+        corrections.append(
+            Correction(row, col, corrected[king_index], 0, "稀疏残局缺少红帅位置先验")
+        )
+        corrected[king_index] = 0
+
+        if 4 not in corrected:
+            for index, piece in enumerate(corrected):
+                row, col = divmod(index, COLS)
+                if (
+                    piece == 5
+                    and (row, col) == (7, 4)
+                    and confidences[index] <= SPARSE_ENDGAME_MAX_PALACE_CANNON_CONFIDENCE
+                ):
+                    corrections.append(
+                        Correction(row, col, piece, 4, "稀疏残局九宫红炮马形近先验")
+                    )
+                    corrected[index] = 4
+                    break
+        return corrected, corrected_confidences, corrections
+
     def analyze(self, image: np.ndarray, debug_dir=None, visualize_dir=None) -> AnalysisResult:
         """返回完整结构化结果，并可选择保存本次识别的调试产物。"""
         detection, grid, board, cells = self._extract(image)
@@ -458,6 +504,11 @@ class Pipeline:
             confidences,
             static_position_corrections,
         ) = self._apply_static_position_probability_prior(predictions, confidences, probabilities)
+        (
+            predictions,
+            confidences,
+            sparse_endgame_corrections,
+        ) = self._apply_sparse_endgame_identity_prior(predictions, confidences)
         if self.apply_rules:
             final_predictions, rule_corrections = legalize_predictions_with_corrections(
                 predictions, confidences
@@ -467,6 +518,7 @@ class Pipeline:
                 + initial_corrections
                 + visual_initial_corrections
                 + static_position_corrections
+                + sparse_endgame_corrections
                 + rule_corrections
             )
         else:
@@ -476,6 +528,7 @@ class Pipeline:
                 + initial_corrections
                 + visual_initial_corrections
                 + static_position_corrections
+                + sparse_endgame_corrections
             )
         warnings = validate_position(final_predictions, orientation)
         low_confidence = [

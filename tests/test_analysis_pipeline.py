@@ -284,3 +284,45 @@ def test_static_position_prior_replaces_weak_pawn_on_elephant_point():
 
     assert corrected[index] == 9
     assert corrections
+
+
+def test_sparse_endgame_identity_prior_restores_missing_red_king_and_horse():
+    pipeline = Pipeline.__new__(Pipeline)
+    predictions = [EMPTY_IDX] * 90
+    confidences = [0.99] * 90
+    cannon_index = 7 * 9 + 4
+    king_index = 9 * 9 + 4
+    predictions[4] = 7
+    predictions[5] = 8
+    predictions[cannon_index] = 5
+    confidences[cannon_index] = 0.42
+    predictions[king_index] = 6
+    confidences[king_index] = 0.55
+
+    corrected, corrected_confidences, corrections = (
+        pipeline._apply_sparse_endgame_identity_prior(predictions, confidences)
+    )
+
+    assert corrected[king_index] == 0
+    assert corrected[cannon_index] == 4
+    assert corrected_confidences == confidences
+    assert [correction.reason for correction in corrections] == [
+        "稀疏残局缺少红帅位置先验",
+        "稀疏残局九宫红炮马形近先验",
+    ]
+
+
+def test_sparse_endgame_identity_prior_rejects_dense_boards():
+    pipeline = Pipeline.__new__(Pipeline)
+    predictions = [EMPTY_IDX] * 90
+    confidences = [0.40] * 90
+    for index in range(7):
+        predictions[index] = 5
+    predictions[9 * 9 + 4] = 6
+
+    corrected, _, corrections = pipeline._apply_sparse_endgame_identity_prior(
+        predictions, confidences
+    )
+
+    assert corrected == predictions
+    assert corrections == []

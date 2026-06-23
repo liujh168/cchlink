@@ -41,7 +41,7 @@ def test_standard_dataset_has_provenance_and_no_seed_leakage(tmp_path):
         "wood",
     }
     rows = list(csv.DictReader(open(dataset / "manifest.csv", encoding="utf-8")))
-    assert all(row["source"] == "standard-v8" for row in rows)
+    assert all(row["source"] == "standard-v9" for row in rows)
     assert all(row["scene_augmented"] == "true" for row in rows)
     assert all(row["patch_scale"] for row in rows)
     assert all(row["patch_shift_y"] for row in rows)
@@ -79,16 +79,16 @@ def test_dataset_audit_rejects_eval_seed_leakage(tmp_path):
         audit_dataset(dataset, eval_manifest)
 
 
-def test_v8_layout_cycle_matches_target_distribution():
+def test_v9_layout_cycle_matches_target_distribution():
     rng = random.Random(1234)
-    counts = Counter(choose_layout(index, rng)[1] for index in range(20))
+    counts = Counter(choose_layout(index, rng)[1] for index in range(25))
 
     assert counts == {
         "initial": 2,
         "empty": 2,
         "opening": 5,
         "midgame": 7,
-        "sparse_endgame": 4,
+        "sparse_endgame": 9,
     }
 
 

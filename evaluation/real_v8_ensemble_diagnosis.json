@@ -17,11 +17,11 @@
   "evaluated_boards": 18,
   "read_errors": 0,
   "rejected": 0,
-  "exact": 11,
-  "exact_rate": 0.6111111111111112,
+  "exact": 12,
+  "exact_rate": 0.6666666666666666,
   "total_cells": 1620,
-  "error_cells": 77,
-  "cell_accuracy": 0.9524691358024692,
+  "error_cells": 74,
+  "cell_accuracy": 0.9543209876543209,
   "by_style": {
     "plastic": {
       "boards": 3,
@@ -32,8 +32,8 @@
     "screen": {
       "boards": 7,
       "cells": 630,
-      "error_cells": 32,
-      "cell_accuracy": 0.9492063492063492
+      "error_cells": 31,
+      "cell_accuracy": 0.9507936507936507
     },
     "unknown": {
       "boards": 1,
@@ -44,8 +44,8 @@
     "wood": {
       "boards": 7,
       "cells": 630,
-      "error_cells": 17,
-      "cell_accuracy": 0.973015873015873
+      "error_cells": 15,
+      "cell_accuracy": 0.9761904761904762
     }
   },
   "by_layout_type": {
@@ -58,8 +58,8 @@
     "endgame": {
       "boards": 7,
       "cells": 630,
-      "error_cells": 34,
-      "cell_accuracy": 0.946031746031746
+      "error_cells": 31,
+      "cell_accuracy": 0.9507936507936507
     },
     "initial": {
       "boards": 8,
@@ -87,25 +87,25 @@
     "红炮": 7,
     "红相": 7,
     "空": 7,
-    "红帅": 5,
     "黑马": 4,
     "黑象": 4,
     "黑炮": 4,
     "红兵": 4,
     "红俥": 4,
     "黑将": 3,
-    "红马": 2,
+    "红帅": 3,
+    "红马": 1,
     "红仕": 1
   },
   "top_actual": {
     "空": 51,
     "黑卒": 6,
-    "红炮": 6,
+    "红炮": 5,
     "红俥": 3,
-    "红马": 3,
     "黑马": 3,
-    "红兵": 2,
+    "红马": 2,
     "黑象": 1,
+    "红兵": 1,
     "红相": 1,
     "黑将": 1
   },
@@ -128,40 +128,39 @@
     "红相->空": 2,
     "黑炮->黑卒": 1,
     "黑马->黑象": 1,
-    "红马->红炮": 1,
-    "红帅->红兵": 1
+    "红马->空": 1,
+    "红炮->红马": 1
   },
   "top_kinds": {
     "piece_to_empty": 51,
-    "piece_confusion": 19,
+    "piece_confusion": 16,
     "empty_to_piece": 7
   },
   "top_regions": {
-    "edge": 43,
+    "edge": 41,
     "center": 16,
-    "palace": 14,
+    "palace": 13,
     "river": 4
   },
   "top_region_kinds": {
     "edge:piece_to_empty": 32,
     "center:piece_to_empty": 10,
-    "edge:piece_confusion": 10,
+    "edge:piece_confusion": 8,
     "palace:piece_to_empty": 7,
     "center:piece_confusion": 4,
     "palace:empty_to_piece": 4,
-    "palace:piece_confusion": 3,
     "river:piece_confusion": 2,
     "river:piece_to_empty": 2,
+    "palace:piece_confusion": 2,
     "center:empty_to_piece": 2,
     "edge:empty_to_piece": 1
   },
   "top_cells": {
-    "r7_c4": 5,
+    "r7_c4": 4,
     "r0_c5": 3,
     "r2_c1": 3,
     "r3_c0": 3,
     "r9_c6": 3,
-    "r9_c4": 3,
     "r0_c3": 3,
     "r1_c4": 3,
     "r9_c5": 3,
@@ -175,7 +174,8 @@
     "r5_c2": 2,
     "r8_c3": 2,
     "r9_c1": 2,
-    "r9_c3": 2
+    "r9_c3": 2,
+    "r0_c6": 1
   },
   "board_errors": [
     {
@@ -336,38 +336,6 @@
           "actual": "C",
           "expected_name": "红相",
           "actual_name": "红炮",
-          "kind": "piece_confusion"
-        }
-      ]
-    },
-    {
-      "path": "evaluation/real_images/real_006_wood_endgame_red_bottom.jpg",
-      "style": "wood",
-      "layout_type": "endgame",
-      "orientation": "red_bottom",
-      "seed": "real_006_wood_endgame_red_bottom",
-      "expected_fen": "4ka3/9/9/9/9/9/9/4N4/9/4K4",
-      "actual_fen": "4ka3/9/9/9/9/9/9/4C4/9/4P4",
-      "error_count": 2,
-      "errors": [
-        {
-          "row": 7,
-          "col": 4,
-          "region": "palace",
-          "expected": "N",
-          "actual": "C",
-          "expected_name": "红马",
-          "actual_name": "红炮",
-          "kind": "piece_confusion"
-        },
-        {
-          "row": 9,
-          "col": 4,
-          "region": "edge",
-          "expected": "K",
-          "actual": "P",
-          "expected_name": "红帅",
-          "actual_name": "红兵",
           "kind": "piece_confusion"
         }
       ]
@@ -967,8 +935,8 @@
       "orientation": "red_top",
       "seed": "real_016_screen_endgame_red_top_02",
       "expected_fen": "4k4/9/9/p8/8p/9/8P/5A3/4A4/r3K4",
-      "actual_fen": "9/4k4/9/9/9/9/8P/5A3/4A4/p3N4",
-      "error_count": 6,
+      "actual_fen": "9/4k4/9/9/9/9/8P/5A3/4A4/p3K4",
+      "error_count": 5,
       "errors": [
         {
           "row": 0,
@@ -1018,16 +986,6 @@
           "actual": "p",
           "expected_name": "黑车",
           "actual_name": "黑卒",
-          "kind": "piece_confusion"
-        },
-        {
-          "row": 9,
-          "col": 4,
-          "region": "edge",
-          "expected": "K",
-          "actual": "N",
-          "expected_name": "红帅",
-          "actual_name": "红马",
           "kind": "piece_confusion"
         }
       ]

@@ -47,18 +47,18 @@ MANIFEST_FIELDS = [
     "patch_shift_x",
     "edge_augmented",
 ]
-GENERATOR_VERSION = "standard-v8"
+GENERATOR_VERSION = "standard-v9"
 STYLE_SEQUENCE = (
+    "screen",
     "cloth_red",
+    "screen",
     "plastic",
     "light_cloth",
     "screen",
-    "light_wood",
     "wood",
-    "classic",
-    "cloth_red",
+    "light_wood",
     "screen",
-    "plastic",
+    "classic",
 )
 STYLES = tuple(dict.fromkeys(STYLE_SEQUENCE))
 EDGE_ROWS = {0, 9}
@@ -194,13 +194,18 @@ def generate_sparse_endgame(rng: random.Random) -> list[list[str | None]]:
         candidates = _empty_positions_for_piece(layout, piece)
         if not candidates:
             continue
-        row, col = rng.choice(candidates)
+        biased = [
+            (row, col)
+            for row, col in candidates
+            if row in {0, 1, 8, 9} or col in {0, 8} or (3 <= col <= 5 and row in {0, 1, 7, 8, 9})
+        ]
+        row, col = rng.choice(biased if biased and rng.random() < 0.70 else candidates)
         layout[row][col] = piece
     return layout
 
 
 def choose_layout(board_index: int, rng: random.Random):
-    fraction = board_index % 20
+    fraction = board_index % 25
     if fraction < 2:
         return clone_layout(STANDARD_INITIAL_LAYOUT), "initial"
     if fraction < 4:
@@ -451,7 +456,7 @@ def generate_dataset(
 
 def main():
     parser = argparse.ArgumentParser(description="生成标准棋盘按完整棋盘分组的训练图块")
-    parser.add_argument("-o", "--output", default="data/pieces_grouped_v8", help="输出目录")
+    parser.add_argument("-o", "--output", default="data/pieces_grouped_v9", help="输出目录")
     parser.add_argument("-n", "--num-boards", type=int, default=3000, help="生成棋盘数量")
     parser.add_argument("--seed", type=int, default=42000, help="训练数据随机种子")
     parser.add_argument("--empty-keep-prob", type=float, default=0.18, help="空交点保留概率")
